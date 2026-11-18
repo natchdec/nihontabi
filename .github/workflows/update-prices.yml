@@ -42,7 +42,7 @@ jobs:
           if [ -z "$SA" ]; then echo "no FIREBASE_SERVICE_ACCOUNT secret, skip deploy"; exit 0; fi
           echo "$SA" > "$RUNNER_TEMP/sa.json"; export GOOGLE_APPLICATION_CREDENTIALS="$RUNNER_TEMP/sa.json"
           if [ "$TARGET" = "preview" ]; then
-            npx --yes firebase-tools hosting:channel:deploy pxtest --site nihontabi --expires 1d --project nihontabi-63523
+            npx --yes firebase-tools hosting:channel:deploy pxtest --only nihontabi --expires 1d --project nihontabi-63523
           else
             npx --yes firebase-tools deploy --only hosting --project nihontabi-63523
           fi
