@@ -1,0 +1,32 @@
+name: update-prices-and-deploy
+on:
+  schedule:
+    - cron: "0 1 * * *"   # 01:00 UTC = 08:00 Thailand, daily
+  workflow_dispatch: {}
+permissions:
+  contents: write
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20 }
+      - name: Fetch prices (skipped until TRAVELPAYOUTS_TOKEN secret exists)
+        env:
+          TRAVELPAYOUTS_TOKEN: ${{ secrets.TRAVELPAYOUTS_TOKEN }}
+        run: |
+          if [ -z "$TRAVELPAYOUTS_TOKEN" ]; then echo "no token, keeping existing data/px_summary.json"; else node scripts/update_prices.mjs; fi
+      - name: Commit changed price file (keeps repo active)
+        run: |
+          git config user.name "price-bot"; git config user.email "price-bot@users.noreply.github.com"
+          git add data/px_summary.json && (git diff --cached --quiet || git commit -m "update prices $(date -u +%F)") && git push || true
+      - name: Deploy to Firebase Hosting
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS_JSON: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        run: |
+          if [ -z "$GOOGLE_APPLICATION_CREDENTIALS_JSON" ]; then echo "no FIREBASE_SERVICE_ACCOUNT secret, skip deploy"; exit 0; fi
+          echo "$GOOGLE_APPLICATION_CREDENTIALS_JSON" > "$RUNNER_TEMP/sa.json"
+          GOOGLE_APPLICATION_CREDENTIALS="$RUNNER_TEMP/sa.json" npx --yes firebase-tools deploy --only hosting --project nihontabi-63523
+          rm -f "$RUNNER_TEMP/sa.json"

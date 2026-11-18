@@ -1,0 +1,605 @@
+[
+ {
+  "ids": [
+   "nikko",
+   "oku-nikko-yumoto",
+   "away-nikko",
+   "away-oku-nikko"
+  ],
+  "reason": "All cover Toshogu/Kegon Falls/Lake Chuzenji"
+ },
+ {
+  "ids": [
+   "morioka-hiraizumi",
+   "hiraizumi-geibikei",
+   "ichinoseki-geibikei",
+   "away-hiraizumi",
+   "away-ichinoseki"
+  ],
+  "reason": "Chusonji/Motsuji and Geibikei gorge repeated"
+ },
+ {
+  "ids": [
+   "sendai-matsushima",
+   "matsushima-shiogama",
+   "away-shiogama"
+  ],
+  "reason": "Matsushima bay cruise, Zuiganji, Shiogama"
+ },
+ {
+  "ids": [
+   "yamagata-yamadera-ginzan",
+   "yamadera-yamagata",
+   "away-ginzan-onsen",
+   "away-yamagata"
+  ],
+  "reason": "Yamadera, Ginzan Onsen, Yamagata Kajo Park"
+ },
+ {
+  "ids": [
+   "zao-juhyo",
+   "away-zao"
+  ],
+  "reason": "Zao snow monsters ropeway and onsen"
+ },
+ {
+  "ids": [
+   "kakunodate-tazawako",
+   "kakunodate",
+   "away-tazawa"
+  ],
+  "reason": "Kakunodate samurai district and Lake Tazawa"
+ },
+ {
+  "ids": [
+   "nyuto-onsen",
+   "away-nyuto"
+  ],
+  "reason": "Nyuto Onsen / Tsurunoyu"
+ },
+ {
+  "ids": [
+   "akita-city",
+   "kanto-akita",
+   "away-akita"
+  ],
+  "reason": "Akita city, Senshu Park/Kubota Castle"
+ },
+ {
+  "ids": [
+   "aomori-city",
+   "nebuta-aomori",
+   "away-aomori"
+  ],
+  "reason": "Aomori station area, A-Factory, Nebuta house"
+ },
+ {
+  "ids": [
+   "hirosaki",
+   "hirosaki-sakura",
+   "away-hirosaki"
+  ],
+  "reason": "Hirosaki Castle/Park"
+ },
+ {
+  "ids": [
+   "hachinohe",
+   "away-hachinohe"
+  ],
+  "reason": "Hachinohe markets and Tanesashi"
+ },
+ {
+  "ids": [
+   "goshogawara-stove-train",
+   "away-goshogawara"
+  ],
+  "reason": "Tachineputa and Tsugaru stove train"
+ },
+ {
+  "ids": [
+   "oga-peninsula",
+   "away-oga"
+  ],
+  "reason": "Oga Namahage peninsula"
+ },
+ {
+  "ids": [
+   "tono",
+   "away-tono"
+  ],
+  "reason": "Tono Furusato village and folklore sites"
+ },
+ {
+  "ids": [
+   "tsuruoka-haguro",
+   "away-tsuruoka"
+  ],
+  "reason": "Mt Haguro / Tsuruoka"
+ },
+ {
+  "ids": [
+   "hachimantai-appi",
+   "away-hachimantai"
+  ],
+  "reason": "Hachimantai area"
+ },
+ {
+  "ids": [
+   "fukushima-iizaka",
+   "away-fukushima"
+  ],
+  "reason": "Fukushima city / Iizaka area"
+ },
+ {
+  "ids": [
+   "aizu-wakamatsu-ouchijuku",
+   "away-aizu-wakamatsu"
+  ],
+  "reason": "Tsuruga Castle, Sazae-do"
+ },
+ {
+  "ids": [
+   "karuizawa",
+   "away-karuizawa"
+  ],
+  "reason": "Karuizawa outlets and Kyu-Karuizawa Ginza"
+ },
+ {
+  "ids": [
+   "gala-yuzawa",
+   "away-gala-yuzawa"
+  ],
+  "reason": "GALA Yuzawa ski resort"
+ },
+ {
+  "ids": [
+   "kusatsu",
+   "away-kusatsu"
+  ],
+  "reason": "Kusatsu Yubatake and Otaki-no-yu"
+ },
+ {
+  "ids": [
+   "nasu",
+   "away-nasu"
+  ],
+  "reason": "Nasu Yumoto and ropeway"
+ },
+ {
+  "ids": [
+   "ashikaga-sano-utsunomiya",
+   "away-ashikaga-sano",
+   "away-utsunomiya"
+  ],
+  "reason": "Ashikaga Flower Park, Sano outlets, Utsunomiya gyoza"
+ },
+ {
+  "ids": [
+   "mito-kairakuen",
+   "away-mito"
+  ],
+  "reason": "Mito Kairakuen"
+ },
+ {
+  "ids": [
+   "narita-san",
+   "away-narita"
+  ],
+  "reason": "Naritasan Shinshoji and Omotesando"
+ },
+ {
+  "ids": [
+   "kawagoe",
+   "away-kawagoe"
+  ],
+  "reason": "Kawagoe Kurazukuri, Toki no Kane, Kashiya Yokocho"
+ },
+ {
+  "ids": [
+   "kamakura-enoshima",
+   "kamakura-hydrangea-june",
+   "away-kamakura"
+  ],
+  "reason": "Kamakura Hase-dera, Great Buddha, Komachi-dori"
+ },
+ {
+  "ids": [
+   "yokohama",
+   "away-yokohama"
+  ],
+  "reason": "Minato Mirai, Red Brick, Chinatown"
+ },
+ {
+  "ids": [
+   "takao-okutama",
+   "away-takao"
+  ],
+  "reason": "Mt Takao and Yakuo-in"
+ },
+ {
+  "ids": [
+   "kinugawa-ikaho",
+   "away-kinugawa"
+  ],
+  "reason": "Kinugawa Onsen"
+ },
+ {
+  "ids": [
+   "minakami-tanigawa",
+   "away-minakami"
+  ],
+  "reason": "Tanigawadake ropeway, Minakami onsen"
+ },
+ {
+  "ids": [
+   "odawara-yugawara",
+   "away-odawara"
+  ],
+  "reason": "Odawara Castle and Suzuhiro"
+ },
+ {
+  "ids": [
+   "matsumoto-castle",
+   "away-matsumoto"
+  ],
+  "reason": "Matsumoto Castle and Nakamachi"
+ },
+ {
+  "ids": [
+   "boso-kamogawa",
+   "away-boso"
+  ],
+  "reason": "Boso: Nokogiriyama, Kamogawa"
+ },
+ {
+  "ids": [
+   "atami-izu",
+   "away-atami"
+  ],
+  "reason": "Atami Sun Beach, castle, Baien"
+ },
+ {
+  "ids": [
+   "izu-shuzenji-ito",
+   "away-ito"
+  ],
+  "reason": "Kawazu sakura, Jogasaki, Ito Onsen"
+ },
+ {
+  "ids": [
+   "mitaka-ghibli-inokashira",
+   "away-mitaka"
+  ],
+  "reason": "Ghibli Museum Mitaka and Inokashira"
+ },
+ {
+  "ids": [
+   "tachikawa-showa-kinen",
+   "away-showa-kinen"
+  ],
+  "reason": "Showa Kinen Park"
+ },
+ {
+  "ids": [
+   "niigata-city",
+   "away-niigata"
+  ],
+  "reason": "Niigata Ponshukan and seafood"
+ },
+ {
+  "ids": [
+   "nagano-zenkoji-obuse",
+   "away-nagano"
+  ],
+  "reason": "Zenkoji and Nakamise"
+ },
+ {
+  "ids": [
+   "hakodate",
+   "away-hakodate"
+  ],
+  "reason": "Hakodate morning market, Motomachi, night view"
+ },
+ {
+  "ids": [
+   "sendai-aoba-zuihoden",
+   "sendai-food-night",
+   "away-sendai"
+  ],
+  "reason": "Sendai city: Zuihoden, Ichibancho, gyutan"
+ },
+ {
+  "ids": [
+   "chichibu",
+   "chichibu-shibazakura"
+  ],
+  "reason": "Chichibu Shrine and Banba-dori; seasonal variants"
+ },
+ {
+  "ids": [
+   "kawaguchiko",
+   "fuji-5th-station-summer"
+  ],
+  "reason": "Kawaguchiko lakeside and Oishi Park"
+ },
+ {
+  "ids": [
+   "bunkyo-suidobashi",
+   "tokyo-city-rides"
+  ],
+  "reason": "Tokyo Dome City attractions and Spa LaQua"
+ },
+ {
+  "ids": [
+   "ueno-asakusa",
+   "tokyo-city-rides"
+  ],
+  "reason": "Sensoji/Nakamise and Hanayashiki in both"
+ },
+ {
+  "ids": [
+   "away-tokyo",
+   "shibuya-harajuku",
+   "ueno-asakusa",
+   "ginza-tsukiji-toyosu"
+  ],
+  "reason": "away-tokyo sampler repeats these Tokyo cores"
+ },
+ {
+  "ids": [
+   "ghibli-park-nagoya",
+   "ghibli-park"
+  ],
+  "reason": "Ghibli Park"
+ },
+ {
+  "ids": [
+   "kyoto-fushimi-uji",
+   "away-fushimi-uji",
+   "kyoto-mimuroto-ji-uji-hydrangea"
+  ],
+  "reason": "Fushimi Inari and Uji"
+ },
+ {
+  "ids": [
+   "kyoto-higashiyama-gion",
+   "kyoto-kamogawa-gion-matsuri"
+  ],
+  "reason": "Gion, Yasaka Shrine, Nishiki Market"
+ },
+ {
+  "ids": [
+   "away-kyoto",
+   "kyoto-arashiyama-kinkakuji",
+   "kyoto-higashiyama-gion",
+   "kyoto-fushimi-uji"
+  ],
+  "reason": "away-kyoto sampler repeats Kyoto core modules"
+ },
+ {
+  "ids": [
+   "osaka-castle-umeda",
+   "away-castle-umeda"
+  ],
+  "reason": "Osaka Castle and Umeda"
+ },
+ {
+  "ids": [
+   "osaka-namba-shinsekai",
+   "away-osaka"
+  ],
+  "reason": "Dotonbori and Kuromon"
+ },
+ {
+  "ids": [
+   "nara-todaiji-deer",
+   "away-nara"
+  ],
+  "reason": "Todaiji, deer park, Kasuga Taisha"
+ },
+ {
+  "ids": [
+   "himeji-castle",
+   "away-himeji"
+  ],
+  "reason": "Himeji Castle and Koko-en"
+ },
+ {
+  "ids": [
+   "hikone-biwako",
+   "away-hikone-biwako"
+  ],
+  "reason": "Hikone Castle and Genkyu-en"
+ },
+ {
+  "ids": [
+   "koyasan",
+   "away-koyasan"
+  ],
+  "reason": "Okunoin and Danjo Garan"
+ },
+ {
+  "ids": [
+   "amanohashidate",
+   "away-amanohashidate"
+  ],
+  "reason": "Amanohashidate viewpoints"
+ },
+ {
+  "ids": [
+   "kinosaki-onsen",
+   "away-kinosaki"
+  ],
+  "reason": "Kinosaki seven onsen"
+ },
+ {
+  "ids": [
+   "shirahama-wakayama",
+   "away-shirahama",
+   "away-wakayama"
+  ],
+  "reason": "Shirahama Sandanbeki and Wakayama Castle"
+ },
+ {
+  "ids": [
+   "okayama-kurashiki",
+   "away-okayama",
+   "away-kurashiki"
+  ],
+  "reason": "Korakuen and Kurashiki Bikan"
+ },
+ {
+  "ids": [
+   "kanazawa",
+   "away-kanazawa"
+  ],
+  "reason": "Kenrokuen, Higashi Chaya, Omicho"
+ },
+ {
+  "ids": [
+   "ise-jingu-ise-shima",
+   "ise-jingu-toba",
+   "away-ise-shima"
+  ],
+  "reason": "Ise Jingu Naiku/Geku and Okage Yokocho"
+ },
+ {
+  "ids": [
+   "hiroshima-miyajima",
+   "away-hiroshima",
+   "away-miyajima",
+   "away-hiroshima-miyajima"
+  ],
+  "reason": "Peace Park and Itsukushima"
+ },
+ {
+  "ids": [
+   "takayama",
+   "away-takayama"
+  ],
+  "reason": "Takayama Sanmachi and Jinya"
+ },
+ {
+  "ids": [
+   "shirakawago",
+   "away-shirakawa-go"
+  ],
+  "reason": "Shirakawa-go Ogimachi and Shiroyama"
+ },
+ {
+  "ids": [
+   "tateyama-kurobe",
+   "away-toyama"
+  ],
+  "reason": "Tateyama Kurobe Alpine Route"
+ },
+ {
+  "ids": [
+   "gifu-nagaragawa",
+   "gifu-ukai",
+   "away-gifu"
+  ],
+  "reason": "Gifu Castle/Kinkazan and Nagara ukai"
+ },
+ {
+  "ids": [
+   "nagoya-castle-atsuta",
+   "nagoya-sakae-osu",
+   "away-nagoya"
+  ],
+  "reason": "Nagoya Castle, Atsuta, Osu"
+ },
+ {
+  "ids": [
+   "away-hakata",
+   "tenjin-ohori-castle"
+  ],
+  "reason": "Fukuoka city core: Tenjin, Nakasu"
+ },
+ {
+  "ids": [
+   "beppu-yufuin",
+   "away-beppu"
+  ],
+  "reason": "Beppu hells and Takegawara"
+ },
+ {
+  "ids": [
+   "kumamoto-castle-aso",
+   "away-kumamoto"
+  ],
+  "reason": "Kumamoto Castle, Suizenji, Shimotori"
+ },
+ {
+  "ids": [
+   "aso-kusasenri-summer",
+   "away-aso"
+  ],
+  "reason": "Aso Nakadake, Kusasenri, Daikanbo"
+ },
+ {
+  "ids": [
+   "itoshima-beach-summer",
+   "away-itoshima"
+  ],
+  "reason": "Itoshima Futamigaura"
+ },
+ {
+  "ids": [
+   "hita-ukai-gion",
+   "away-hita"
+  ],
+  "reason": "Hita Mameda-machi and ukai"
+ },
+ {
+  "ids": [
+   "karatsu-yobuko",
+   "karatsu-kunchi"
+  ],
+  "reason": "Karatsu town and castle"
+ },
+ {
+  "ids": [
+   "arita-saga",
+   "takeo-ureshino-autumn"
+  ],
+  "reason": "Both include Takeo Onsen"
+ },
+ {
+  "ids": [
+   "away-hitoyoshi",
+   "away-yatsushiro"
+  ],
+  "reason": "Both centre on Hitoyoshi/Kuma River"
+ },
+ {
+  "ids": [
+   "away-kagoshima",
+   "away-sakurajima",
+   "away-ibusuki"
+  ],
+  "reason": "Kagoshima sampler includes Sakurajima/Ibusuki"
+ },
+ {
+  "ids": [
+   "sapporo-sakura-hokkaido-shrine",
+   "sapporo-summer-beer-moiwa",
+   "sapporo-autumn-fest-hokudai"
+  ],
+  "reason": "Hokkaido Jingu, Maruyama, Odori; seasonal variants"
+ },
+ {
+  "ids": [
+   "furano-biei-winter",
+   "furano-biei-summer"
+  ],
+  "reason": "Biei Patchwork Road and Blue Pond; seasonal variants"
+ },
+ {
+  "ids": [
+   "lake-toya",
+   "toya-fireworks-summer"
+  ],
+  "reason": "Toyako Onsen, Mt Usu, lake cruise"
+ }
+]

@@ -1,0 +1,63 @@
+{
+  "hosting": [
+    {
+      "site": "nihontabi",
+      "public": ".",
+      "ignore": [
+        "firebase.json",
+        "**/.*",
+        "**/node_modules/**",
+        "redirect/**",
+        ".firebaserc",
+        "firestore.rules",
+        "redirect/**",
+        "scripts/**",
+        "README.md",
+        ".github/**"
+      ],
+      "headers": [
+        {
+          "source": "/index.html",
+          "headers": [
+            {
+              "key": "Cache-Control",
+              "value": "no-cache"
+            }
+          ]
+        },
+        {
+          "source": "/data/**",
+          "headers": [
+            {
+              "key": "Cache-Control",
+              "value": "public, max-age=86400"
+            }
+          ]
+        },
+        {
+          "source": "/img/**",
+          "headers": [
+            {
+              "key": "Cache-Control",
+              "value": "public, max-age=2592000"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "site": "nihontabi-63523",
+      "public": "redirect",
+      "redirects": [
+        {
+          "source": "**",
+          "destination": "https://nihontabi.web.app",
+          "type": 301
+        }
+      ]
+    }
+  ],
+  "firestore": {
+    "rules": "firestore.rules"
+  }
+}

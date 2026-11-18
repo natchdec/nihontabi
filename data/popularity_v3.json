@@ -1,0 +1,410 @@
+{
+  "akashi-maiko": {
+    "p": 2,
+    "why": "Castle and fish market; mostly domestic weekend trip"
+  },
+  "daigoji-yamashina": {
+    "p": 3,
+    "why": "Daigoji sakura and UNESCO temple; second-tier Kyoto"
+  },
+  "fukui": {
+    "p": 2,
+    "why": "Eiheiji and Tojinbo; niche for foreign visitors"
+  },
+  "hasedera-muroji": {
+    "p": 3,
+    "why": "Hasedera seasonal flowers; common Nara-area add-on"
+  },
+  "hieizan-enryakuji-sakamoto": {
+    "p": 3,
+    "why": "Enryakuji UNESCO temple; moderate foreign traffic"
+  },
+  "horyuji-ikaruga": {
+    "p": 3,
+    "why": "Oldest wooden temple; common Nara add-on"
+  },
+  "hozugawa-sagano-kameoka": {
+    "p": 4,
+    "why": "Hozugawa boat and Torokko train; popular Kyoto add-on"
+  },
+  "iga-ueno-ninja": {
+    "p": 3,
+    "why": "Ninja museum and show; fun but second-tier"
+  },
+  "kobe-rokko-nunobiki": {
+    "p": 3,
+    "why": "Nunobiki ropeway and herb garden; secondary Kobe"
+  },
+  "minoo-falls": {
+    "p": 3,
+    "why": "Autumn maple falls near Osaka; known with Japanese crowds"
+  },
+  "nabana-no-sato": {
+    "p": 3,
+    "why": "Winter illumination popular with Asian visitors"
+  },
+  "nagahama-chikubushima": {
+    "p": 2,
+    "why": "Lake Biwa old town; mostly domestic"
+  },
+  "nagoya": {
+    "p": 3,
+    "why": "Major city with castle and food; modest draw"
+  },
+  "ohara-sanzen-in": {
+    "p": 3,
+    "why": "Moss gardens and Sanzen-in; second-tier Kyoto"
+  },
+  "osaka-bay-kaiyukan": {
+    "p": 4,
+    "why": "Kaiyukan aquarium and Tempozan wheel; very popular family stop"
+  },
+  "sakai-daisen-kofun": {
+    "p": 2,
+    "why": "Huge tomb; niche for foreign visitors"
+  },
+  "takamatsu": {
+    "p": 2,
+    "why": "Ritsurin Garden and udon; remote for most"
+  },
+  "tennoji-abeno-sumiyoshi": {
+    "p": 3,
+    "why": "Harukas observatory and Sumiyoshi shrine; moderate draw"
+  },
+  "toyama": {
+    "p": 3,
+    "why": "Alpine Route gateway and Fugan canal; moderate"
+  },
+  "yoshino": {
+    "p": 2,
+    "why": "Famed cherry mountain but mostly domestic"
+  },
+  "akiu-onsen": {
+    "p": 2,
+    "why": "Akiu falls and onsen; mostly domestic"
+  },
+  "ashikaga-sano": {
+    "p": 3,
+    "why": "Ashikaga wisteria and illumination; Thai tour favourite"
+  },
+  "fukushima": {
+    "p": 1,
+    "why": "City sights; rarely visited by foreigners"
+  },
+  "funaoka-sakura": {
+    "p": 2,
+    "why": "Local castle ruin sakura park; niche"
+  },
+  "ginzan-onsen": {
+    "p": 4,
+    "why": "Snowy gaslight onsen street; hugely popular with Thais"
+  },
+  "hachimantai": {
+    "p": 2,
+    "why": "Plateau drive and Dragon Eye; niche"
+  },
+  "hakodate": {
+    "p": 4,
+    "why": "Night view and morning market; popular"
+  },
+  "ishinomaki-tashirojima": {
+    "p": 2,
+    "why": "Cat island; niche for foreigners"
+  },
+  "karuizawa": {
+    "p": 4,
+    "why": "Outlets and resort town popular with Thais"
+  },
+  "kinkasan": {
+    "p": 1,
+    "why": "Remote island with deer; rarely visited"
+  },
+  "kinugawa": {
+    "p": 3,
+    "why": "Onsen resort and Edo Wonderland; moderate"
+  },
+  "kitakami": {
+    "p": 2,
+    "why": "Sakura riverside park; mostly domestic"
+  },
+  "morioka": {
+    "p": 2,
+    "why": "Wanko soba and castle park; few tourists"
+  },
+  "nagano": {
+    "p": 3,
+    "why": "Zenkoji and Togakushi; moderate foreign traffic"
+  },
+  "nikko": {
+    "p": 4,
+    "why": "UNESCO shrines; major Tokyo daytrip"
+  },
+  "nyuto": {
+    "p": 3,
+    "why": "Tsurunoyu snow onsen famous on social media"
+  },
+  "oku-nikko": {
+    "p": 3,
+    "why": "Chuzenji lake and Kegon falls; second to core Nikko"
+  },
+  "sakunami-nikka": {
+    "p": 2,
+    "why": "Onsen and whisky distillery; niche"
+  },
+  "sendai-starlight": {
+    "p": 3,
+    "why": "Big winter illumination; seasonal Tohoku draw"
+  },
+  "soma-nomaoi": {
+    "p": 2,
+    "why": "Samurai horse festival; niche"
+  },
+  "tazawa": {
+    "p": 2,
+    "why": "Deep lake and Tatsuko statue; niche"
+  },
+  "tokyo": {
+    "p": 5,
+    "why": "Capital highlights; core Japan itinerary"
+  },
+  "tsuruoka": {
+    "p": 2,
+    "why": "Sacred Mt Haguro stairs; niche pilgrimage"
+  },
+  "urabandai-goshikinuma": {
+    "p": 2,
+    "why": "Blue ponds and highland; mostly domestic"
+  },
+  "castle-umeda": {
+    "p": 5,
+    "why": "Osaka Castle and Umeda Sky; standard Osaka stop"
+  },
+  "fushimi-uji": {
+    "p": 5,
+    "why": "Fushimi Inari torii gates; icon Kyoto"
+  },
+  "gamagori": {
+    "p": 2,
+    "why": "Mikawa island shrine and onsen; niche"
+  },
+  "gero-onsen": {
+    "p": 3,
+    "why": "One of Japan's famous three onsen towns"
+  },
+  "hamamatsu": {
+    "p": 2,
+    "why": "Castle and Lake Hamana eel; secondary"
+  },
+  "himeji": {
+    "p": 4,
+    "why": "Japan's most famous original castle"
+  },
+  "iga-ueno": {
+    "p": 3,
+    "why": "Ninja town with show and castle; moderate"
+  },
+  "kinosaki": {
+    "p": 3,
+    "why": "Charming onsen town; growing popularity"
+  },
+  "kobe": {
+    "p": 4,
+    "why": "Kitano houses and Harborland; very common Kansai trip"
+  },
+  "koyasan": {
+    "p": 3,
+    "why": "Temple stay and Okunoin; second-tier"
+  },
+  "kyoto-arashiyama": {
+    "p": 5,
+    "why": "Bamboo grove and Tenryuji; icon Kyoto"
+  },
+  "kyoto": {
+    "p": 5,
+    "why": "Kiyomizu-dera and Gion; icon Kyoto"
+  },
+  "matsumoto": {
+    "p": 3,
+    "why": "National-treasure castle; common Alps stopover"
+  },
+  "nara": {
+    "p": 5,
+    "why": "Deer park and Great Buddha; icon"
+  },
+  "narai-juku": {
+    "p": 3,
+    "why": "Nakasendo post town; Westerner-favoured trail"
+  },
+  "ogaki-suimon": {
+    "p": 2,
+    "why": "Water town boat ride; niche"
+  },
+  "okazaki": {
+    "p": 2,
+    "why": "Ieyasu birthplace castle; modest draw"
+  },
+  "osaka": {
+    "p": 5,
+    "why": "Dotonbori, Kuromon and Shinsekai; icon Osaka"
+  },
+  "shizuoka-nihondaira": {
+    "p": 2,
+    "why": "Fuji view and Toshogu shrine; secondary"
+  },
+  "tokoname-seto": {
+    "p": 2,
+    "why": "Ceramic town and kilns; niche"
+  },
+  "ainoshima": {
+    "p": 3,
+    "why": "Cat island popular on social media"
+  },
+  "hakata-old-town": {
+    "p": 4,
+    "why": "Fukuoka old town, yatai and temples; standard"
+  },
+  "hiroshima-miyajima": {
+    "p": 5,
+    "why": "Peace Park and floating torii; icon"
+  },
+  "hiroshima": {
+    "p": 4,
+    "why": "Peace Memorial major stop"
+  },
+  "kagoshima": {
+    "p": 3,
+    "why": "Sakurajima city; far for most"
+  },
+  "kawachi-fuji": {
+    "p": 4,
+    "why": "Wisteria tunnel very popular on social media"
+  },
+  "kurume": {
+    "p": 1,
+    "why": "Ramen origin town; rarely visited"
+  },
+  "munakata-taisha": {
+    "p": 2,
+    "why": "Sacred shrine island; niche"
+  },
+  "nanzoin-sasaguri": {
+    "p": 3,
+    "why": "Giant reclining Buddha; photogenic but far"
+  },
+  "sakurajima": {
+    "p": 3,
+    "why": "Active volcano; Kagoshima highlight"
+  },
+  "sasebo-kujukushima": {
+    "p": 2,
+    "why": "Island cruise; niche"
+  },
+  "shikanoshima": {
+    "p": 2,
+    "why": "Sea shrine island; mostly local"
+  },
+  "shimonoseki": {
+    "p": 2,
+    "why": "Fugu and Karato market; secondary"
+  },
+  "uminonakamichi": {
+    "p": 2,
+    "why": "Seaside park; mostly local"
+  },
+  "yamaga": {
+    "p": 2,
+    "why": "Lantern town and theatre; niche"
+  },
+  "yame-hoshino": {
+    "p": 2,
+    "why": "Tea farms and old town; niche"
+  },
+  "yoshinogari": {
+    "p": 2,
+    "why": "Yayoi village replica; niche"
+  },
+  "yutoku-inari": {
+    "p": 3,
+    "why": "Red gate shrine; moderate"
+  },
+  "date-bear-park-noboribetsu": {
+    "p": 3,
+    "why": "Edo village and bear park; moderate"
+  },
+  "ishikari-hamamasu": {
+    "p": 2,
+    "why": "Lighthouse and salmon hotpot; niche"
+  },
+  "kiroro-akaigawa": {
+    "p": 2,
+    "why": "Ski area mainly for skiers"
+  },
+  "kitahiroshima-escon-field": {
+    "p": 2,
+    "why": "Baseball park; mostly domestic"
+  },
+  "kyogoku-fukidashi-yotei": {
+    "p": 2,
+    "why": "Spring water and Yotei view; niche"
+  },
+  "muroran-chikyu-misaki": {
+    "p": 2,
+    "why": "Industrial night view; niche"
+  },
+  "niseko-winter-ski": {
+    "p": 5,
+    "why": "Top powder snow destination; icon winter trip"
+  },
+  "obihiro": {
+    "p": 2,
+    "why": "Sweets town and pork bowl; secondary"
+  },
+  "rusutsu-resort": {
+    "p": 3,
+    "why": "Powder ski and summer park; moderate"
+  },
+  "sapporo-hitsujigaoka-dome": {
+    "p": 3,
+    "why": "Clark statue and sheep hill; common Sapporo stop"
+  },
+  "sapporo-maruyama-zoo-okurayama": {
+    "p": 3,
+    "why": "Zoo and ski jump views; common Sapporo stop"
+  },
+  "sapporo-teine": {
+    "p": 2,
+    "why": "Olympic ski hill; skiers mainly"
+  },
+  "sapporo-yosakoi-lilac": {
+    "p": 3,
+    "why": "Summer festival; seasonal Sapporo draw"
+  },
+  "shakotan-kamui": {
+    "p": 3,
+    "why": "Shakotan blue coast; far but photogenic"
+  },
+  "shikotsu-tarumae-summer": {
+    "p": 2,
+    "why": "Lake canoe and volcano; niche"
+  },
+  "shiraoi": {
+    "p": 2,
+    "why": "Ainu museum Upopoy; modest draw"
+  },
+  "shiroi-koibito-park": {
+    "p": 3,
+    "why": "Chocolate park and winter lights; known"
+  },
+  "sounkyo-gorge": {
+    "p": 3,
+    "why": "Ice falls and autumn gorge; moderate"
+  },
+  "takino-suzuran-hillside": {
+    "p": 2,
+    "why": "Flower hillside; niche"
+  },
+  "tomamu": {
+    "p": 3,
+    "why": "Unkai terrace and Ice Village; moderate"
+  }
+}
