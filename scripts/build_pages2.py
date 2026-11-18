@@ -87,9 +87,10 @@ for p in PASSCAT:
         faq.append((f"{name} ใช้ได้กี่วัน?", str(p["v"])))
     if p.get("buy"):
         faq.append((f"ซื้อ {name} ได้ที่ไหน?", first_sent(p["buy"], 400)))
+    note_c = re.sub(r"^active[;:,]?\s*", "", str(p.get("note", "")), flags=re.I)
     body = (f'<p class="m"><a href="/">Nihontabi</a> › <a href="/guide/">คู่มือ</a> › <a href="/guide/pass/">Pass</a></p><h1>{E(name)}</h1><p class="m">ผู้ให้บริการ: {E(p.get("op", ""))}'
             + (f' · เมืองฐานที่เกี่ยวข้อง: {E(", ".join(hubs))}' if hubs else "") + "</p>"
-            + (f'<p>{E(re.sub(r"^active[;:,]?\s*", "", str(p.get("note", "")), flags=re.I))}</p>' if re.sub(r"^active[;:,]?\s*", "", str(p.get("note", "")), flags=re.I) else "")
+            + (f'<p>{E(note_c)}</p>' if note_c else "")
             + (f"<h2>ระยะเวลาใช้งาน</h2><p>{E(p['v'])}</p>" if p.get("v") else "")
             + (f'<h2>ราคา (เยน)</h2><table><tr><th>รายการ</th><th>ผู้ใหญ่</th><th>เด็ก</th></tr>{rows}</table>' if rows else "")
             + (f'<h2>ข้อจำกัด / ใช้ไม่ได้</h2><p>{E(p["ex"])}</p>' if p.get("ex") else "")
