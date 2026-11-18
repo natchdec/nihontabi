@@ -1,0 +1,19 @@
+# Nihontabi
+> Thai-language Japan trip planner. Stay in one hub city and make day trips all year round. Covers 6 hubs (Tokyo/Ueno, Osaka/Namba, Sendai, Nagoya, Fukuoka/Hakata, Sapporo) with routes, fares, passes, best months and estimated flight prices from Bangkok.
+
+Facts are compiled from official sites and travel sites (data as of 2026-11-18); prices and hours change, so verify with the provider before travel. Flight prices are sampled estimates, not live fares.
+
+## Guides
+- [โตเกียว (ฐาน Ueno)](https://nihontabi.web.app/guide/tokyo/): 26 places reachable as day trips, routes, fares, best months
+- [โอซาก้า (ฐาน Namba)](https://nihontabi.web.app/guide/osaka/): 114 places reachable as day trips, routes, fares, best months
+- [เซนได (ฐาน Sendai Station)](https://nihontabi.web.app/guide/sendai/): 107 places reachable as day trips, routes, fares, best months
+- [นาโกย่า (ฐาน Nagoya Station)](https://nihontabi.web.app/guide/nagoya/): 96 places reachable as day trips, routes, fares, best months
+- [ฟุกุโอกะ (ฐาน Hakata)](https://nihontabi.web.app/guide/fukuoka/): 108 places reachable as day trips, routes, fares, best months
+- [ซัปโปโร (ฐาน Sapporo Station)](https://nihontabi.web.app/guide/sapporo/): 103 places reachable as day trips, routes, fares, best months
+- [Guide index](https://nihontabi.web.app/guide/)
+
+## App
+- [Interactive planner](https://nihontabi.web.app/): choose month, trip length (3-15 days) and passes; plans and maps. Thai UI.
+
+## Policy
+- [Privacy](https://nihontabi.web.app/privacy.html)
