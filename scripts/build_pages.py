@@ -16,14 +16,14 @@ def E(s):
 CSS = ":root{color-scheme:light dark;--bg:#fff;--fg:#1d2330;--mut:#5b6475;--ac:#c0392b;--bd:#e4e7ee}@media(prefers-color-scheme:dark){:root{--bg:#12151c;--fg:#e8ebf2;--mut:#9aa3b5;--ac:#ff7a6b;--bd:#2a3040}}body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.75 system-ui,'Noto Sans Thai',sans-serif}main{max-width:820px;margin:0 auto;padding:20px 16px 64px}a{color:var(--ac)}h1{font-size:26px;line-height:1.3}h2{font-size:19px;margin-top:30px;border-bottom:1px solid var(--bd);padding-bottom:6px}table{border-collapse:collapse;width:100%;font-size:14.5px}td,th{border-bottom:1px solid var(--bd);padding:6px 8px;text-align:left}.m{color:var(--mut);font-size:14px}.cta{display:inline-block;margin:10px 0;padding:10px 16px;border-radius:12px;background:var(--ac);color:#fff;text-decoration:none;font-weight:600}.tag{display:inline-block;margin:2px 4px 2px 0;padding:1px 9px;border:1px solid var(--bd);border-radius:99px;font-size:13px}ul.l{padding-left:20px}"
 
 
-def page(title, desc, canon, body, ld):
+def page(title, desc, canon, body, ld, img="default"):
     return ('<!doctype html><html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">'
             f'<title>{E(title)}</title><meta name="description" content="{E(desc)}"><link rel="canonical" href="{canon}">'
             f'<meta property="og:type" content="article"><meta property="og:title" content="{E(title)}"><meta property="og:description" content="{E(desc)}">'
-            f'<meta property="og:url" content="{canon}"><meta property="og:locale" content="th_TH"><meta name="twitter:card" content="summary">'
+            f'<meta property="og:url" content="{canon}"><meta property="og:locale" content="th_TH"><meta property="og:image" content="{SITE}/og/{img}.jpg"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:image" content="{SITE}/og/{img}.jpg">'
             f'<style>{CSS}</style><script type="application/ld+json">{json.dumps(ld, ensure_ascii=False)}</script></head><body><main>{body}<hr>'
             f'<p class="m">ข้อมูลรวบรวม ณ {UPDATED} จากแหล่งทางการและเว็บท่องเที่ยว ราคา เวลาเปิด-ปิด และเงื่อนไขอาจเปลี่ยน ตรวจกับผู้ให้บริการก่อนเดินทางทุกครั้ง · '
-            '<a href="/privacy.html">นโยบายความเป็นส่วนตัว</a></p></main></body></html>')
+            '<a href="/privacy.html">นโยบายความเป็นส่วนตัว</a></p></main><script src="/analytics.js" defer></script></body></html>')
 
 
 def first_sent(s, n=160):
@@ -45,7 +45,7 @@ for hub, (th, en, base) in HUBS.items():
     H = json.load(open(f"data/hub_{hub}.json", encoding="utf8"))["hub"]
     d = f"guide/{hub}"
     shutil.rmtree(d, ignore_errors=True)
-    os.makedirs(d)
+    os.makedirs(d, exist_ok=True)
     mods = [m for m in H["mods"] if m.get("kind") not in ("arrival", "departure") and re.fullmatch(r"[a-z0-9][a-z0-9\-_]*", str(m.get("id", "")))]
     items = []
     for m in mods:
@@ -70,7 +70,7 @@ for hub, (th, en, base) in HUBS.items():
         body = (f'<p class="m"><a href="/">Nihontabi</a> › <a href="/guide/">คู่มือ</a> › <a href="/guide/{hub}/">{E(th)}</a></p><h1>{E(title)}</h1>'
                 + (f'<p class="m">{E(m.get("jp", ""))} · {E(m.get("region", ""))}</p>' if m.get("jp") or m.get("region") else "")
                 + "".join(f'<span class="tag">{E(t)}</span>' for t in themes)
-                + f'<p>{E(m.get("pitch", ""))}</p><p><a class="cta" href="/">เปิดแอปวางแผน {E(th)} →</a></p>')
+                + f'<p>{E(m.get("pitch", ""))}</p><p><a class="cta" href="/?hub={hub}">เปิดแอปวางแผน {E(th)} →</a></p>')
         if mn:
             body += f'<h2>เดินทางจาก{E(th)} ({E(base)})</h2><p>ประมาณ <b>{mn} นาที</b>ต่อเที่ยว · เปลี่ยนสาย {fh.get("transfers", 0)} ครั้ง</p><p>{E(fh.get("route", ""))}</p>'
             if fh.get("returnBy"):
@@ -99,7 +99,7 @@ for hub, (th, en, base) in HUBS.items():
                   {"@type": "ListItem", "position": 3, "name": short}]}]
         if faq:
             ld.append({"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": q, "acceptedAnswer": {"@type": "Answer", "text": a}} for q, a in faq]})
-        open(f"{d}/{m['id']}.html", "w", encoding="utf8").write(page(f"{short} – เที่ยวจาก{th} | Nihontabi", first_sent(m.get("pitch"), 150), f"{SITE}/guide/{hub}/{m['id']}.html", body, ld))
+        open(f"{d}/{m['id']}.html", "w", encoding="utf8").write(page(f"{short} – เที่ยวจาก{th} | Nihontabi", first_sent(m.get("pitch"), 150), f"{SITE}/guide/{hub}/{m['id']}.html", body, ld, hub))
         urls.append(f"{SITE}/guide/{hub}/{m['id']}.html")
         items.append((short, m["id"], mn, first_sent(m.get("pitch"), 130)))
         total += 1
@@ -117,11 +117,11 @@ for hub, (th, en, base) in HUBS.items():
         f'<li><a href="/guide/{hub}/{i}.html">{E(s)}</a>' + (f' <span class="m">({mn} นาที)</span>' if mn else "") + f'<br><span class="m">{E(p)}</span></li>' for s, i, mn, p in items) + "</ul>"
     body = (f'<p class="m"><a href="/">Nihontabi</a> › <a href="/guide/">คู่มือ</a></p><h1>เที่ยวญี่ปุ่นจาก{E(th)} ({E(base)}) : ที่เที่ยว แพลน และราคา</h1>'
             f'<p>นอนที่{E(th)}ที่เดียว แล้วเที่ยวไป-กลับตลอดปี รวม {len(items)} จุดหมายพร้อมวิธีเดินทาง เวลา ค่าเดินทาง และเดือนที่เหมาะ</p>'
-            f'<p><a class="cta" href="/">เปิดแอปวางแผน (เลือกเดือน จำนวนวัน และพาส) →</a></p>{pl}{pr}{lst}')
+            f'<p><a class="cta" href="/?hub={hub}">เปิดแอปวางแผน (เลือกเดือน จำนวนวัน และพาส) →</a></p>{pl}{pr}{lst}')
     ld = [{"@context": "https://schema.org", "@type": "CollectionPage", "name": f"เที่ยวญี่ปุ่นจาก{th}", "inLanguage": "th", "url": f"{SITE}/guide/{hub}/",
            "mainEntity": {"@type": "ItemList", "itemListElement": [{"@type": "ListItem", "position": n + 1, "name": s, "url": f"{SITE}/guide/{hub}/{i}.html"} for n, (s, i, _, _) in enumerate(items)]}}]
     open(f"{d}/index.html", "w", encoding="utf8").write(page(f"เที่ยวญี่ปุ่นจาก{th}: {len(items)} ที่เที่ยวไป-กลับ แพลน และราคา | Nihontabi",
-                                                           f"รวมที่เที่ยวที่ไปเช้า-เย็นกลับจาก{th} พร้อมวิธีเดินทาง ค่าเดินทาง เดือนที่เหมาะ และราคาตั๋วบินโดยประมาณ", f"{SITE}/guide/{hub}/", body, ld))
+                                                           f"รวมที่เที่ยวที่ไปเช้า-เย็นกลับจาก{th} พร้อมวิธีเดินทาง ค่าเดินทาง เดือนที่เหมาะ และราคาตั๋วบินโดยประมาณ", f"{SITE}/guide/{hub}/", body, ld, hub))
     urls.append(f"{SITE}/guide/{hub}/")
     hub_links.append((hub, th, len(items)))
     llm.append(f"- [{th} ({base})]({SITE}/guide/{hub}/): {len(items)} places reachable as day trips, routes, fares, best months")
