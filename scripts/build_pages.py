@@ -126,10 +126,11 @@ for hub, (th, en, base) in HUBS.items():
     hub_links.append((hub, th, len(items)))
     llm.append(f"- [{th} ({base})]({SITE}/guide/{hub}/): {len(items)} places reachable as day trips, routes, fares, best months")
 
+exec(open("scripts/build_pages2.py", encoding="utf8").read())
 idx = "".join(f'<li><a href="/guide/{h}/">เที่ยวจาก{E(t)}</a> <span class="m">({n} จุดหมาย)</span></li>' for h, t, n in hub_links)
 open("guide/index.html", "w", encoding="utf8").write(page("คู่มือเที่ยวญี่ปุ่นรายเมือง | Nihontabi",
     "รวมคู่มือที่เที่ยวญี่ปุ่นแบบนอนเมืองเดียวแล้วเที่ยวไป-กลับ 6 เมืองฐาน: Tokyo, Osaka, Sendai, Nagoya, Fukuoka, Sapporo", SITE + "/guide/",
-    f'<h1>คู่มือเที่ยวญี่ปุ่นรายเมืองฐาน</h1><ul class=l>{idx}</ul><p><a class="cta" href="/">เปิดแอปวางแผน →</a></p>',
+    f'<h1>คู่มือเที่ยวญี่ปุ่นรายเมืองฐาน</h1><h2>รายเมืองฐาน</h2><ul class=l>{idx}</ul>{EXTRA_INDEX}<p><a class="cta" href="/">เปิดแอปวางแผน →</a></p>',
     {"@context": "https://schema.org", "@type": "CollectionPage", "name": "คู่มือเที่ยวญี่ปุ่นรายเมืองฐาน", "inLanguage": "th", "url": SITE + "/guide/"}))
 today = datetime.date.today().isoformat()
 open("sitemap.xml", "w", encoding="utf8").write('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
@@ -142,6 +143,7 @@ Facts are compiled from official sites and travel sites (data as of {UPDATED}); 
 
 ## Guides
 {NL.join(llm)}
+{NL.join(extra_llm)}
 - [Guide index]({SITE}/guide/)
 
 ## App

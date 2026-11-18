@@ -10,6 +10,9 @@ Facts are compiled from official sites and travel sites (data as of 2026-11-18);
 - [นาโกย่า (ฐาน Nagoya Station)](https://nihontabi.web.app/guide/nagoya/): 96 places reachable as day trips, routes, fares, best months
 - [ฟุกุโอกะ (ฐาน Hakata)](https://nihontabi.web.app/guide/fukuoka/): 108 places reachable as day trips, routes, fares, best months
 - [ซัปโปโร (ฐาน Sapporo Station)](https://nihontabi.web.app/guide/sapporo/): 103 places reachable as day trips, routes, fares, best months
+- [Month guides](https://nihontabi.web.app/guide/month/jan.html): best places by month (jan..dec)
+- [Theme guides](https://nihontabi.web.app/guide/theme/food.html): places by theme (food, onsen, snow, sakura, anime, ...)
+- [Pass guides](https://nihontabi.web.app/guide/pass/): 83 active travel passes with prices, validity, exclusions, where to buy
 - [Guide index](https://nihontabi.web.app/guide/)
 
 ## App
