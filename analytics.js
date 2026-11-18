@@ -1,4 +1,4 @@
-/* Google Analytics 4 only after the visitor accepts; also counts outbound partner clicks. */
+/* Google Analytics 4 loads by default (no banner); visitors can opt out on /privacy.html (jp:consent="no"). Also counts outbound partner clicks. */
 (function () {
   var ID = "G-E5WP4G9X5B", KEY = "jp:consent";
   function get() { try { return localStorage.getItem(KEY); } catch (e) { return null; } }
@@ -6,12 +6,12 @@
   function load() {
     if (window.__ga) return; window.__ga = 1; window.dataLayer = window.dataLayer || [];
     window.gtag = function () { dataLayer.push(arguments); };
-    gtag("js", new Date()); gtag("config", ID, { anonymize_ip: true });
+    gtag("js", new Date()); gtag("config", ID, { anonymize_ip: true, allow_google_signals: false, allow_ad_personalization_signals: false });
     var s = document.createElement("script"); s.async = 1; s.src = "https://www.googletagmanager.com/gtag/js?id=" + ID; document.head.appendChild(s);
   }
   var PARTNERS = [[/klook\.com/, "klook"], [/kkday\.com/, "kkday"], [/booking\.com/, "booking"], [/agoda\.com/, "agoda"], [/trip\.com/, "trip"], [/skyscanner/, "skyscanner"], [/google\.com\/travel/, "google_travel"], [/airalo/, "airalo"], [/shopee|lazada/, "shop"], [/travelpayouts|emrldtp|aviasales/, "travelpayouts"]];
   document.addEventListener("click", function (e) {
-    if (get() !== "yes" || !window.gtag) return;
+    if (get() === "no" || !window.gtag) return;
     var a = e.target && e.target.closest ? e.target.closest('a[href^="http"]') : null; if (!a) return;
     for (var i = 0; i < PARTNERS.length; i++) if (PARTNERS[i][0].test(a.href)) { gtag("event", "outbound_click", { partner: PARTNERS[i][1], link_text: (a.textContent || "").trim().slice(0, 40), page_path: location.pathname }); break; }
   }, true);
@@ -23,6 +23,6 @@
     b.querySelector("#gaY").onclick = function () { set("yes"); b.remove(); load(); };
     b.querySelector("#gaN").onclick = function () { set("no"); b.remove(); };
   }
-  function init() { var c = get(); if (c === "yes") load(); else if (c === null) banner(); }
+  function init() { if (get() !== "no") load(); }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init); else init();
 })();
