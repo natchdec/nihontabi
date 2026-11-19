@@ -3115,6 +3115,7 @@ ${apSteps()}</div></section>
   const pxHist = (hid, k) => ((PXH && PXH[hid] && PXH[hid][k]) || []);
   const pxTrend = (hid, k) => { const a = pxHist(hid, k); if (a.length < 2) return ""; const cur = a[a.length - 1][1], prev = a[a.length - 2][1], d = cur - prev; return d === 0 ? "" : `<small style="display:block;font-size:10px;color:${d < 0 ? "#2ea05a" : "#d9534f"}">${d < 0 ? "▼" : "▲"}${Math.abs(d).toLocaleString("en-US")}</small>`; };
   const hubMonths = hid => { const o = {}; ((PXSUM && PXSUM[hid] && PXSUM[hid].flights) || []).forEach(f => { const k = String(f.dep).slice(0, 7); if (!o[k] || f.thb < o[k].thb) o[k] = f; }); return o; };
+  const pxHubName = h => h === "tokyo" ? "Tokyo" : (HUBCFG[h] && HUBCFG[h].short) || h;
   const pxOverview = () => { if (!PXSUM) return "";
     const ids = ["tokyo", "osaka", "nagoya", "fukuoka", "sapporo", "sendai"].filter(h => PXSUM[h] && (PXSUM[h].flights || []).length), per = {}; ids.forEach(h => per[h] = hubMonths(h));
     const months = [...new Set(ids.flatMap(h => Object.keys(per[h])))].sort(); if (!months.length) return "";
@@ -3122,7 +3123,7 @@ ${apSteps()}</div></section>
     const nm = k => { const t = k.split("-"); return MTHX[+t[1] - 1] + " " + String(+t[0] + 543).slice(2); };
     const cell = (h, k) => { const f = per[h][k]; if (!f) return `<td class="num" style="opacity:.35">–</td>`; const rowMin = Math.min(...Object.values(per[h]).map(x => x.thb)), a = (0.08 + 0.5 * (1 - (f.thb - mn) / Math.max(1, mx - mn))).toFixed(2);
       return `<td class="num" style="background:rgba(46,160,90,${a});${f.thb === rowMin ? "font-weight:700;outline:2px solid rgba(46,160,90,.9);outline-offset:-2px;border-radius:4px" : ""}">${(f.thb / 1000).toFixed(1)}k${pxTrend(h, k)}</td>`; };
-    const hn = h => (HUBCFG[h] && HUBCFG[h].short) || h;
+    const hn = pxHubName;
     const body = ids.map(h => `<tr><td><a href="#" data-act="setbase" data-keep="px" data-v="${h}" style="font-weight:${h === HB.id ? 700 : 500}">${E(hn(h))}${h === "sendai" ? "*" : ""}</a></td>${months.map(k => cell(h, k)).join("")}</tr>`).join("");
     const best = ids.map(h => { const m = Object.entries(per[h]).sort((a, b) => a[1].thb - b[1].thb)[0]; return { h, k: m[0], thb: m[1].thb }; }).sort((a, b) => a.thb - b.thb);
     const hi = ids.map(h => Math.max(...Object.values(per[h]).map(f => f.thb))), me = per[HB.id] && Object.keys(per[HB.id]).length ? Object.entries(per[HB.id]).sort((a, b) => a[1].thb - b[1].thb) : null;
@@ -3135,7 +3136,7 @@ ${apSteps()}</div></section>
     S.pxn = S.pxn || 5; S.pxd = S.pxd || 2000; S.pxt = S.pxt || 1; const k = per[S.pxm] ? S.pxm : ks.sort((a, b) => per[a].thb - per[b].thb)[0], f = per[k], rooms = Math.max(1, Math.ceil(S.people / 2)), hn = Math.round((PX_BASE.hotelNight || 3000) * S.pxt);
     const air = f.thb * S.people, hot = hn * rooms * S.pxn, loc = S.pxd * S.people * (S.pxn + 1), tot = air + hot + loc, nmx = x => { const t = x.split("-"); return MTHX[+t[1] - 1] + " " + (+t[0] + 543); };
     const row = (l, v, sub) => `<tr><td>${l}${sub ? `<div class="sub">${sub}</div>` : ""}</td><td class="num">${thb(v)}</td></tr>`;
-    return sec(`${ic("coin", "sm")} คำนวณงบทริป · ${E(HB.short)}`, "ปรับได้", `<p class="sub" style="margin:8px 0 10px;font-size:13.5px;color:var(--ink-2)">ประมาณการงบรวมจากราคาตั๋วจริงของเดือนที่เลือก + ค่าที่พักและค่าใช้จ่ายรายวันที่ปรับได้ (เป็นค่าประมาณเพื่อวางแผน)</p>
+    return sec(`${ic("coin", "sm")} คำนวณงบทริป · ${E(pxHubName(HB.id))}`, "ปรับได้", `<p class="sub" style="margin:8px 0 10px;font-size:13.5px;color:var(--ink-2)">ประมาณการงบรวมจากราคาตั๋วจริงของเดือนที่เลือก + ค่าที่พักและค่าใช้จ่ายรายวันที่ปรับได้ (เป็นค่าประมาณเพื่อวางแผน)</p>
       <div class="step"><span class="label">เดือนที่ไป</span><div class="chips">${ks.map(x => `<button class="chip" aria-pressed="${x === k}" data-act="pxm" data-v="${x}">${nmx(x)} ${(per[x].thb / 1000).toFixed(1)}k</button>`).join("")}</div></div>
       <div class="step" style="margin-top:8px"><span class="label">จำนวนคืน</span><div class="chips"><button class="btn sm" data-act="pxn" data-v="-1">−</button><b class="mono" style="min-width:28px;text-align:center">${S.pxn}</b><button class="btn sm" data-act="pxn" data-v="1">+</button></div></div>
       <div class="step" style="margin-top:8px"><span class="label">ระดับที่พัก</span><div class="chips">${[[0.6, "ประหยัด"], [1, "กลางๆ"], [1.7, "สบาย"]].map(([m, l]) => `<button class="chip" aria-pressed="${S.pxt === m}" data-act="pxt" data-v="${m}">${l}</button>`).join("")}</div></div>
