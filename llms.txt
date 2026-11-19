@@ -4,7 +4,7 @@
 Facts are compiled from official sites and travel sites (data as of 2026-11-18); prices and hours change, so verify with the provider before travel. Flight prices are sampled estimates, not live fares.
 
 ## Guides
-- [โตเกียว (ฐาน Ueno)](https://nihontabi.web.app/guide/tokyo/): 26 places reachable as day trips, routes, fares, best months
+- [โตเกียว (ฐาน Ueno)](https://nihontabi.web.app/guide/tokyo/): 96 places reachable as day trips, routes, fares, best months
 - [โอซาก้า (ฐาน Namba)](https://nihontabi.web.app/guide/osaka/): 114 places reachable as day trips, routes, fares, best months
 - [เซนได (ฐาน Sendai Station)](https://nihontabi.web.app/guide/sendai/): 107 places reachable as day trips, routes, fares, best months
 - [นาโกย่า (ฐาน Nagoya Station)](https://nihontabi.web.app/guide/nagoya/): 96 places reachable as day trips, routes, fares, best months
@@ -15,6 +15,7 @@ Facts are compiled from official sites and travel sites (data as of 2026-11-18);
 - [Pass guides](https://nihontabi.web.app/guide/pass/): 83 active travel passes with prices, validity, exclusions, where to buy
 - Plans by trip length: https://nihontabi.web.app/guide/<hub>/plans-<N>-days.html (N = 3..10)
 - [Pass comparison table](https://nihontabi.web.app/guide/pass-compare.html)
+- Seasonal guides: https://nihontabi.web.app/guide/season/events-2027.html, sakura.html, foliage.html, winter-snow.html
 - [Guide index](https://nihontabi.web.app/guide/)
 
 ## App
