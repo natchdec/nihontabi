@@ -1974,7 +1974,7 @@ details.pgrp>summary::-webkit-details-marker{display:none}
   const lenCtl = () => `<div class="seg">${[4, 5, 6, 7, 10, 15].map(n => `<button class="chip" aria-pressed="${S.len === n}" data-act="len" data-v="${n}">${n} วัน</button>`).join("")}</div><div class="seg" aria-label="กำหนดจำนวนวันเอง"><button class="chip" data-act="lenstep" data-v="-1" aria-label="ลดหนึ่งวัน">−</button><span class="chip" aria-live="polite" style="pointer-events:none">${S.len} วัน</span><button class="chip" data-act="lenstep" data-v="1" aria-label="เพิ่มหนึ่งวัน">+</button></div>`;
   const SEAS_TH = { sakura: ["mar", "apr", "may"], snow: ["nov", "dec", "jan", "feb", "mar", "apr"] };
   const themesEff = p => S.mall ? (p.themes || []) : (p.themes || []).filter(t => !SEAS_TH[t] || SEAS_TH[t].includes(S.month));
-  const score = p => { const th = themesEff(p); return S.themes.reduce((n, t) => n + (th.includes(t) ? (th[0] === t ? 2 : 1) : 0), 0); };
+  const score = p => { const th = themesEff(p); return S.themes.reduce((n, t) => n + (t === "foliage" && !["sep", "oct", "nov", "dec"].includes(S.month) ? 0 : th.includes(t) ? (th[0] === t ? 2 : 1) : 0), 0); };
   const visible = () => PLANS.filter(p => (S.mode === "all" || p.mode === S.mode) && (!nd(p) || Math.abs(nd(p) - (S.len || 6)) <= 1 || (p.gen && (S.len || 6) > 10 && nd(p) >= 7)))
     .map(p => ({ p, s: score(p) })).sort((a, b) => b.s - a.s);
   const cur = () => { let p = PLANS.find(x => x.id === S.planId); if (p && p.gen && (p._orig || p).nDays) { adaptGen(p); p = PLANS.find(x => x.id === S.planId); } return p; };

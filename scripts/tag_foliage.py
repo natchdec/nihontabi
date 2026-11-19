@@ -16,15 +16,33 @@ def tag_mods(mods, extra=None):
         hit = hits(mo)
         if strong or len(hit) >= 2 or (extra and any((mo.get(k) or {}).get('score', 0) >= 5 for k in hit)):
             months = hit or [k for k in ('oct', 'nov') if (mo.get(k) or {}).get('score', 0) >= 4]
+            mj = m.get('momiji')
+            if mj and mj.get('start') and mj.get('end'):
+                order = ['sep', 'oct', 'nov', 'dec']; mm = {'Sep': 'sep', 'Oct': 'oct', 'Nov': 'nov', 'Dec': 'dec'}
+                st = [v for k, v in mm.items() if k in str(mj['start'])]; en = [v for k, v in mm.items() if k in str(mj['end'])]
+                if st and en and order.index(st[0]) <= order.index(en[0]): months = order[order.index(st[0]):order.index(en[0]) + 1]
+            elif not mj:
+                strong5 = [k for k in months if (mo.get(k) or {}).get('score', 0) >= 5]
+                if strong5: months = strong5
             if months: m['momijiMonths'] = months; m['themes'].append('foliage'); tagged[m['id']] = months
     return tagged
 def tag_plans(plans, tagged):
     n = 0
     for p in plans:
         p['themes'] = [t for t in (p.get('themes') or []) if t != 'foliage']
-        ids = [x.get('mod') for x in p.get('days', []) if x.get('mod')]; t = sum(1 for i in ids if i in tagged)
-        pm = set(p.get('months') or []); ok = (not pm) or bool(pm & {'sep', 'oct', 'nov', 'dec'})
-        if ok and (KW.search(p.get('title', '') + ' ' + p.get('tagline', '')) or (ids and t >= max(2, len(ids) // 3))): p['themes'].append('foliage'); n += 1
+        ids = [x.get('mod') for x in p.get('days', []) if x.get('mod')]
+        fm = set(); cnt = 0
+        for i in ids:
+            if i in tagged: fm |= set(tagged[i]); cnt += 1
+        pm = set(p.get('months') or [])
+        kw = bool(KW.search(p.get('title', '') + ' ' + p.get('tagline', '')))
+        if not pm:  # no month restriction: tag only when the title says foliage
+            ok = kw and cnt >= 1
+        else:
+            window = pm & {'sep', 'oct', 'nov', 'dec'}
+            inter = pm & fm
+            ok = bool(inter) and len(inter) / len(pm) >= 0.5 and (cnt >= max(2, len(ids) // 3) or (kw and cnt >= 1)) and bool(window)
+        if ok: p['themes'].append('foliage'); n += 1
     return n
 HUBS = ['tokyo', 'osaka', 'sendai', 'nagoya', 'fukuoka', 'sapporo']
 core = json.load(open('data/modules.json', encoding='utf8')); core_t = tag_mods(core, json.load(open('data/hub_tokyo.json', encoding='utf8'))['hub']['monthsExtra'])
