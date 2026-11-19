@@ -7,6 +7,12 @@ const rid = () => { const a = new Uint8Array(10); crypto.getRandomValues(a); ret
 const BTN = "border:0;border-radius:10px;padding:9px 14px;font:600 14px system-ui;cursor:pointer;";
 const INP = "width:100%;box-sizing:border-box;padding:9px 10px;border-radius:10px;border:1px solid #445;background:#12151c;color:#fff;font:15px system-ui;";
 
+const TPL = [
+  { t: "ไปฐานเมืองไหนดี", o: [["h:tokyo", "โตเกียว (Ueno)", "ครบทุกแบบ ไป-กลับได้ทั่วคันโต"], ["h:osaka", "โอซาก้า (Namba)", "เกียวโต นารา โกเบ ของกินเยอะ"], ["h:sendai", "เซนได", "ธรรมชาติ ออนเซ็น โทโฮคุ"], ["h:nagoya", "นาโกย่า", "ชิราคาวาโกะ ทาคายามะ คานาซาวะ"], ["h:fukuoka", "ฟุกุโอกะ", "คิวชู ออนเซ็น ของกินถูก"], ["h:sapporo", "ซัปโปโร", "หิมะ ฮอกไกโด ซีฟู้ด"]] },
+  { t: "ไปช่วงไหนดี", o: [["s:sakura", "ซากุระ (ปลาย มี.ค. – เม.ย.)", "สวยแต่คนเยอะ ตั๋วแพง"], ["s:summer", "หน้าร้อน เทศกาล/พลุ (ก.ค. – ส.ค.)", "ร้อนจัด แต่มีงานเยอะ"], ["s:foliage", "ใบไม้เปลี่ยนสี (ต.ค. – พ.ย.)", "อากาศดี ใบไม้สวย"], ["s:winter", "หิมะ/ออนเซ็น (ธ.ค. – ก.พ.)", "หนาว เล่นสกีได้ ตั๋วถูกกว่า"]] },
+  { t: "อยากเที่ยวสไตล์ไหน", o: [["t:food", "สายกิน", "ตลาด ร้านดัง ราเมน ซูชิ"], ["t:nature", "ธรรมชาติ/วิว", "ภูเขา ทะเลสาบ ใบไม้ ซากุระ"], ["t:onsen", "ออนเซ็นพักผ่อน", "แช่น้ำแร่ เดินเล่นช้าๆ"], ["t:culture", "วัด/ปราสาท/เมืองเก่า", "ประวัติศาสตร์ ถ่ายรูปสวย"], ["t:anime", "อนิเมะ/ช้อปปิ้ง", "Akihabara Ghibli ของสะสม"], ["t:family", "ครอบครัว/เด็ก", "สวนสนุก สัตว์ เดินน้อย"]] },
+];
+
 export function modal(html) {
   const o = document.createElement("div"); o.style.cssText = "position:fixed;inset:0;z-index:90;background:rgba(0,0,0,.65);display:grid;place-items:center;padding:12px";
   const c = document.createElement("div"); c.style.cssText = "background:#1f2430;color:#fff;border-radius:16px;max-width:580px;width:100%;max-height:90vh;overflow:auto;padding:18px;font:15px/1.5 system-ui,sans-serif";
@@ -14,14 +20,15 @@ export function modal(html) {
   return { o, c, close: () => o.remove() };
 }
 
-const link = o => { const id = String(o.id || ""); if (id.startsWith("p:")) return ` <a href="/?hub=${encodeURIComponent(window.__ntPollHub || "")}&plan=${encodeURIComponent(id.slice(2))}" target="_blank" rel="noopener" style="color:#9cc4ff;font-size:12px">ดูแผน ↗</a>`; if (id.startsWith("m:")) return ` <a href="/guide/${encodeURIComponent(window.__ntPollHub || "")}/${encodeURIComponent(id.slice(2))}.html" target="_blank" rel="noopener" style="color:#9cc4ff;font-size:12px">ดูรายละเอียด ↗</a>`; return ""; };
+const link = o => { const id = String(o.id || ""); if (id.startsWith("h:")) return ` <a href="/?hub=${encodeURIComponent(id.slice(2))}" target="_blank" rel="noopener" style="color:#9cc4ff;font-size:12px">ดูฮับนี้ ↗</a>`; if (id.startsWith("p:")) return ` <a href="/?hub=${encodeURIComponent(window.__ntPollHub || "")}&plan=${encodeURIComponent(id.slice(2))}" target="_blank" rel="noopener" style="color:#9cc4ff;font-size:12px">ดูแผน ↗</a>`; if (id.startsWith("m:")) return ` <a href="/guide/${encodeURIComponent(window.__ntPollHub || "")}/${encodeURIComponent(id.slice(2))}.html" target="_blank" rel="noopener" style="color:#9cc4ff;font-size:12px">ดูรายละเอียด ↗</a>`; return ""; };
 // Pure renderer (also used by tests): poll = {title, options:[{id,l,s}]}, votes = {uid:{n,picks}}
 export function renderPoll(c, poll, votes, myUid, onSave) {
   const mine = new Set(((votes[myUid] || {}).picks) || []);
   const count = {}, who = {};
   Object.entries(votes).forEach(([u, v]) => (v.picks || []).forEach(id => { count[id] = (count[id] || 0) + 1; (who[id] = who[id] || []).push(v.n || "เพื่อน"); }));
   const total = Object.keys(votes).length, max = Math.max(1, ...Object.values(count));
-  c.innerHTML = `<h3 style="margin:0 0 4px">${esc(poll.title)}</h3><p style="margin:0 0 12px;color:#9aa3b5;font-size:13px">โหวตได้หลายข้อ · ${total} คนโหวตแล้ว · ทุกคนในลิงก์เห็นชื่อและผลโหวต</p>`
+  const top = Object.entries(count).sort((a, b) => b[1] - a[1]), lead = top.length && top[0][1] > 0 ? poll.options.find(o => o.id === top[0][0]) : null, tie = top.length > 1 && top[1][1] === top[0][1];
+  c.innerHTML = `<h3 style="margin:0 0 4px">${esc(poll.title)}</h3>${lead ? `<div style="margin:0 0 10px;padding:8px 12px;border-radius:12px;background:#2a3a2e;font-size:14px">🏆 ${tie ? "คะแนนเท่ากันนำอยู่" : "นำอยู่ตอนนี้"}: <b>${esc(lead.l)}</b> (${top[0][1]} จาก ${total} คน)</div>` : ""}<p style="margin:0 0 12px;color:#9aa3b5;font-size:13px">โหวตได้หลายข้อ · ${total} คนโหวตแล้ว · ทุกคนในลิงก์เห็นชื่อและผลโหวต</p>`
     + poll.options.map(o => `<label style="display:block;margin:8px 0;padding:10px;border:1px solid #334;border-radius:12px;cursor:pointer"><div style="display:flex;gap:10px;align-items:flex-start"><input type="checkbox" data-id="${esc(o.id)}" ${mine.has(o.id) ? "checked" : ""} style="margin-top:4px;width:18px;height:18px"><div style="flex:1"><b>${esc(o.l)}</b>${link(o)}${o.s ? `<div style="color:#9aa3b5;font-size:13px">${esc(String(o.s).slice(0, 110))}</div>` : ""}<div style="margin-top:6px;height:6px;border-radius:4px;background:#2a3040"><div style="height:6px;border-radius:4px;background:#ff7a6b;width:${Math.round(((count[o.id] || 0) / max) * 100)}%"></div></div><div style="font-size:12.5px;color:#c8d0e2;margin-top:3px">${count[o.id] || 0} โหวต${who[o.id] ? " · " + esc(who[o.id].slice(0, 8).join(", ")) : ""}</div></div></div></label>`).join("")
     + `<div style="display:flex;gap:8px;margin-top:12px"><button id="pvSave" style="${BTN}background:#e8ecf4;color:#111">บันทึกโหวต</button><button id="pvX" style="${BTN}background:none;color:#fff;border:1px solid #556">ปิด</button></div><p id="pvMsg" style="color:#9aa3b5;font-size:13px;margin:8px 0 0"></p>`;
   c.querySelector("#pvSave").onclick = () => onSave(Array.from(c.querySelectorAll("input[type=checkbox]:checked"), x => x.dataset.id));
@@ -37,7 +44,7 @@ export function init(ctx) {
     if (!(await needLogin())) return;
     const data = window.__ntData && window.__ntData(); if (!data) { alert("ข้อมูลยังโหลดไม่เสร็จ ลองอีกครั้งในอีกสักครู่"); return; }
     const m = modal(`<h3 style="margin:0 0 8px">ชวนเพื่อนโหวต</h3><p style="margin:0 0 10px;color:#9aa3b5;font-size:13px">เลือกแพลนหรือที่เที่ยวสูงสุด ${MAXOPT} อย่างจากฐาน ${esc(data.hubName)} แล้วส่งลิงก์ให้เพื่อนโหวต (เพื่อนต้องเข้าสู่ระบบด้วย Google)</p>
-      <input id="pT" maxlength="80" style="${INP}" value="ไปเที่ยว${esc(data.hubName)}แบบไหนดี"><input id="pQ" placeholder="ค้นหา เช่น ซากุระ, Ghibli, 5 วัน" style="${INP}margin-top:8px"><div id="pR" style="margin:8px 0"></div><div id="pS" style="margin:8px 0"></div>
+      <div id="pTpl" style="margin:0 0 10px"><div style="font-size:12.5px;color:#9aa3b5;margin-bottom:6px">เริ่มเร็ว: เลือกแม่แบบ (แก้ต่อได้)</div>${TPL.map((x, i) => `<button data-tpl="${i}" style="${BTN}padding:6px 12px;margin:0 6px 6px 0;background:#2a3040;color:#fff;font-size:13px">${esc(x.t)}</button>`).join("")}<button data-tpl="top" style="${BTN}padding:6px 12px;margin:0 6px 6px 0;background:#2a3040;color:#fff;font-size:13px">แพลนยอดนิยมของ${esc(data.hubName)}</button></div><input id="pT" maxlength="80" style="${INP}" value="ไปเที่ยว${esc(data.hubName)}แบบไหนดี"><input id="pQ" placeholder="ค้นหา เช่น ซากุระ, Ghibli, 5 วัน" style="${INP}margin-top:8px"><div id="pR" style="margin:8px 0"></div><div id="pS" style="margin:8px 0"></div>
       <div style="display:flex;gap:8px"><button id="pGo" style="${BTN}background:#e8ecf4;color:#111" disabled>สร้างลิงก์</button><button id="pX" style="${BTN}background:none;color:#fff;border:1px solid #556">ปิด</button></div><div id="pMsg" style="margin-top:10px"></div><div id="pMine" style="margin-top:10px;font-size:13px;color:#9aa3b5"></div>`);
     const c = m.c, sel = [], q = c.querySelector("#pQ"), R = c.querySelector("#pR"), S = c.querySelector("#pS"), go = c.querySelector("#pGo");
     const draw = () => {
@@ -47,7 +54,7 @@ export function init(ctx) {
       go.disabled = sel.length < 2;
     };
     q.oninput = draw; draw();
-    c.addEventListener("click", e => { const a = e.target.dataset && e.target.dataset.add, r = e.target.dataset && e.target.dataset.rm; if (a && sel.length < MAXOPT) { sel.push(data.items.find(i => i.id === a)); draw(); } if (r) { e.preventDefault(); const k = sel.findIndex(i => i.id === r); if (k >= 0) sel.splice(k, 1); draw(); } });
+    c.addEventListener("click", e => { const tp = e.target.dataset && e.target.dataset.tpl; if (tp != null && tp !== "") { sel.length = 0; if (tp === "top") { data.items.filter(i => i.k === "plan").slice(0, 6).forEach(i => sel.push(i)); c.querySelector("#pT").value = "แพลน" + data.hubName + "แบบไหนดี"; } else { const T0 = TPL[+tp]; T0.o.forEach(([id, l, s2]) => sel.push({ id, k: "tpl", l, s: s2 })); c.querySelector("#pT").value = T0.t; } draw(); return; } const a = e.target.dataset && e.target.dataset.add, r = e.target.dataset && e.target.dataset.rm; if (a && sel.length < MAXOPT) { sel.push(data.items.find(i => i.id === a)); draw(); } if (r) { e.preventDefault(); const k = sel.findIndex(i => i.id === r); if (k >= 0) sel.splice(k, 1); draw(); } });
     c.querySelector("#pX").onclick = m.close;
     const mine = ls.get(MINE); if (mine.length) c.querySelector("#pMine").innerHTML = "โพลของฉัน: " + mine.slice(-5).reverse().map(p => `<a href="/?poll=${esc(p.id)}" style="color:#9cc4ff">${esc(p.t || p.id)}</a>`).join(" · ");
     go.onclick = async () => {

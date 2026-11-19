@@ -1998,7 +1998,7 @@ details.pgrp>summary::-webkit-details-marker{display:none}
     }
     if (np) { PLANS[i] = np; ORIG[i] = JSON.parse(JSON.stringify(np.days)); }
   }
-  const save = () => store.set("state", { base:S.base, mode:S.mode, themes:S.themes, len:S.len, planId:S.planId, day:S.day, tab:S.tab, month:S.month, people:S.people, rooms:S.rooms, lt:S.lt, sel:S.sel, want:S.want, planDays:S.planDays, pairOn:S.pairOn, arrOn:S.arrOn, depOn:S.depOn, pcat:S.pcat, pmap:S.pmap, pxw:S.pxw, lpass:S.lpass, hsel:S.hsel, hcity:S.hcity, fwin:S.fwin });
+  const save = () => store.set("state", { base:S.base, mode:S.mode, themes:S.themes, len:S.len, planId:S.planId, day:S.day, tab:S.tab, month:S.month, people:S.people, rooms:S.rooms, lt:S.lt, sel:S.sel, want:S.want, planDays:S.planDays, pairOn:S.pairOn, arrOn:S.arrOn, depOn:S.depOn, pcat:S.pcat, pmap:S.pmap, pxw:S.pxw, lpass:S.lpass, hsel:S.hsel, hcity:S.hcity, fwin:S.fwin, pxn:S.pxn, pxd:S.pxd, pxt:S.pxt });
   const render = () => { draw(); save(); };
   const go = tab => { S.tab = tab; anim = true; render(); window.scrollTo({ top: 0 }); };
   const sec = (title, aside, body, i = 0, cls = "") => `<section class="glass rv ${cls}" style="--i:${i}"><div class="sec-h"><h2>${title}</h2>${aside ? `<span class="aside">${aside}</span>` : ""}</div>${body}</section>`;
@@ -3103,12 +3103,43 @@ ${apSteps()}</div></section>
   const pxStatic = (links) => { const d = PXSUM && PXSUM[HB.id]; if (!d || !(d.flights || []).length) return ""; const mx = Math.max(...d.flights.map(f => f.thb)), mn = Math.min(...d.flights.map(f => f.thb)), dm = x => { const t = String(x).split("-"); return (+t[2]) + " " + ["ม.ค.","ก.พ.","มี.ค.","เม.ย.","พ.ค.","มิ.ย.","ก.ค.","ส.ค.","ก.ย.","ต.ค.","พ.ย.","ธ.ค."][(+t[1]) - 1] + " " + t[0]; };
     const rows = d.flights.map(f => `<tr><td>${esc(dm(f.dep))}</td><td style="width:55%"><div style="height:10px;border-radius:6px;background:linear-gradient(90deg,var(--accent,#c0392b),var(--accent,#c0392b));width:${Math.round(40 + 60 * (f.thb - mn) / Math.max(1, mx - mn) * 0.6)}%;opacity:${f.thb === mn ? 1 : .55}"></div></td><td class="num">${thb(f.thb)}</td><td class="num" style="opacity:.8">${f.directThb ? thb(f.directThb) : "–"}</td></tr>`).join("");
     const h = d.hotel || {}, ha = h.asOf && h.asOf !== d.asOf ? ` (ข้อมูลโรงแรม ณ ${esc(h.asOf)})` : "", hl = (h.median ? `ห้องคู่ต่อคืน ประมาณ ${thb(h.low)}–${thb(h.median)} (ต่ำสุด–กลาง)` : `ที่ถูกที่สุดที่พบ ${thb(h.low)} ต่อคืน`) + ha;
-    return sec(`${ic("coin", "sm")} ราคาที่เก็บตัวอย่างไว้ · BKK → ${HB.airName || "Tokyo (NRT/HND)"}`, `ข้อมูล ณ ${esc(d.asOf)}`,
+    return pxOverview() + pxCalc(d) + sec(`${ic("coin", "sm")} ราคาที่เก็บตัวอย่างไว้ · BKK → ${HB.airName || "Tokyo (NRT/HND)"}`, `ข้อมูล ณ ${esc(d.asOf)}`,
       `<p class="sub" style="margin:8px 0 10px;font-size:13.5px;color:var(--ink-2)">ตั๋วบินไป-กลับต่อ 1 คน ถูกสุดที่พบในแต่ละเดือน (ราคาแคชจากการค้นหาล่าสุด อาจเป็นสายการบินต้นทุนต่ำและไม่รวมสัมภาระ ราคาจริงเปลี่ยนทุกวัน)</p>${d.via ? `<p class="mp-note" style="margin-bottom:8px">ไม่มีตั๋วบินตรงเข้า${esc(HB.short)}ในข้อมูลที่เก็บได้ ตารางนี้เป็นราคาบินถึงโตเกียว แล้วต้องต่อชินคันเซ็นเพิ่ม (ค่าชินคันเซ็นราวหนึ่งหมื่นกว่าเยนต่อเที่ยว ตรวจราคาก่อนไป)</p>` : ""}<div class="tblwrap"><table class="cmp fl"><thead><tr><th>ออกเดินทาง</th><th></th><th style="text-align:right">ถูกสุด</th><th style="text-align:right">บินตรง</th></tr></thead><tbody>${rows}</tbody></table></div>
       <p class="sub" style="margin-top:10px">โรงแรม: ${hl}</p><p class="mp-note">เป็นค่าประมาณจากตัวอย่าง ไม่ใช่ราคาตอนจอง ตรวจราคาล่าสุดที่ปุ่มด้านล่างก่อนตัดสินใจ</p>${links}`, 0); };
   (async () => { try { if (HB.id === "tokyo") return; const db = await window.claude.use("db"); if (!db) return;
       db.collection("px_hubs").onSnapshot(snap => { HUBPX = {}; snap.docs.forEach(d => { HUBPX[d.id] = d.data(); }); draw(); }, () => { });
     } catch (e) { } })();
+
+  const MTHX = ["ม.ค.","ก.พ.","มี.ค.","เม.ย.","พ.ค.","มิ.ย.","ก.ค.","ส.ค.","ก.ย.","ต.ค.","พ.ย.","ธ.ค."];
+  const hubMonths = hid => { const o = {}; ((PXSUM && PXSUM[hid] && PXSUM[hid].flights) || []).forEach(f => { const k = String(f.dep).slice(0, 7); if (!o[k] || f.thb < o[k].thb) o[k] = f; }); return o; };
+  const pxOverview = () => { if (!PXSUM) return "";
+    const ids = ["tokyo", "osaka", "nagoya", "fukuoka", "sapporo", "sendai"].filter(h => PXSUM[h] && (PXSUM[h].flights || []).length), per = {}; ids.forEach(h => per[h] = hubMonths(h));
+    const months = [...new Set(ids.flatMap(h => Object.keys(per[h])))].sort(); if (!months.length) return "";
+    const all = ids.flatMap(h => Object.values(per[h]).map(f => f.thb)), mn = Math.min(...all), mx = Math.max(...all);
+    const nm = k => { const t = k.split("-"); return MTHX[+t[1] - 1] + " " + String(+t[0] + 543).slice(2); };
+    const cell = (h, k) => { const f = per[h][k]; if (!f) return `<td class="num" style="opacity:.35">–</td>`; const rowMin = Math.min(...Object.values(per[h]).map(x => x.thb)), a = (0.08 + 0.5 * (1 - (f.thb - mn) / Math.max(1, mx - mn))).toFixed(2);
+      return `<td class="num" style="background:rgba(46,160,90,${a});${f.thb === rowMin ? "font-weight:700;outline:2px solid rgba(46,160,90,.9);outline-offset:-2px;border-radius:4px" : ""}">${(f.thb / 1000).toFixed(1)}k</td>`; };
+    const hn = h => (HUBCFG[h] && HUBCFG[h].short) || h;
+    const body = ids.map(h => `<tr><td><a href="#" data-act="setbase" data-keep="px" data-v="${h}" style="font-weight:${h === HB.id ? 700 : 500}">${E(hn(h))}${h === "sendai" ? "*" : ""}</a></td>${months.map(k => cell(h, k)).join("")}</tr>`).join("");
+    const best = ids.map(h => { const m = Object.entries(per[h]).sort((a, b) => a[1].thb - b[1].thb)[0]; return { h, k: m[0], thb: m[1].thb }; }).sort((a, b) => a.thb - b.thb);
+    const hi = ids.map(h => Math.max(...Object.values(per[h]).map(f => f.thb))), me = per[HB.id] && Object.keys(per[HB.id]).length ? Object.entries(per[HB.id]).sort((a, b) => a[1].thb - b[1].thb) : null;
+    const tip = me ? `${hn(HB.id)}: ถูกสุด <b>${nm(me[0][0])} ${thb(me[0][1].thb)}</b> · แพงสุด ${nm(me[me.length - 1][0])} ${thb(me[me.length - 1][1].thb)} (ต่างกัน ${thb(me[me.length - 1][1].thb - me[0][1].thb)}/คน)` : "";
+    return sec(`${ic("coin", "sm")} เทียบตั๋วบินทุกฮับ · เดือนไหนถูกสุด`, `ข้อมูล ณ ${E(PXSUM[ids[0]].asOf)}`,
+      `<p class="sub" style="margin:8px 0 10px;font-size:13.5px;color:var(--ink-2)">ราคาไป-กลับถูกสุดต่อคน (BKK) แยกฮับและเดือน สีเขียวเข้ม = ถูก กรอบ = เดือนที่ถูกสุดของฮับนั้น แตะชื่อฮับเพื่อเปลี่ยนฐานและดูรายละเอียด</p>
+       <div class="tblwrap"><table class="cmp"><thead><tr><th>ฮับ</th>${months.map(k => `<th style="text-align:right">${nm(k)}</th>`).join("")}</tr></thead><tbody>${body}</tbody></table></div>
+       <p class="mp-note"><b>ถูกสุดโดยรวม:</b> ${E(hn(best[0].h))} ${nm(best[0].k)} ${thb(best[0].thb)}${best[1] ? " · รองลงมา " + E(hn(best[1].h)) + " " + nm(best[1].k) + " " + thb(best[1].thb) : ""}${tip ? "<br>" + tip : ""}<br>* เซนไดไม่มีตั๋วบินตรงในข้อมูล ใช้ราคาบินถึงโตเกียวแล้วต่อชินคันเซ็น ราคาแคชจากการค้นหา ไม่ใช่ราคาตอนจอง</p>`, 0); };
+  const pxCalc = d => { const per = hubMonths(HB.id), ks = Object.keys(per).sort(); if (!ks.length) return "";
+    S.pxn = S.pxn || 5; S.pxd = S.pxd || 2000; S.pxt = S.pxt || 1; const k = per[S.pxm] ? S.pxm : ks.sort((a, b) => per[a].thb - per[b].thb)[0], f = per[k], rooms = Math.max(1, Math.ceil(S.people / 2)), hn = Math.round((PX_BASE.hotelNight || 3000) * S.pxt);
+    const air = f.thb * S.people, hot = hn * rooms * S.pxn, loc = S.pxd * S.people * (S.pxn + 1), tot = air + hot + loc, nmx = x => { const t = x.split("-"); return MTHX[+t[1] - 1] + " " + (+t[0] + 543); };
+    const row = (l, v, sub) => `<tr><td>${l}${sub ? `<div class="sub">${sub}</div>` : ""}</td><td class="num">${thb(v)}</td></tr>`;
+    return sec(`${ic("coin", "sm")} คำนวณงบทริป · ${E(HB.short)}`, "ปรับได้", `<p class="sub" style="margin:8px 0 10px;font-size:13.5px;color:var(--ink-2)">ประมาณการงบรวมจากราคาตั๋วจริงของเดือนที่เลือก + ค่าที่พักและค่าใช้จ่ายรายวันที่ปรับได้ (เป็นค่าประมาณเพื่อวางแผน)</p>
+      <div class="step"><span class="label">เดือนที่ไป</span><div class="chips">${ks.map(x => `<button class="chip" aria-pressed="${x === k}" data-act="pxm" data-v="${x}">${nmx(x)} ${(per[x].thb / 1000).toFixed(1)}k</button>`).join("")}</div></div>
+      <div class="step" style="margin-top:8px"><span class="label">จำนวนคืน</span><div class="chips"><button class="btn sm" data-act="pxn" data-v="-1">−</button><b class="mono" style="min-width:28px;text-align:center">${S.pxn}</b><button class="btn sm" data-act="pxn" data-v="1">+</button></div></div>
+      <div class="step" style="margin-top:8px"><span class="label">ระดับที่พัก</span><div class="chips">${[[0.6, "ประหยัด"], [1, "กลางๆ"], [1.7, "สบาย"]].map(([m, l]) => `<button class="chip" aria-pressed="${S.pxt === m}" data-act="pxt" data-v="${m}">${l}</button>`).join("")}</div></div>
+      <div class="step" style="margin-top:8px"><span class="label">กิน+เดินทาง+เข้าชม ต่อคนต่อวัน</span><div class="chips"><button class="btn sm" data-act="pxd" data-v="-500">−</button><b class="mono" style="min-width:60px;text-align:center">${thb(S.pxd)}</b><button class="btn sm" data-act="pxd" data-v="500">+</button></div></div>
+      <div class="tblwrap" style="margin-top:12px"><table class="cmp"><tbody>${row("ตั๋วบิน ไป-กลับ", air, S.people + " คน × " + thb(f.thb) + " (" + nmx(k) + ")")}${row("ที่พัก", hot, rooms + " ห้อง × " + S.pxn + " คืน × " + thb(hn))}${row("กิน เดินทาง เข้าชม", loc, S.people + " คน × " + (S.pxn + 1) + " วัน × " + thb(S.pxd))}<tr><td><b>รวมทั้งกลุ่ม</b></td><td class="num"><b>${thb(tot)}</b></td></tr><tr><td><b>เฉลี่ยต่อคน</b></td><td class="num"><b>${thb(tot / S.people)}</b></td></tr></tbody></table></div>
+      <p class="mp-note">จำนวนคนปรับได้ที่ปุ่มในหน้านี้ ห้องคำนวณเป็นคู่ละห้อง ไม่รวมประกัน ซิม ช้อปปิ้ง และตั๋ว Pass ที่ต้องซื้อเพิ่ม (ดูเปรียบเทียบ Pass ในหน้าข้อมูล)</p>
+      <div class="step" style="margin-top:8px"><span class="label">จำนวนคน</span><div class="chips"><button class="btn sm" data-act="people" data-v="-1">−</button><b class="mono" style="min-width:28px;text-align:center">${S.people}</b><button class="btn sm" data-act="people" data-v="1">+</button></div></div>`, 1); };
   function vPx() {
     if (HB.id !== "tokyo") {
       const g = x => "https://www.google.com/travel/" + x, d = HUBPX[HB.id];
@@ -3717,7 +3748,7 @@ ${apSteps()}</div></section>
     if (a === "hpmore") { S.hpmore = !S.hpmore; return render(); }
     if (a === "hpass") { S.hpass = v || null; if (HB.id !== "tokyo") S.pcat = v ? "p:" + v : (String(S.pcat).startsWith("p:") ? "all" : S.pcat); return render(); }
     if (a === "pprev") { S.pprev = S.pprev === t.dataset.id ? null : t.dataset.id; return render(); }
-    if (a === "setbase") { if (!HUBCFG[v] || v === HB.id) return; const o = store.get("state") || {}; store.set("state", { base: v, tab: "pick", month: o.month, people: o.people, rooms: o.rooms, len: o.len }); const ov = document.createElement("div"); ov.style.cssText = "position:fixed;inset:0;z-index:99;display:grid;place-items:center;background:rgba(10,10,14,.72);color:#fff;font:600 16px system-ui,sans-serif"; ov.textContent = "กำลังเปลี่ยนฐานเป็น " + HUBCFG[v].short + " …"; document.body.append(ov); setTimeout(() => location.reload(), 60); return; }
+    if (a === "setbase") { if (!HUBCFG[v] || v === HB.id) return; const o = store.get("state") || {}; store.set("state", { base: v, tab: t.dataset.keep || "pick", month: o.month, people: o.people, rooms: o.rooms, len: o.len }); const ov = document.createElement("div"); ov.style.cssText = "position:fixed;inset:0;z-index:99;display:grid;place-items:center;background:rgba(10,10,14,.72);color:#fff;font:600 16px system-ui,sans-serif"; ov.textContent = "กำลังเปลี่ยนฐานเป็น " + HUBCFG[v].short + " …"; document.body.append(ov); setTimeout(() => location.reload(), 60); return; }
     if (a === "expand") { t.classList.toggle("open"); return; }
     if (a === "hub") { if (v && HUBDATA[v] && HUBDATA[v]._stub) { try { __fill(v, JSON.parse(__xhr("data/hub_" + v + ".json"))); } catch (e) { } } S.hub = S.hub === v ? "" : v; S.hpass = null; S.pprev = null; S.hmv = null; return render(); }
     if (a === "pgrp") { S.pgrp = v; return render(); }
@@ -3786,6 +3817,10 @@ ${apSteps()}</div></section>
     if (a === "mall") { S.mall = !S.mall; return render(); }
     if (a === "ltall") { S.lt = []; return render(); }
     if (a === "lt") { S.lt = S.lt.includes(v) ? S.lt.filter(x => x !== v) : [...S.lt, v]; return render(); }
+    if (a === "pxn") { S.pxn = Math.max(1, Math.min(21, (S.pxn || 5) + (+v))); return render(); }
+    if (a === "pxd") { S.pxd = Math.max(500, Math.min(10000, (S.pxd || 2000) + (+v))); return render(); }
+    if (a === "pxt") { S.pxt = +v; return render(); }
+    if (a === "pxm") { S.pxm = v; return render(); }
     if (a === "people") { S.people = Math.max(1, Math.min(60, S.people + (+v))); return render(); }
     if (a === "addday") { const id = t.dataset.id, k = MOD[id] && MOD[id].kind, last = TRIP.days[TRIP.days.length - 1];
       const at = k === "arrival" ? 0 : k === "departure" ? TRIP.days.length : (MOD[last.opts[0]].kind === "departure" ? TRIP.days.length - 1 : TRIP.days.length);
