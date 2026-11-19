@@ -46,6 +46,11 @@ for (const [hub, code] of Object.entries(HUBS)) {
   if (flights.length >= 3) { out[hub] = { ...(prev[hub] || {}), asOf: iso(today), flights, hotel: { ...(prev[hub]?.hotel || { low: null, median: null, n: 0 }), asOf: prev[hub]?.hotel?.asOf || prev[hub]?.asOf }, source: provider }; okHubs++; }
   else console.warn(`${hub}: only ${flights.length} months, keeping previous data`);
 }
+// Sendai has no cached BKK->SDJ fares: show Tokyo fares (fly to Tokyo, then Shinkansen) and say so on the page.
+if (provider !== "mock" && out.tokyo && out.tokyo.asOf === iso(today) && (!out.sendai || out.sendai.asOf !== iso(today))) {
+  out.sendai = { ...(out.sendai || {}), asOf: iso(today), flights: out.tokyo.flights, via: "tokyo", hotel: out.sendai?.hotel || { low: null, median: null, n: 0 }, source: provider };
+  okHubs++; console.log("sendai: using Tokyo fares (via TYO)");
+}
 if (!okHubs) { console.error("no hub updated; keeping file unchanged"); process.exit(provider === "mock" ? 1 : 0); }
 fs.writeFileSync(FILE, JSON.stringify(out, null, 1));
 console.log(`updated ${okHubs}/${Object.keys(HUBS).length} hubs via ${provider}`);
