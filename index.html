@@ -635,7 +635,7 @@ details.pgrp>summary::-webkit-details-marker{display:none}
  },
  "agoda": {
   "label": "Agoda",
-  "search": "",
+  "search": "https://www.agoda.com/th-th/city/{q}-jp.html",
   "wrap": ""
  },
  "airalo": {
@@ -656,6 +656,16 @@ details.pgrp>summary::-webkit-details-marker{display:none}
  "flights": {
   "label": "ค้นตั๋วเครื่องบิน",
   "search": "https://www.google.com/travel/flights?q=Flights%20from%20Bangkok%20to%20{q}",
+  "wrap": ""
+ },
+ "skyscanner": {
+  "label": "Skyscanner",
+  "search": "https://www.skyscanner.co.th/transport/flights/bkk/{q}/",
+  "wrap": ""
+ },
+ "tripf": {
+  "label": "Trip.com ตั๋วบิน",
+  "search": "https://th.trip.com/flights/bangkok-to-{q}/",
   "wrap": ""
  }
 }</script>
@@ -3103,7 +3113,7 @@ ${apSteps()}</div></section>
     if (HB.id !== "tokyo") {
       const g = x => "https://www.google.com/travel/" + x, d = HUBPX[HB.id];
       const links = `<div class="actions"><a class="btn pri" href="${g("flights?q=" + encodeURIComponent(HB.flightQ) + "&curr=THB&hl=th")}" target="_blank" rel="noopener">ดูตั๋วบิน BKK → ${HB.airName} (Google Flights)</a>
-        <a class="btn" href="${g("hotels?q=" + encodeURIComponent("Hotels near " + (HB.hotelQ || "Ueno Station Tokyo")) + "&curr=THB&hl=th")}" target="_blank" rel="noopener">ดูโรงแรมย่าน ${HB.short} (Google)</a></div>${affRow("ดูที่พักแถวนี้", [affA("booking", HB.short + " hotel", "Booking.com")])}${affNote()}`;
+        <a class="btn" href="${g("hotels?q=" + encodeURIComponent("Hotels near " + (HB.hotelQ || "Ueno Station Tokyo")) + "&curr=THB&hl=th")}" target="_blank" rel="noopener">ดูโรงแรมย่าน ${HB.short} (Google)</a></div>${affRow("เปรียบเทียบราคา", PXLINKS())}${affNote()}`;
       if (!d && PXSUM && PXSUM[HB.id]) return pxStatic(links);
       if (!d) return sec(`${ic("coin", "sm")} ราคาตั๋วบิน + โรงแรม · ฐาน ${HB.name}`, "ค่าประมาณ ตรวจราคาจริงก่อนจอง",
         `<p class="sub" style="margin:8px 0 10px;font-size:13.5px;color:var(--ink-2)">ตัวเลขในเว็บนี้เป็นค่าประมาณคร่าวๆ สำหรับวางงบ (ตั๋วบิน ~${thb(HB.px.flight)} · โรงแรม ~${thb(HB.px.hotelNight)}/ห้อง/คืน) ไม่ใช่ราคาจริง ตรวจราคาก่อนจองทุกครั้ง</p>${links}`, 0);
@@ -3114,7 +3124,7 @@ ${apSteps()}</div></section>
         ${ho.length ? `<div class="tblwrap" style="margin-top:12px"><table class="cmp fl"><thead><tr><th>โรงแรม</th><th style="text-align:right">ต่อคืน</th><th>ระยะ</th></tr></thead><tbody>${ho.map(h => `<tr><td>${E(h.name)}${typeof h.rating === "number" ? " · " + h.rating : ""}</td><td class="num">${thb(h.perNightTHB)}</td><td>${typeof h.distM === "number" ? h.distM + " ม." : ""}</td></tr>`).join("")}</tbody></table></div>` : `<p class="sub">ไม่มีข้อมูลโรงแรมในรอบล่าสุด</p>`}
         ${(d.notes || []).length ? `<p class="mp-note">${(d.notes || []).slice(0, 3).map(E).join(" · ")}</p>` : ""}${links}`, 0);
     }
-    if (!RUNS.length && PXSUM && PXSUM.tokyo) { const g = x => "https://www.google.com/travel/" + x, links = `<div class="actions"><a class="btn pri" href="${g("flights?q=" + encodeURIComponent(HB.flightQ) + "&curr=THB&hl=th")}" target="_blank" rel="noopener">ดูตั๋วบิน BKK → ${HB.airName || "Tokyo"} (Google Flights)</a><a class="btn" href="${g("hotels?q=" + encodeURIComponent("Hotels near " + (HB.hotelQ || "Ueno Station Tokyo")) + "&curr=THB&hl=th")}" target="_blank" rel="noopener">ดูโรงแรมย่าน ${HB.short} (Google)</a></div>${affRow("ดูที่พักแถวนี้", [affA("booking", HB.short + " hotel", "Booking.com")])}${affNote()}`; return pxStatic(links); }
+    if (!RUNS.length && PXSUM && PXSUM.tokyo) { const g = x => "https://www.google.com/travel/" + x, links = `<div class="actions"><a class="btn pri" href="${g("flights?q=" + encodeURIComponent(HB.flightQ) + "&curr=THB&hl=th")}" target="_blank" rel="noopener">ดูตั๋วบิน BKK → ${HB.airName || "Tokyo"} (Google Flights)</a><a class="btn" href="${g("hotels?q=" + encodeURIComponent("Hotels near " + (HB.hotelQ || "Ueno Station Tokyo")) + "&curr=THB&hl=th")}" target="_blank" rel="noopener">ดูโรงแรมย่าน ${HB.short} (Google)</a></div>${affRow("เปรียบเทียบราคา", PXLINKS())}${affNote()}`; return pxStatic(links); }
     const last = RUNS[RUNS.length - 1];
     const stale = last && last.checkedAt && (Date.now() - Date.parse(last.checkedAt)) > 36 * 3600e3;
     const head = sec(`${ic("coin", "sm")} ติดตามราคา · ตั๋วบิน + โรงแรมใกล้ Ueno`, last ? `เช็คล่าสุด ${esc(pxTime(last.checkedAt))}` : "",
@@ -3466,7 +3476,7 @@ ${apSteps()}</div></section>
   // ---------- affiliate / partner links (config in <script id="aff">; empty "wrap" = plain link, no disclosure)
   const AFFC = (() => { try { return JSON.parse(document.getElementById("aff").textContent) || {}; } catch (e) { return {}; } })();
   const affWrapped = () => Object.values(AFFC).some(p => p && (p.wrap || p.param));
-  const affHref = (k, q) => { const p = AFFC[k]; if (!p || !p.search) return ""; let dest = p.search.replace("{q}", encodeURIComponent(q || "")); if (p.param) dest += (dest.includes("?") ? "&" : "?") + p.param; return p.wrap ? p.wrap.replace("{url}", encodeURIComponent(dest)) : dest; };
+  const affHref = (k, q) => { const p = AFFC[k]; if (!p || !p.search) return ""; let dest = p.search.replace("{q}", encodeURIComponent(q || "").replace(/%2F/g, "/")); if (p.param) dest += (dest.includes("?") ? "&" : "?") + p.param; return p.wrap ? p.wrap.replace("{url}", encodeURIComponent(dest)) : dest; };
   const affA = (k, q, text) => { const h = affHref(k, q); const p = AFFC[k] || {}; return h ? `<a class="aff-a" href="${esc(h)}" target="_blank" rel="${(p.wrap || p.param) ? "sponsored " : ""}noopener noreferrer">${E(text || p.label || k)} ↗</a>` : ""; };
   const affQ = n => { const lat = (String(n).match(/[A-Za-z][A-Za-z'’.&\- ]{3,}/g) || []).sort((a, b) => b.length - a.length)[0]; return (lat || String(n).replace(EMO, "").split(/[(（]/)[0]).trim().slice(0, 60); };
   const affNote = () => affWrapped() ? `<small class="aff-note">ลิงก์ที่มีเครื่องหมาย ↗ บางส่วนเป็นลิงก์พันธมิตร ถ้าคุณซื้อผ่านลิงก์ เราอาจได้ค่าคอมมิชชันโดยที่คุณไม่ต้องจ่ายแพงขึ้น</small>` : "";
@@ -3477,6 +3487,7 @@ ${apSteps()}</div></section>
   const affStop = s => { const t = String(s.cost || "") + " " + String(s.book || ""), n = String(s.name || ""); if (!/(¥\s*\d{3,}|\d{3,}\s*(¥|เยน))/.test(t) || /(station|สถานี|ฟรี)/i.test(n)) return ""; const q = affQ(n); if (!q) return ""; return affRow("ตั๋ว/กิจกรรม", [klookA(n, ["ticket", "tour"], q), affA("kkday", q)]); };
   const affHotel = area => { const q = (String(area || "").replace(EMO, "") + " " + (HB.short || "")).trim(); return affRow("ดูที่พักแถวนี้", [affA("booking", q), affA("agoda", q)]); };
   const affPass = name => { const q = affQ(name) || String(name || ""); return affRow("ซื้อ/จองตั๋ว", [klookA(name, ["pass"], q), affA("kkday", q)]); };
+  const PXLINKS = () => { const L = ({ tokyo: ["tyoa", "tokyo/airfares-bkk-tyo", "tokyo"], osaka: ["osaa", "osaka/airfares-bkk-osa", "osaka"], sendai: ["sdj", "sendai/airfares-bkk-sdj", "sendai"], nagoya: ["ngo", "nagoya/airfares-bkk-ngo", "nagoya"], fukuoka: ["fuk", "fukuoka/airfares-bkk-fuk", "fukuoka"], sapporo: ["cts", "sapporo/airfares-bkk-spk", "sapporo"] })[HB.id] || []; return [affA("skyscanner", L[0], "ตั๋วบิน Skyscanner"), affA("tripf", L[1], "ตั๋วบิน Trip.com"), affA("agoda", L[2], "ที่พัก Agoda"), affA("booking", HB.short + " hotel", "ที่พัก Booking.com")]; };
   const affPrep = () => affRow("เตรียมก่อนไป", [affA("airalo", "", "eSIM ญี่ปุ่น"), affA("klook", "Japan SIM", "ซิม/WiFi"), affA("shopee", "ปลั๊กแบน ญี่ปุ่น", "ปลั๊กแบน (Shopee)"), affA("lazada", "ฮีทเทค", "ฮีทเทค (Lazada)"), affA("flights", HB.short, "ตั๋วเครื่องบิน")]);
 
   function stopItem(s, i, n, ed) {
