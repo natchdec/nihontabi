@@ -23,7 +23,7 @@ def page(title, desc, canon, body, ld, img="default"):
             f'<meta property="og:url" content="{canon}"><meta property="og:locale" content="th_TH"><meta property="og:image" content="{SITE}/og/{img}.jpg"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:image" content="{SITE}/og/{img}.jpg">'
             f'<style>{CSS}</style><script type="application/ld+json">{json.dumps(ld, ensure_ascii=False)}</script></head><body><main>{body}<hr>'
             f'<p class="m">ข้อมูลรวบรวม ณ {UPDATED} จากแหล่งทางการและเว็บท่องเที่ยว ราคา เวลาเปิด-ปิด และเงื่อนไขอาจเปลี่ยน ตรวจกับผู้ให้บริการก่อนเดินทางทุกครั้ง · '
-            '<a href="/privacy.html">นโยบายความเป็นส่วนตัว</a></p></main><script src="/analytics.js" defer></script></body></html>')
+            '<a href="/privacy.html">นโยบายความเป็นส่วนตัว</a> · <a href="/credits.html">เครดิตรูปภาพ</a></p></main><script src="/analytics.js" defer></script></body></html>')
 
 
 MTH_EN = {"Sep": "ก.ย.", "Oct": "ต.ค.", "Nov": "พ.ย.", "Dec": "ธ.ค.", "Aug": "ส.ค."}
