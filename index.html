@@ -3111,6 +3111,9 @@ ${apSteps()}</div></section>
     } catch (e) { } })();
 
   const MTHX = ["ม.ค.","ก.พ.","มี.ค.","เม.ย.","พ.ค.","มิ.ย.","ก.ค.","ส.ค.","ก.ย.","ต.ค.","พ.ย.","ธ.ค."];
+  let PXH = null; fetch("data/px_history.json").then(r => r.json()).then(j => { PXH = j; if (S.tab === "px") draw(); }).catch(() => { });
+  const pxHist = (hid, k) => ((PXH && PXH[hid] && PXH[hid][k]) || []);
+  const pxTrend = (hid, k) => { const a = pxHist(hid, k); if (a.length < 2) return ""; const cur = a[a.length - 1][1], prev = a[a.length - 2][1], d = cur - prev; return d === 0 ? "" : `<small style="display:block;font-size:10px;color:${d < 0 ? "#2ea05a" : "#d9534f"}">${d < 0 ? "▼" : "▲"}${Math.abs(d).toLocaleString("en-US")}</small>`; };
   const hubMonths = hid => { const o = {}; ((PXSUM && PXSUM[hid] && PXSUM[hid].flights) || []).forEach(f => { const k = String(f.dep).slice(0, 7); if (!o[k] || f.thb < o[k].thb) o[k] = f; }); return o; };
   const pxOverview = () => { if (!PXSUM) return "";
     const ids = ["tokyo", "osaka", "nagoya", "fukuoka", "sapporo", "sendai"].filter(h => PXSUM[h] && (PXSUM[h].flights || []).length), per = {}; ids.forEach(h => per[h] = hubMonths(h));
@@ -3118,7 +3121,7 @@ ${apSteps()}</div></section>
     const all = ids.flatMap(h => Object.values(per[h]).map(f => f.thb)), mn = Math.min(...all), mx = Math.max(...all);
     const nm = k => { const t = k.split("-"); return MTHX[+t[1] - 1] + " " + String(+t[0] + 543).slice(2); };
     const cell = (h, k) => { const f = per[h][k]; if (!f) return `<td class="num" style="opacity:.35">–</td>`; const rowMin = Math.min(...Object.values(per[h]).map(x => x.thb)), a = (0.08 + 0.5 * (1 - (f.thb - mn) / Math.max(1, mx - mn))).toFixed(2);
-      return `<td class="num" style="background:rgba(46,160,90,${a});${f.thb === rowMin ? "font-weight:700;outline:2px solid rgba(46,160,90,.9);outline-offset:-2px;border-radius:4px" : ""}">${(f.thb / 1000).toFixed(1)}k</td>`; };
+      return `<td class="num" style="background:rgba(46,160,90,${a});${f.thb === rowMin ? "font-weight:700;outline:2px solid rgba(46,160,90,.9);outline-offset:-2px;border-radius:4px" : ""}">${(f.thb / 1000).toFixed(1)}k${pxTrend(h, k)}</td>`; };
     const hn = h => (HUBCFG[h] && HUBCFG[h].short) || h;
     const body = ids.map(h => `<tr><td><a href="#" data-act="setbase" data-keep="px" data-v="${h}" style="font-weight:${h === HB.id ? 700 : 500}">${E(hn(h))}${h === "sendai" ? "*" : ""}</a></td>${months.map(k => cell(h, k)).join("")}</tr>`).join("");
     const best = ids.map(h => { const m = Object.entries(per[h]).sort((a, b) => a[1].thb - b[1].thb)[0]; return { h, k: m[0], thb: m[1].thb }; }).sort((a, b) => a.thb - b.thb);
@@ -3138,6 +3141,7 @@ ${apSteps()}</div></section>
       <div class="step" style="margin-top:8px"><span class="label">ระดับที่พัก</span><div class="chips">${[[0.6, "ประหยัด"], [1, "กลางๆ"], [1.7, "สบาย"]].map(([m, l]) => `<button class="chip" aria-pressed="${S.pxt === m}" data-act="pxt" data-v="${m}">${l}</button>`).join("")}</div></div>
       <div class="step" style="margin-top:8px"><span class="label">กิน+เดินทาง+เข้าชม ต่อคนต่อวัน</span><div class="chips"><button class="btn sm" data-act="pxd" data-v="-500">−</button><b class="mono" style="min-width:60px;text-align:center">${thb(S.pxd)}</b><button class="btn sm" data-act="pxd" data-v="500">+</button></div></div>
       <div class="tblwrap" style="margin-top:12px"><table class="cmp"><tbody>${row("ตั๋วบิน ไป-กลับ", air, S.people + " คน × " + thb(f.thb) + " (" + nmx(k) + ")")}${row("ที่พัก", hot, rooms + " ห้อง × " + S.pxn + " คืน × " + thb(hn))}${row("กิน เดินทาง เข้าชม", loc, S.people + " คน × " + (S.pxn + 1) + " วัน × " + thb(S.pxd))}<tr><td><b>รวมทั้งกลุ่ม</b></td><td class="num"><b>${thb(tot)}</b></td></tr><tr><td><b>เฉลี่ยต่อคน</b></td><td class="num"><b>${thb(tot / S.people)}</b></td></tr></tbody></table></div>
+      ${(() => { const a = pxHist(HB.id, k); if (a.length < 2) return `<p class="mp-note">แนวโน้มราคา: เริ่มเก็บประวัติราคารายวันแล้ว (ตั้งแต่ ${E(a[0] ? a[0][0] : "วันนี้")}) กราฟจะขึ้นเมื่อมีข้อมูลอย่างน้อย 2 วัน</p>`; const v = a.map(x => x[1]), lo = Math.min(...v), cur = v[v.length - 1], d = cur - v[0]; return `<div class="hx on" style="margin-top:10px"><div class="hx-main"><b>แนวโน้มตั๋ว ${nmx(k)}</b><div class="hx-s">${a.length} วันที่เก็บ · ต่ำสุดที่เคยเห็น ${thb(lo)} · ${d === 0 ? "ราคาเท่าเดิม" : (d < 0 ? "ลดลง " : "เพิ่มขึ้น ") + thb(Math.abs(d)) + " จากวันแรก"}${cur === lo ? " · <b>ตอนนี้ต่ำสุดเท่าที่เคยเห็น</b>" : ""}</div></div><div class="hx-p">${spark(v)}</div></div>`; })()}
       <p class="mp-note">จำนวนคนปรับได้ที่ปุ่มในหน้านี้ ห้องคำนวณเป็นคู่ละห้อง ไม่รวมประกัน ซิม ช้อปปิ้ง และตั๋ว Pass ที่ต้องซื้อเพิ่ม (ดูเปรียบเทียบ Pass ในหน้าข้อมูล)</p>
       <div class="step" style="margin-top:8px"><span class="label">จำนวนคน</span><div class="chips"><button class="btn sm" data-act="people" data-v="-1">−</button><b class="mono" style="min-width:28px;text-align:center">${S.people}</b><button class="btn sm" data-act="people" data-v="1">+</button></div></div>`, 1); };
   function vPx() {

@@ -53,5 +53,11 @@ if (provider !== "mock" && out.tokyo && out.tokyo.asOf === iso(today) && (!out.s
 }
 if (!okHubs) { console.error("no hub updated; keeping file unchanged"); process.exit(provider === "mock" ? 1 : 0); }
 fs.writeFileSync(FILE, JSON.stringify(out, null, 1));
+if (provider !== "mock") { // price history: per hub, per departure month, [date, cheapest THB]; one point per day, last 120 days
+  const HF = "data/px_history.json"; let h = {}; try { h = JSON.parse(fs.readFileSync(HF, "utf8")); } catch (e) { }
+  for (const [hub, v] of Object.entries(out)) { if (!v || v.asOf !== iso(today)) continue; h[hub] = h[hub] || {};
+    for (const f of v.flights || []) { const k = String(f.dep).slice(0, 7), a = (h[hub][k] = h[hub][k] || []); const m = a.find(x => x[0] === v.asOf); if (m) m[1] = Math.min(m[1], f.thb); else a.push([v.asOf, f.thb]); if (a.length > 120) a.splice(0, a.length - 120); } }
+  fs.writeFileSync(HF, JSON.stringify(h));
+}
 console.log(`updated ${okHubs}/${Object.keys(HUBS).length} hubs via ${provider}`);
 if (provider !== "mock") console.log("diag", JSON.stringify(diag));
