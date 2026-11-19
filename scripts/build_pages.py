@@ -26,6 +26,31 @@ def page(title, desc, canon, body, ld, img="default"):
             '<a href="/privacy.html">นโยบายความเป็นส่วนตัว</a></p></main><script src="/analytics.js" defer></script></body></html>')
 
 
+MTH_EN = {"Sep": "ก.ย.", "Oct": "ต.ค.", "Nov": "พ.ย.", "Dec": "ธ.ค.", "Aug": "ส.ค."}
+WRD = {"early": "ต้น", "mid": "กลาง", "late": "ปลาย"}
+
+
+def thm(x):
+    if not x:
+        return "-"
+    out = str(x)
+    for k, v in WRD.items():
+        out = re.sub(r"" + k + r"", v, out, flags=re.I)
+    for k, v in MTH_EN.items():
+        out = re.sub(k, v, out, flags=re.I)
+    return out
+
+
+LOCKED = []
+
+
+def safe_write(path, text):
+    try:
+        open(path, "w", encoding="utf8").write(text)
+    except PermissionError:
+        LOCKED.append(path)
+
+
 def first_sent(s, n=160):
     s = re.sub(r"\s+", " ", str(s or "")).strip()
     return s if len(s) <= n else s[:n].rsplit(" ", 1)[0] + "…"
@@ -83,6 +108,9 @@ for hub, (th, en, base) in HUBS.items():
                 + (f' — {E(first_sent(p.get("note", ""), 240))}' if p.get("note") else "") + "</li>" for p in tick[:6]) + "</ul>"
         if rows:
             body += f'<h2>เดือนไหนไปดี</h2><table><tr><th>เดือน</th><th>คะแนน</th><th>หมายเหตุ</th></tr>{rows}</table>'
+        mj = m.get("momiji")
+        if mj and mj.get("peak"):
+            body += f'<h2>ช่วงใบไม้เปลี่ยนสี (ปีเฉลี่ย)</h2><p>เริ่ม {E(thm(mj.get("start")))} · พีค <b>{E(thm(mj.get("peak")))}</b> · ร่วงหมด/จบ {E(thm(mj.get("end")))}</p><p class="m">ช่วงทั่วไปของปีเฉลี่ย ไม่ใช่พยากรณ์ปีนี้ ความมั่นใจ: {E(mj.get("conf", ""))} · <a href="{E(mj.get("src", ""))}" rel="nofollow noopener">แหล่งอ้างอิง</a> · ควรเช็คพยากรณ์ใบไม้เปลี่ยนสีของปีนั้นก่อนไป</p>'
         cl = [c for c in (m.get("closures") or []) if isinstance(c, str)]
         if cl:
             body += "<h2>ข้อควรรู้ / วันปิด / การจอง</h2><ul class=l>" + "".join(f"<li>{E(c)}</li>" for c in cl[:8]) + "</ul>"
@@ -99,7 +127,7 @@ for hub, (th, en, base) in HUBS.items():
                   {"@type": "ListItem", "position": 3, "name": short}]}]
         if faq:
             ld.append({"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": q, "acceptedAnswer": {"@type": "Answer", "text": a}} for q, a in faq]})
-        open(f"{d}/{m['id']}.html", "w", encoding="utf8").write(page(f"{short} – เที่ยวจาก{th} | Nihontabi", first_sent(m.get("pitch"), 150), f"{SITE}/guide/{hub}/{m['id']}.html", body, ld, hub))
+        safe_write(f"{d}/{m['id']}.html", page(f"{short} – เที่ยวจาก{th} | Nihontabi", first_sent(m.get("pitch"), 150), f"{SITE}/guide/{hub}/{m['id']}.html", body, ld, hub))
         urls.append(f"{SITE}/guide/{hub}/{m['id']}.html")
         items.append((short, m["id"], mn, first_sent(m.get("pitch"), 130)))
         total += 1
@@ -153,3 +181,5 @@ Facts are compiled from official sites and travel sites (data as of {UPDATED}); 
 - [Privacy]({SITE}/privacy.html)
 """)
 print("pages:", total, "urls:", len(urls))
+if LOCKED:
+    print("LOCKED files (not rewritten):", LOCKED)
