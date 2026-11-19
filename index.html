@@ -485,7 +485,6 @@ svg.spk circle{fill:var(--shu)}
 .kmap-lite .kd i{transform:scale(max(.3,calc(1 / (var(--z,1) * 1.6 - .6)))) !important}.kmap-lite .kl{transform:translateY(-50%) scale(max(.55,calc(1 / (var(--z,1) * 1.4 - .4)))) !important}
 .kmap-lite .kd i{width:11px;height:11px;border-width:2px}.kmap-lite .kd.sel i{width:15px;height:15px}.kmap-lite .kl{font-size:.62rem}
 .kgrid-city .kd i{width:11px;height:11px;border-width:2px}.kgrid-city .kd.sel i{width:15px;height:15px}.kgrid-city .kl{font-size:.68rem}
-button.tab[data-tab="vote"]{display:none !important}
 .kmapr .kd i{transform:scale(max(.3,calc(1 / (var(--z,1) * 1.6 - .6)))) !important;width:11px;height:11px;border-width:2px}.kmapr .kd.sel i{width:15px;height:15px}.kmapr .kl{transform:translateY(-50%) scale(max(.55,calc(1 / (var(--z,1) * 1.4 - .4)))) !important;font-size:.62rem}.kmapr .kd.nat i{transform:rotate(45deg) scale(max(.22,calc(.8 / (var(--z,1) * 1.9 - .9)))) !important}
 @media(max-width:600px){header.top{flex-wrap:wrap !important;row-gap:8px !important}header.top .brand{flex:1 1 100% !important}header.top .pill{font-size:12.5px !important;padding:6px 11px !important;margin-left:0 !important}}
 .kgrid.kgrid-city{grid-template-columns:minmax(0,1fr) !important}.kgrid.kgrid-city .kmap,.kgrid.kgrid-city .kmap.kmapr,.kgrid.kgrid-city .kmap.wide{width:100%;max-width:min(1000px,calc(105vh * var(--ar,1))) !important}.kgrid-city .citypanel .cards{grid-template-columns:repeat(auto-fill,minmax(300px,1fr)) !important}.kgrid-city .kside{min-width:0}
@@ -1998,7 +1997,7 @@ details.pgrp>summary::-webkit-details-marker{display:none}
   function draw() {
     const grp = ["pick", "plan", "cmp"].includes(S.tab) ? "pick" : S.tab; document.querySelectorAll(".tab").forEach(el => el.setAttribute("aria-selected", String(el.dataset.tab === grp)));
     const p = cur(); $("#selPill").textContent = grp === "pick" ? (p ? `${p.title} · ${p.nDays || S.len} วัน` : "แพลนสำเร็จรูป") : `ทริปของฉัน · ${TRIP.days.length} วัน`; $("#selPill").dataset.tab = grp === "pick" ? (p ? "plan" : "pick") : "trip";
-    const v = { vote: vVote, px: vPx, lib: vLib, trip: vTrip, pick: vPick, plan: vPlan, cmp: vCmp, info: () => vInfo() + eventsCalendar() }[S.tab]();
+    const v = { vote: vPoll, px: vPx, lib: vLib, trip: vTrip, pick: vPick, plan: vPlan, cmp: vCmp, info: () => vInfo() + eventsCalendar() }[S.tab]();
     $("#app").innerHTML = `<section class="view ${anim ? "anim" : ""}">${v}</section>`;
     anim = false;
   }
@@ -3211,6 +3210,16 @@ ${apSteps()}</div></section>
         VOTE_ERR = null; VOTE_READY = true; if (S.tab === "vote" || S.tab === "lib") draw(); },
         e => { VOTE_ERR = (e && e.code) || "err"; VOTE_READY = true; if (S.tab === "vote") draw(); });
     } catch (e) { VOTE_ERR = "nodb"; VOTE_READY = true; } })();
+  function vPoll() {
+    const L = k => { try { return JSON.parse(localStorage.getItem(k) || "[]"); } catch (e) { return []; } }, T = (() => { try { return JSON.parse(localStorage.getItem("jp:pollt") || "{}"); } catch (e) { return {}; } })();
+    const mine = L("jp:polls").slice(-10).reverse(), voted = L("jp:voted").filter(id => !mine.find(m => m.id === id)).slice(-10).reverse();
+    const row = (id, t) => `<li><a href="?poll=${esc(id)}" data-ntpoll="open" data-id="${esc(id)}">${esc(t || T[id] || "โพล " + id)}</a></li>`;
+    return sec(`${ic("check", "sm")} โหวตทริปกับเพื่อน`, "", `<p style="margin:0 0 10px">เลือกแพลนหรือที่เที่ยว 2–8 อย่าง แล้วส่งลิงก์ให้เพื่อนโหวตด้วยบัญชี Google ผลรวมและชื่อคนโหวตเห็นได้ในหน้าโพล</p><p><button class="btn pri" data-ntpoll="create">+ สร้างโพลใหม่</button></p>`
+      + `<h3 style="margin:16px 0 6px;font-size:15px">โพลของฉัน</h3>` + (mine.length ? `<ul class="plain">${mine.map(m => row(m.id, m.t)).join("")}</ul>` : `<p class="sub">ยังไม่มีโพลที่สร้างจากเครื่องนี้</p>`)
+      + `<h3 style="margin:16px 0 6px;font-size:15px">โพลที่ฉันโหวต</h3>` + (voted.length ? `<ul class="plain">${voted.map(id => row(id)).join("")}</ul>` : `<p class="sub">ยังไม่มี</p>`)
+      + `<p class="mp-note">ทุกคนที่มีลิงก์และเข้าสู่ระบบจะเห็นตัวเลือก ชื่อต้นของผู้โหวต และผลโหวต · รายการนี้จำไว้ในเบราว์เซอร์เครื่องนี้</p>`, 0);
+  }
+  window.__ntDraw = () => { if (S.tab === "vote") draw(); };
   function vVote() {
     const voters = Object.keys(VOTES).filter(u => (VOTES[u] || []).length), mine = VOTE_UID ? (VOTES[VOTE_UID] || []) : [];
     const cities = MODS.filter(m => m.kind === "daytrip" || m.kind === "city");

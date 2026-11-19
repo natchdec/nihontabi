@@ -53,7 +53,7 @@ export function init(ctx) {
       go.disabled = true; const id = rid(), title = (c.querySelector("#pT").value || "โหวตทริป").trim().slice(0, 80);
       try {
         await setDoc(doc(db, "polls", id), { owner: auth.currentUser.uid, title, hub: data.hub, month: data.month || "", options: sel.map(i => ({ id: i.id, k: i.k, l: String(i.l).slice(0, 140), s: String(i.s || "").slice(0, 100) })), createdAt: Date.now() });
-        const p = ls.get(MINE); p.push({ id, t: title }); ls.set(MINE, p.slice(-20));
+        const p = ls.get(MINE); p.push({ id, t: title }); ls.set(MINE, p.slice(-20)); if (window.__ntDraw) window.__ntDraw();
         const url = location.origin + "/?poll=" + id;
         c.querySelector("#pMsg").innerHTML = `<p style="margin:0 0 6px"><b>สร้างโพลแล้ว</b> ส่งลิงก์นี้ให้เพื่อน:</p><input readonly value="${esc(url)}" style="${INP}" id="pU"><div style="display:flex;gap:8px;margin-top:8px"><button id="pC" style="${BTN}background:#e8ecf4;color:#111">คัดลอกลิงก์</button>${navigator.share ? `<button id="pSh" style="${BTN}background:#2a3040;color:#fff">แชร์</button>` : ""}<button id="pOpen" style="${BTN}background:none;color:#fff;border:1px solid #556">เปิดโพล</button></div>`;
         c.querySelector("#pC").onclick = async () => { try { await navigator.clipboard.writeText(url); c.querySelector("#pC").textContent = "คัดลอกแล้ว ✓"; } catch (e) { c.querySelector("#pU").select(); } };
@@ -72,14 +72,14 @@ export function init(ctx) {
     }
     try {
       const snap = await getDoc(doc(db, "polls", id)); if (!snap.exists()) { c.innerHTML = "<p>ไม่พบโพลนี้ (ลิงก์อาจผิดหรือถูกลบแล้ว)</p>"; return; }
-      const poll = snap.data(), uid = auth.currentUser.uid; let votes = {};
-      const saveVote = async picks => { const msg = c.querySelector("#pvMsg"); try { await setDoc(doc(db, "polls", id, "votes", uid), { n: first(auth.currentUser), picks: picks.slice(0, 12), t: Date.now() }); const v = ls.get(VOTED); if (!v.includes(id)) { v.push(id); ls.set(VOTED, v.slice(-50)); } if (msg) msg.textContent = "บันทึกโหวตแล้ว ✓"; } catch (e) { if (msg) msg.textContent = "บันทึกไม่สำเร็จ (" + (e.code || e.message) + ")"; } };
+      const poll = snap.data(), uid = auth.currentUser.uid; let votes = {}; try { const T = JSON.parse(localStorage.getItem("jp:pollt") || "{}"); T[id] = String(poll.title || "").slice(0, 80); localStorage.setItem("jp:pollt", JSON.stringify(T)); } catch (e) { }
+      const saveVote = async picks => { const msg = c.querySelector("#pvMsg"); try { await setDoc(doc(db, "polls", id, "votes", uid), { n: first(auth.currentUser), picks: picks.slice(0, 12), t: Date.now() }); const v = ls.get(VOTED); if (!v.includes(id)) { v.push(id); ls.set(VOTED, v.slice(-50)); if (window.__ntDraw) window.__ntDraw(); } if (msg) msg.textContent = "บันทึกโหวตแล้ว ✓"; } catch (e) { if (msg) msg.textContent = "บันทึกไม่สำเร็จ (" + (e.code || e.message) + ")"; } };
       if (unsub) unsub();
       unsub = onSnapshot(collection(db, "polls", id, "votes"), s => { votes = {}; s.forEach(d => { votes[d.id] = d.data(); }); const keep = c.querySelector("#pvMsg") ? c.querySelector("#pvMsg").textContent : ""; renderPoll(c, poll, votes, uid, saveVote); const mm = c.querySelector("#pvMsg"); if (mm) mm.textContent = keep; const x = c.querySelector("#pvX"); if (x) x.onclick = () => { if (unsub) unsub(); m.close(); }; }, e => { c.innerHTML = "<p>อ่านผลโหวตไม่สำเร็จ (" + esc(e.code || e.message) + ")</p>"; });
     } catch (e) { c.innerHTML = "<p>เปิดโพลไม่สำเร็จ (" + esc(e.code || e.message) + ")</p>"; }
   }
 
-  const pb = document.createElement("button"); pb.className = "pill"; pb.type = "button"; pb.id = "pollBtn"; pb.textContent = "ชวนเพื่อนโหวต"; pb.style.marginLeft = "8px"; pb.onclick = openCreate; host && host.appendChild(pb);
+  document.addEventListener("click", e => { const el = e.target.closest && e.target.closest("[data-ntpoll]"); if (!el) return; e.preventDefault(); if (el.dataset.ntpoll === "create") openCreate(); else if (el.dataset.ntpoll === "open") openPoll(el.dataset.id); });
   const pid = new URLSearchParams(location.search).get("poll");
   if (pid && /^[a-z0-9]{8,24}$/.test(pid)) (auth.authStateReady ? auth.authStateReady() : Promise.resolve()).then(() => setTimeout(() => openPoll(pid), 400));
   window.__ntPoll = { openCreate, openPoll, renderPoll, modal };

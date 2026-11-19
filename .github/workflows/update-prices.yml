@@ -47,3 +47,9 @@ jobs:
             npx --yes firebase-tools deploy --only hosting --project nihontabi-63523
           fi
           rm -f "$RUNNER_TEMP/sa.json"
+      - name: Remove old hosting versions (keeps storage under the free quota)
+        if: env.TARGET == 'live'
+        continue-on-error: true
+        env:
+          SA: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        run: node scripts/cleanup_versions.mjs
