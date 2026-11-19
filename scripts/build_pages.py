@@ -80,7 +80,15 @@ for hub, (th, en, base) in HUBS.items():
     d = f"guide/{hub}"
     shutil.rmtree(d, ignore_errors=True)
     os.makedirs(d, exist_ok=True)
-    mods = [m for m in H["mods"] if m.get("kind") not in ("arrival", "departure") and re.fullmatch(r"[a-z0-9][a-z0-9\-_]*", str(m.get("id", "")))]
+    allm = list(H["mods"])
+    if hub == "tokyo":
+        me0 = H.get("monthsExtra") or {}
+        have = {m["id"] for m in allm}
+        for cm in json.load(open("data/modules.json", encoding="utf8")):
+            if cm["id"] not in have:
+                cm["months"] = {**(cm.get("months") or {}), **(me0.get(cm["id"]) or {})}
+                allm.append(cm)
+    mods = [m for m in allm if m.get("kind") not in ("arrival", "departure") and re.fullmatch(r"[a-z0-9][a-z0-9\-_]*", str(m.get("id", "")))]
     META = {}
     for m0 in mods:
         t0 = m0.get("title", ""); fh0 = m0.get("fromHub") or m0.get("fromUeno") or {}

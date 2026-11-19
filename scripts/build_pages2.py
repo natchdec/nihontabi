@@ -5,7 +5,15 @@ PASSCAT = json.loads(re.search(r'<script type="application/json" id="passcat">(.
 ALL = []
 for hub, (th, en, base) in HUBS.items():
     H = json.load(open(f"data/hub_{hub}.json", encoding="utf8"))["hub"]
-    for m in H["mods"]:
+    mods_all = list(H["mods"])
+    if hub == "tokyo":
+        me0 = H.get("monthsExtra") or {}
+        have = {m["id"] for m in mods_all}
+        for cm in json.load(open("data/modules.json", encoding="utf8")):
+            if cm["id"] not in have:
+                cm["months"] = {**(cm.get("months") or {}), **(me0.get(cm["id"]) or {})}
+                mods_all.append(cm)
+    for m in mods_all:
         if m.get("kind") in ("arrival", "departure") or not re.fullmatch(r"[a-z0-9][a-z0-9\-_]*", str(m.get("id", ""))):
             continue
         title = m.get("title", "")
@@ -174,9 +182,119 @@ safe_write("guide/pass-compare.html", page("เปรียบเทียบพ
 urls.append(f"{SITE}/guide/pass-compare.html")
 extra_llm.append(f"- [Pass comparison table]({SITE}/guide/pass-compare.html)")
 
+# ---- seasonal pages: events, sakura, foliage, winter
+os.makedirs("guide/season", exist_ok=True)
+MIDX = {k: i for i, (k, _) in enumerate(MON)}
+EVENTS, SAK = [], []
+for hub, (th, en, base) in HUBS.items():
+    H = json.load(open(f"data/hub_{hub}.json", encoding="utf8"))["hub"]
+    mids = {m["id"] for m in ALL if m["hub"] == hub}
+    for ev in H.get("events") or []:
+        EVENTS.append((hub, th, ev, ev.get("city") in mids))
+    for m in H["mods"]:
+        for sp in (m.get("sakura100") or []):
+            if isinstance(sp, dict) and sp.get("bloom"):
+                SAK.append((hub, th, m["id"], sp))
+
+
+def mlink(hub, mid, label):
+    ok = any(m["hub"] == hub and m["id"] == mid for m in ALL)
+    return f'<a href="/guide/{hub}/{E(mid)}.html">{E(label)}</a>' if ok else E(label)
+
+
+def season_page(slug, title, desc, h1, intro, body_html):
+    url = f"{SITE}/guide/season/{slug}.html"
+    body = (f'<p class="m"><a href="/">Nihontabi</a> › <a href="/guide/">คู่มือ</a></p><h1>{E(h1)}</h1><p>{E(intro)}</p>'
+            f'<p><a class="cta" href="/">ให้แอปจัดแพลนตามเดือนที่คุณไป →</a></p>{body_html}')
+    ld = {"@context": "https://schema.org", "@type": "CollectionPage", "name": h1, "inLanguage": "th", "url": url}
+    safe_write(f"guide/season/{slug}.html", page(title, desc, url, body, ld))
+    urls.append(url)
+
+
+# events
+evs = sorted(EVENTS, key=lambda x: (MIDX.get((x[2].get("months") or ["jan"])[0], 0), x[2].get("name", "")))
+rows = ""
+cur = None
+for hub, th, ev, has in evs:
+    m0 = (ev.get("months") or ["jan"])[0]
+    if m0 != cur:
+        cur = m0
+        rows += f'<h2>{E(FULL[m0])}</h2>'
+    conf = ev.get("confirmed2027")
+    dates = ev.get("dates2027") if conf and ev.get("dates2027") else ev.get("datesTypical")
+    link_html = mlink(hub, ev.get("city"), "ดูสถานที่/วิธีไป") if has else ""
+    rows += (f'<h3>{E(ev.get("name", ""))} <span class="m">{E(ev.get("jp", ""))}</span></h3><p>{E(first_sent(ev.get("th", ""), 200))}</p>'
+             f'<p class="m">{"✓ ประกาศวันปี 2027 แล้ว: " if conf else "วันที่: "}{E(first_sent(dates or "ยังไม่ประกาศ", 220))} · ใกล้เมืองฐาน{E(th)} · {link_html}</p>'
+             + (f'<p class="m">ค่าเข้า/ค่าใช้จ่าย: {E(first_sent(ev.get("cost", ""), 140))}</p>' if ev.get("cost") else ""))
+season_page("events-2027", f"เทศกาลและอีเวนต์ญี่ปุ่นปี 2027: {len(evs)} งานเด่นแยกตามเดือน | Nihontabi",
+            "รวมเทศกาลและอีเวนต์ญี่ปุ่นที่เหมาะวางแผนปี 2027 แยกตามเดือนและเมืองฐาน พร้อมวันที่ปกติหรือวันที่ประกาศแล้ว", "เทศกาลและอีเวนต์ญี่ปุ่นปี 2027",
+            f"รวม {len(evs)} งานเด่นที่ใกล้เมืองฐาน 6 เมือง เรียงตามเดือน งานที่มีเครื่องหมาย ✓ คือมีวันที่ปี 2027 ที่ประกาศแล้วตามข้อมูลที่เก็บไว้ งานอื่นแสดงวันที่ของปีก่อนเป็นแนวทาง ตรวจวันที่จริงกับผู้จัดก่อนจองตั๋วหรือที่พัก", rows)
+
+# sakura
+sk = sorted(SAK, key=lambda x: str(x[3]["bloom"][0]))
+rows = ""
+for hub, th, mid, sp in sk:
+    b = sp["bloom"]
+    trees = f' · ซากุระประมาณ {sp["trees"]:,} ต้น' if isinstance(sp.get("trees"), int) else ""
+    note = f'<p>{E(first_sent(sp.get("note", ""), 240))}</p>' if sp.get("note") else ""
+    light = f'<p class="m">ไฟยามค่ำ: {E(first_sent(sp.get("light_period", ""), 160))}</p>' if sp.get("light") and sp.get("light_period") else ""
+    rows += (f'<h3>{mlink(hub, mid, sp.get("th") or sp.get("en") or mid)} <span class="m">{E(sp.get("en", ""))}</span></h3>'
+             f'<p class="m">ช่วงบานปกติ: {E(b[0].replace("-", "/"))} – {E(b[1].replace("-", "/"))} (เดือน/วัน) · ใกล้เมืองฐาน{E(th)}{trees}</p>{note}{light}')
+season_page("sakura", f"ซากุระญี่ปุ่น: {len(sk)} จุดชมซากุระ ช่วงบานปกติ ไฟยามค่ำ | Nihontabi",
+            "รวมจุดชมซากุระใกล้เมืองฐาน พร้อมช่วงบานปกติ จำนวนต้น และกิจกรรมไฟยามค่ำ เรียงตามเวลาที่บานก่อน", "จุดชมซากุระญี่ปุ่น เรียงตามช่วงบาน",
+            f"{len(sk)} จุดที่มีข้อมูลช่วงบานปกติ เรียงจากบานก่อนไปบานทีหลัง วันบานจริงเปลี่ยนทุกปีตามสภาพอากาศ ควรเช็คพยากรณ์ซากุระล่าสุดก่อนซื้อตั๋วหรือจองที่พัก", rows)
+
+# foliage
+FOL = []
+for hub, (th, en, base) in HUBS.items():
+    H = json.load(open(f"data/hub_{hub}.json", encoding="utf8"))["hub"]
+    mods2 = list(H["mods"]) + (json.load(open("data/modules.json", encoding="utf8")) if hub == "tokyo" else [])
+    seen = set()
+    for m in mods2:
+        mj = m.get("momiji")
+        if mj and mj.get("peak") and m["id"] not in seen:
+            seen.add(m["id"])
+            FOL.append((hub, th, m["id"], mj))
+
+
+def fkey(x):
+    pk = str(x[3].get("peak", ""))
+    mo = {"Sep": 9, "Oct": 10, "Nov": 11, "Dec": 12}
+    mm = [v for k, v in mo.items() if k in pk]
+    w = 0 if "early" in pk else 2 if "late" in pk else 1
+    return (mm[0] if mm else 99, w)
+
+
+fol = sorted(FOL, key=fkey)
+SHORT2 = {(m["hub"], m["id"]): m["short"] for m in ALL}
+rows = "".join(f'<tr><td>{mlink(h, i, SHORT2.get((h, i), i))}</td><td>{E(t)}</td><td>{E(thm(j.get("start")))}</td><td><b>{E(thm(j.get("peak")))}</b></td><td>{E(thm(j.get("end")))}</td><td><a href="{E(j.get("src", ""))}" rel="nofollow noopener">แหล่ง</a></td></tr>' for h, t, i, j in fol)
+season_page("foliage", f"ใบไม้เปลี่ยนสีญี่ปุ่น: {len(fol)} จุด ช่วงพีคปกติ เรียงตามเวลา | Nihontabi",
+            "ตารางช่วงใบไม้เปลี่ยนสีปกติของที่เที่ยวใกล้เมืองฐาน 6 เมือง พร้อมแหล่งอ้างอิง เรียงตามช่วงพีค", "ใบไม้เปลี่ยนสีญี่ปุ่น เรียงตามช่วงพีค",
+            f"{len(fol)} จุดที่ตรวจช่วงใบไม้เปลี่ยนสีของปีเฉลี่ยกับแหล่งอ้างอิงแล้ว เรียงตามช่วงพีค (ไม่ใช่พยากรณ์ปีนี้ ใบไม้เปลี่ยนสีจริงเลื่อนเร็ว-ช้าตามอากาศ ควรเช็คพยากรณ์ก่อนไป)",
+            f'<table><tr><th>ที่เที่ยว</th><th>เมืองฐาน</th><th>เริ่ม</th><th>พีค</th><th>จบ</th><th>อ้างอิง</th></tr>{rows}</table>')
+
+# winter / snow
+snow = [m for m in ALL if "snow" in m["themes"] and max(sc(m, "jan"), sc(m, "feb")) >= 5]
+wev = [x for x in evs if (x[2].get("months") or [""])[0] in ("dec", "jan", "feb", "mar")]
+rows = "<h2>เทศกาลและอีเวนต์ฤดูหนาว</h2>"
+for hub, th, ev, has in wev:
+    dd = (ev.get("dates2027") if ev.get("confirmed2027") else ev.get("datesTypical")) or "ยังไม่ประกาศ"
+    rows += f'<h3>{E(ev.get("name", ""))} <span class="m">{E(ev.get("jp", ""))}</span></h3><p>{E(first_sent(ev.get("th", ""), 200))}</p><p class="m">วันที่: {E(first_sent(dd, 200))} · ใกล้เมืองฐาน{E(th)}</p>'
+rows += "<h2>ที่เที่ยวหิมะที่เหมาะเดือนม.ค.–ก.พ.</h2><ul class=l>"
+for m in sorted(snow, key=lambda m: (m["hub"], m["mn"] or 999)):
+    mn_txt = f", {m['mn']} นาที" if m["mn"] else ""
+    rows += f'<li>{link(m)} <span class="m">(เมืองฐาน{E(m["th"])}{mn_txt})</span></li>'
+rows += "</ul>"
+season_page("winter-snow", f"เที่ยวญี่ปุ่นหน้าหนาว: เทศกาลหิมะ ออนเซ็น {len(snow)} ที่เที่ยวหิมะ | Nihontabi",
+            "รวมเทศกาลฤดูหนาวและที่เที่ยวหิมะที่เหมาะกับเดือนมกราคมถึงกุมภาพันธ์ ใกล้เมืองฐาน 6 เมือง", "เที่ยวญี่ปุ่นหน้าหนาว: เทศกาลหิมะและที่เที่ยวหิมะ",
+            f"{len(wev)} เทศกาลฤดูหนาวและ {len(snow)} ที่เที่ยวหิมะที่คะแนนฤดูกาลสูงสุดในเดือนม.ค.–ก.พ. แยกตามเมืองฐาน", rows)
+extra_llm.append(f"- Seasonal guides: {SITE}/guide/season/events-2027.html, sakura.html, foliage.html, winter-snow.html")
+SEASON_LINKS = [("events-2027", "เทศกาลและอีเวนต์ปี 2027"), ("sakura", "จุดชมซากุระ"), ("foliage", "ใบไม้เปลี่ยนสี"), ("winter-snow", "เที่ยวหน้าหนาว/หิมะ")]
+
 # ---- update guide index with the new sections
 idx2 = ('<h2>ตามเดือน</h2><ul class=l>' + "".join(f'<li><a href="/guide/month/{k}.html">เที่ยวญี่ปุ่นเดือน{FULL[k]}</a></li>' for k, lab in MON) + "</ul>"
         '<h2>ตามธีม</h2><ul class=l>' + "".join(f'<li><a href="/guide/theme/{t}.html">สาย{E(tl)}</a> <span class="m">({n} แห่ง)</span></li>' for t, tl, n in tlinks) + "</ul>"
+        '<h2>ตามฤดูกาล</h2><ul class=l>' + ''.join(f'<li><a href="/guide/season/{a}.html">{b}</a></li>' for a, b in SEASON_LINKS) + '</ul>'
         f'<h2>พาส</h2><p><a href="/guide/pass/">รวมพาสท่องเที่ยว {len(plinks)} รายการ</a> · <a href="/guide/pass-compare.html">ตารางเปรียบเทียบพาส</a></p>'
         '<h2>แพลนตามจำนวนวัน</h2><ul class=l>' + ''.join(f'<li>เที่ยว{E(HUBS[h][0])}: ' + ' · '.join(f'<a href="/guide/{h}/plans-{n}-days.html">{n} วัน</a>' for n in ns) + '</li>' for h, ns in PLEN.items()) + '</ul>')
 EXTRA_INDEX = idx2
