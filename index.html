@@ -2393,6 +2393,33 @@ details.pgrp>summary::-webkit-details-marker{display:none}
   }
 
   // ---------- home overview map: pass zones + hubs (only Tokyo has plans yet; others show their passes)
+
+  const switchBase = (v, tab, extra) => { const o = store.get("state") || {}; store.set("state", Object.assign({ base: v, tab: tab || "pick", month: o.month, people: o.people, rooms: o.rooms, len: o.len }, extra || {})); const ov = document.createElement("div"); ov.style.cssText = "position:fixed;inset:0;z-index:99;display:grid;place-items:center;background:rgba(10,10,14,.72);color:#fff;font:600 16px system-ui,sans-serif"; ov.textContent = "กำลังเปลี่ยนฐานเป็น " + HUBCFG[v].short + " …"; document.body.append(ov); setTimeout(() => location.reload(), 60); };
+  const recommendHub = (first, month, days, theme) => { const sc = { tokyo: 2, osaka: 2, sendai: 0, nagoya: 0, fukuoka: 0, sapporo: 0 }, add = (h, n) => { sc[h] += n; };
+    if (first) { add("tokyo", 2); add("osaka", 2); }
+    if (theme === "shop") { add("tokyo", 3); } if (theme === "food") { add("osaka", 2); add("fukuoka", 3); add("sapporo", 1); } if (theme === "culture") { add("osaka", 3); add("nagoya", 1); add("tokyo", 1); }
+    if (theme === "nature") { add("sendai", 2); add("nagoya", 2); add("sapporo", 2); } if (theme === "onsen") { add("sendai", 3); add("fukuoka", 2); add("sapporo", 1); } if (theme === "photo") { add("nagoya", 2); add("tokyo", 1); add("osaka", 1); }
+    if (["dec", "jan", "feb"].includes(month)) add("sapporo", 4); if (["jul", "aug"].includes(month)) add("sapporo", 3);
+    if (["mar", "apr"].includes(month)) { add("tokyo", 1); add("osaka", 1); } if (["oct", "nov"].includes(month)) { add("osaka", 2); add("tokyo", 1); add("sendai", 1); }
+    if (days >= 7) { add("fukuoka", 1); add("nagoya", 1); } if (days <= 4) { add("tokyo", 1); add("osaka", 1); }
+    return Object.entries(sc).filter(([h]) => HUBCFG[h]).sort((a, b) => b[1] - a[1])[0][0]; };
+  const openQuiz = () => { const A = { first: null, month: null, days: null, theme: null };
+    const Q = [["first", "เคยไปญี่ปุ่นมาก่อนไหม", [[true, "ยังไม่เคย (ไปครั้งแรก)"], [false, "เคยไปแล้ว"]]],
+      ["month", "จะไปเดือนไหน", MONTHS.map(m => [m[0], m[1]])],
+      ["days", "ไปกี่วัน", [[4, "3–4 วัน"], [6, "5–6 วัน"], [7, "7–9 วัน"], [10, "10 วันขึ้นไป"]]],
+      ["theme", "ชอบเที่ยวแนวไหนที่สุด", [["food", "กินเป็นหลัก"], ["nature", "ธรรมชาติ/วิว"], ["culture", "วัด ปราสาท เมืองเก่า"], ["onsen", "ออนเซ็น พักผ่อน"], ["shop", "ช้อปปิ้ง/อนิเมะ"], ["photo", "ถ่ายรูปสวยๆ"]]]];
+    const o = document.createElement("div"); o.style.cssText = "position:fixed;inset:0;z-index:95;background:rgba(0,0,0,.7);display:grid;place-items:center;padding:12px"; const c = document.createElement("div"); c.style.cssText = "background:#1f2430;color:#fff;border-radius:16px;max-width:520px;width:100%;max-height:90vh;overflow:auto;padding:20px;font:15px/1.5 system-ui,sans-serif"; o.appendChild(c); document.body.appendChild(o); o.addEventListener("click", e => { if (e.target === o) o.remove(); });
+    let step = 0; const bt = "border:0;border-radius:12px;padding:12px 16px;margin:0 8px 8px 0;font:600 15px system-ui;cursor:pointer;background:#2a3040;color:#fff;";
+    const draw = () => { const q = Q[step]; c.innerHTML = `<div style="font-size:12.5px;color:#9aa3b5">ข้อ ${step + 1} จาก ${Q.length}</div><h3 style="margin:4px 0 14px;font-size:19px">${q[1]}</h3><div>${q[2].map(([v, l]) => `<button data-v="${String(v)}" style="${bt}">${l}</button>`).join("")}</div><div style="margin-top:6px">${step ? `<button data-back style="${bt}background:none;border:1px solid #556">ย้อนกลับ</button>` : ""}<button data-x style="${bt}background:none;color:#9aa3b5">ปิด</button></div>`; };
+    c.addEventListener("click", e => { const b = e.target.closest("button"); if (!b) return; if (b.hasAttribute("data-x")) { o.remove(); return; } if (b.hasAttribute("data-back")) { step--; draw(); return; }
+      const q = Q[step], raw = b.dataset.v; A[q[0]] = q[0] === "first" ? raw === "true" : q[0] === "days" ? +raw : raw;
+      if (++step < Q.length) { draw(); return; }
+      const hub = recommendHub(A.first, A.month, A.days, A.theme), th = [A.theme]; if (["mar", "apr"].includes(A.month)) th.push("sakura"); if (["oct", "nov"].includes(A.month)) th.push("foliage"); if (["dec", "jan", "feb"].includes(A.month) && hub === "sapporo") th.push("snow");
+      const mon = MONTHS.find(m => m[0] === A.month)[1], why = { tokyo: "ครบทุกแนว ไป-กลับได้ทั่วคันโต เหมาะกับครั้งแรก", osaka: "เกียวโต นารา โกเบ อยู่ใกล้ และของกินเยอะ", sendai: "ธรรมชาติและออนเซ็นโทโฮคุ คนน้อยกว่า", nagoya: "ชิราคาวาโกะ ทาคายามะ คานาซาวะ แอลป์ญี่ปุ่น", fukuoka: "ของกินถูกและอร่อย ออนเซ็นคิวชู", sapporo: "ธรรมชาติ ซีฟู้ด และหิมะ/อากาศเย็นตามฤดู" }[hub];
+      c.innerHTML = `<div style="font-size:12.5px;color:#9aa3b5">คำแนะนำสำหรับคุณ</div><h3 style="margin:4px 0 6px;font-size:21px">ฐาน ${HUBCFG[hub].short}</h3><p style="margin:0 0 14px;color:#c8d0e2">${why} (เดือน ${mon} · ${A.days} วัน) กดด้านล่างเพื่อดูแพลนที่เข้ากับคุณได้เลย</p><button data-go style="${bt}background:#e8ecf4;color:#111">ดูแพลนที่เหมาะ →</button><button data-x style="${bt}background:none;color:#9aa3b5">ปิด</button>`;
+      c.querySelector("[data-go]").onclick = () => { const ex = { month: A.month, len: A.days, themes: th, mall: false, tab: "pick", mode: "all" }; if (hub !== HB.id) { switchBase(hub, "pick", ex); return; } Object.assign(S, ex); o.remove(); render(); window.scrollTo({ top: 0, behavior: "smooth" }); };
+      c.querySelector("[data-x]").onclick = () => o.remove(); });
+    draw(); };
   function hubMapSec() {
     const sel = S.hub || "", H = JPMAP.hubs, Z = JPMAP.zones, cur = H.find(h => h.id === sel), liveH = h => !!HUBCFG[h.id];
     const zc = Object.fromEntries(Z.map(z => [z.id, z.c]));
@@ -2405,7 +2432,7 @@ details.pgrp>summary::-webkit-details-marker{display:none}
           ${liveH(h) ? `<text x="${h.x}" y="${h.y + 4}" text-anchor="middle" font-size="11" font-weight="600" fill="#fff">✓</text>` : ""}
           <text x="${h.x + (left ? -r - 4 : r + 4)}" y="${h.y + 4}" text-anchor="${left ? "end" : "start"}" font-size="12" fill="var(--ink)">${esc(h.n)}</text></g>`; }).join("")}</svg>`;
     const zp = id => PASSCAT.filter(p => p.h.includes(id) && p.st === "active");
-    const cards = H.map(h => `<button class="hubc" aria-pressed="${h.id === sel}" data-act="hub" data-v="${h.id}"><i class="dot" style="background:${zc[h.zone] || "#999"}"></i><span><b>${E(h.t)}</b><small>${h.id === HB.id ? "ฐานที่ใช้อยู่ (แพลนและเมืองอยู่ด้านล่าง)" : liveH(h) ? "พร้อมใช้ · แตะเพื่อดูและเปลี่ยนฐาน" : "กำลังจัดทำแพลน · มี Pass " + zp(h.id).length + " รายการ"}</small></span></button>`).join("");
+    const cards = H.map(h => `<button class="hubc" aria-pressed="${h.id === sel}" data-act="hub" data-v="${h.id}"><i class="dot" style="background:${zc[h.zone] || "#999"}"></i><span><b>${E(h.t)}</b><small>${h.id === HB.id ? "ฐานที่ใช้อยู่ (แพลนและเมืองอยู่ด้านล่าง)" : liveH(h) ? "พร้อมใช้ · แตะเพื่อเปลี่ยนฐานทันที" : "กำลังจัดทำแพลน · มี Pass " + zp(h.id).length + " รายการ"}</small></span></button>`).join("");
     let panel = "";
     if (false && cur) {
       const ps = zp(cur.id).sort((a, b) => (b.ck ? 1 : 0) - (a.ck ? 1 : 0)).slice(0, 5);
@@ -2413,7 +2440,7 @@ details.pgrp>summary::-webkit-details-marker{display:none}
         ${ps.length ? `<table>${ps.map(p => `<tr><td>${E(p.n)}</td><td>${p.p[0] ? yenF(p.p[0][1]) : "—"}</td><td>${p.ck ? "✓ ตรวจแล้ว" : "ยังไม่ยืนยัน"}</td></tr>`).join("")}</table>` : ""}
         <div class="actions">${liveH(cur) && cur.id !== HB.id ? `<button class="btn sm pri" data-act="setbase" data-v="${cur.id}">ใช้ ${esc(cur.n)} เป็นฐาน</button>` : ""}<button class="btn sm" data-act="hubpass" data-v="${cur.id}">ดู Pass ของฐานนี้ทั้งหมด</button></div></div>`;
     }
-    return sec(`${ic("map", "sm")} เลือกฐานที่พัก`, "ฐานปัจจุบัน: " + esc(HB.name) + " · สีพื้น = โซน Pass โดยประมาณ", `<div class="hubmap"><div>${svg}</div><div><div class="hubcards">${cards}</div></div></div>${panel}
+    return sec(`${ic("map", "sm")} เริ่มตรงนี้ · แตะเมืองบนแผนที่เพื่อเลือกฐาน`, "ฐานปัจจุบัน: " + esc(HB.name) + " · สีพื้น = โซน Pass โดยประมาณ", `<div class="hubmap"><div>${svg}</div><div><div class="hubcards">${cards}</div></div></div>${panel}
       <p class="sub" style="font-size:12px;color:var(--muted);margin:10px 0 0">ขอบเขตสีเป็นการประมาณ ไม่ใช่ขอบเขตทางการของ Pass · ฐานที่พร้อมใช้: ${Object.values(HUBCFG).map(c => c.name).join(" · ")} · ฐานนอก Tokyo ยังไม่มีรูปถ่ายและแผนที่รายวัน</p>`, 1);
   }
 
@@ -2503,7 +2530,7 @@ details.pgrp>summary::-webkit-details-marker{display:none}
     return `<div class="hero glass rv" style="--i:0"><div class="hero-in"><span class="hero-kanji" aria-hidden="true">${HB.kanji}</span>
         <span class="eyebrow">Japan trip planner</span>
         <h1><span class="jp">${HB.jp}</span>เลือกทริปญี่ปุ่นแบบที่ใช่</h1>
-        <p>นอน ${HB.short} ที่เดียว เที่ยวไป-กลับ ตลอดปี (เลือกเดือนที่จะไป ระบบเรียงที่เที่ยวและแพลนตามฤดู) ดูเมืองบนแผนที่ หรือเลือกแพลนสำเร็จรูปตามวิธีเดินทาง ทุกแพลนปรับจำนวนวันได้ ${LEN_MIN}–${LEN_MAX} วัน (ตัดวันหรือเติมวันเสริมให้อัตโนมัติ)</p></div></div>
+        <p>นอน ${HB.short} ที่เดียว เที่ยวไป-กลับ ตลอดปี (เลือกเดือนที่จะไป ระบบเรียงที่เที่ยวและแพลนตามฤดู) ดูเมืองบนแผนที่ หรือเลือกแพลนสำเร็จรูปตามวิธีเดินทาง ทุกแพลนปรับจำนวนวันได้ ${LEN_MIN}–${LEN_MAX} วัน (ตัดวันหรือเติมวันเสริมให้อัตโนมัติ)</p><div class="actions"><button class="btn pri" data-act="quiz">ไม่รู้จะเริ่มตรงไหน? ตอบ 4 ข้อ ให้เราเลือกให้</button></div><p style="font-size:13px;opacity:.8">หรือเลือกเอง: ① แตะเมืองบนแผนที่ (เปลี่ยนฐานทันที) ② เลือกเดือนและแนวที่ชอบ ③ เลือกแพลนด้านล่าง</p></div></div>
       ${hubMapSec()}
       ${hubRegion()}
       <section class="glass rv" style="--i:2"><div class="pick">
@@ -3753,9 +3780,9 @@ ${apSteps()}</div></section>
     if (a === "hpmore") { S.hpmore = !S.hpmore; return render(); }
     if (a === "hpass") { S.hpass = v || null; if (HB.id !== "tokyo") S.pcat = v ? "p:" + v : (String(S.pcat).startsWith("p:") ? "all" : S.pcat); return render(); }
     if (a === "pprev") { S.pprev = S.pprev === t.dataset.id ? null : t.dataset.id; return render(); }
-    if (a === "setbase") { if (!HUBCFG[v] || v === HB.id) return; const o = store.get("state") || {}; store.set("state", { base: v, tab: t.dataset.keep || "pick", month: o.month, people: o.people, rooms: o.rooms, len: o.len }); const ov = document.createElement("div"); ov.style.cssText = "position:fixed;inset:0;z-index:99;display:grid;place-items:center;background:rgba(10,10,14,.72);color:#fff;font:600 16px system-ui,sans-serif"; ov.textContent = "กำลังเปลี่ยนฐานเป็น " + HUBCFG[v].short + " …"; document.body.append(ov); setTimeout(() => location.reload(), 60); return; }
+    if (a === "setbase") { if (!HUBCFG[v] || v === HB.id) return; return switchBase(v, t.dataset.keep || "pick"); }
     if (a === "expand") { t.classList.toggle("open"); return; }
-    if (a === "hub") { if (v && HUBDATA[v] && HUBDATA[v]._stub) { try { __fill(v, JSON.parse(__xhr("data/hub_" + v + ".json"))); } catch (e) { } } S.hub = S.hub === v ? "" : v; S.hpass = null; S.pprev = null; S.hmv = null; return render(); }
+    if (a === "hub") { if (HUBCFG[v] && v !== HB.id) return switchBase(v, "pick"); if (v && HUBDATA[v] && HUBDATA[v]._stub) { try { __fill(v, JSON.parse(__xhr("data/hub_" + v + ".json"))); } catch (e) { } } S.hub = S.hub === v ? "" : v; S.hpass = null; S.pprev = null; S.hmv = null; return render(); }
     if (a === "pgrp") { S.pgrp = v; return render(); }
     if (a === "pgall") { S.pgall = !S.pgall; return render(); }
     if (a === "pallen") { S.pallen = v ? 1 : 0; return render(); }
@@ -3826,6 +3853,7 @@ ${apSteps()}</div></section>
     if (a === "pxd") { S.pxd = Math.max(500, Math.min(10000, (S.pxd || 2000) + (+v))); return render(); }
     if (a === "pxt") { S.pxt = +v; return render(); }
     if (a === "pxm") { S.pxm = v; return render(); }
+    if (a === "quiz") { return openQuiz(); }
     if (a === "people") { S.people = Math.max(1, Math.min(60, S.people + (+v))); return render(); }
     if (a === "addday") { const id = t.dataset.id, k = MOD[id] && MOD[id].kind, last = TRIP.days[TRIP.days.length - 1];
       const at = k === "arrival" ? 0 : k === "departure" ? TRIP.days.length : (MOD[last.opts[0]].kind === "departure" ? TRIP.days.length - 1 : TRIP.days.length);
