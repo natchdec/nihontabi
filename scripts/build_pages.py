@@ -2,7 +2,7 @@
 sitemap.xml and llms.txt.  usage: python scripts/build_pages.py   (run from the repo root)"""
 import json, re, html, os, shutil, datetime, urllib.parse
 SITE = "https://nihontabi.web.app"
-HUBS = {"tokyo": ("โตเกียว", "Tokyo", "ฐาน Ueno"), "osaka": ("โอซาก้า", "Osaka", "ฐาน Namba"), "sendai": ("เซนได", "Sendai", "ฐาน Sendai Station"),
+HUBS = {"tokyo": ("โตเกียว", "Tokyo", "ฐาน Tokyo"), "osaka": ("โอซาก้า", "Osaka", "ฐาน Namba"), "sendai": ("เซนได", "Sendai", "ฐาน Sendai Station"),
         "nagoya": ("นาโกย่า", "Nagoya", "ฐาน Nagoya Station"), "fukuoka": ("ฟุกุโอกะ", "Fukuoka", "ฐาน Hakata"), "sapporo": ("ซัปโปโร", "Sapporo", "ฐาน Sapporo Station")}
 MON = [("jan", "ม.ค."), ("feb", "ก.พ."), ("mar", "มี.ค."), ("apr", "เม.ย."), ("may", "พ.ค."), ("jun", "มิ.ย."), ("jul", "ก.ค."), ("aug", "ส.ค."), ("sep", "ก.ย."), ("oct", "ต.ค."), ("nov", "พ.ย."), ("dec", "ธ.ค.")]
 TH = {"foliage": "ใบไม้เปลี่ยนสี", "food": "อาหาร", "night": "ราตรี", "shop": "ช้อปปิ้ง", "nature": "ธรรมชาติ", "onsen": "ออนเซ็น", "snow": "หิมะ", "photo": "ถ่ายรูป", "festival": "เทศกาล", "culture": "วัฒนธรรม", "anime": "อนิเมะ", "park": "สวนสนุก/สวน", "chill": "ชิลล์", "sakura": "ซากุระ"}
@@ -191,7 +191,7 @@ open("sitemap.xml", "w", encoding="utf8").write('<?xml version="1.0" encoding="U
                                                 + "\n".join(f"<url><loc>{u}</loc><lastmod>{today}</lastmod></url>" for u in urls) + "\n</urlset>\n")
 NL = "\n"
 open("llms.txt", "w", encoding="utf8").write(f"""# Nihontabi
-> Thai-language Japan trip planner. Stay in one hub city and make day trips all year round. Covers 6 hubs (Tokyo/Ueno, Osaka/Namba, Sendai, Nagoya, Fukuoka/Hakata, Sapporo) with routes, fares, passes, best months and estimated flight prices from Bangkok.
+> Thai-language Japan trip planner. Stay in one hub city and make day trips all year round. Covers 6 hubs (Tokyo, Osaka/Namba, Sendai, Nagoya, Fukuoka/Hakata, Sapporo) with routes, fares, passes, best months and estimated flight prices from Bangkok.
 
 Facts are compiled from official sites and travel sites (data as of {UPDATED}); prices and hours change, so verify with the provider before travel. Flight prices are sampled estimates, not live fares.
 
