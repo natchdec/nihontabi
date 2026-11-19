@@ -5,7 +5,7 @@ SITE = "https://nihontabi.web.app"
 HUBS = {"tokyo": ("โตเกียว", "Tokyo", "ฐาน Ueno"), "osaka": ("โอซาก้า", "Osaka", "ฐาน Namba"), "sendai": ("เซนได", "Sendai", "ฐาน Sendai Station"),
         "nagoya": ("นาโกย่า", "Nagoya", "ฐาน Nagoya Station"), "fukuoka": ("ฟุกุโอกะ", "Fukuoka", "ฐาน Hakata"), "sapporo": ("ซัปโปโร", "Sapporo", "ฐาน Sapporo Station")}
 MON = [("jan", "ม.ค."), ("feb", "ก.พ."), ("mar", "มี.ค."), ("apr", "เม.ย."), ("may", "พ.ค."), ("jun", "มิ.ย."), ("jul", "ก.ค."), ("aug", "ส.ค."), ("sep", "ก.ย."), ("oct", "ต.ค."), ("nov", "พ.ย."), ("dec", "ธ.ค.")]
-TH = {"food": "อาหาร", "night": "ราตรี", "shop": "ช้อปปิ้ง", "nature": "ธรรมชาติ", "onsen": "ออนเซ็น", "snow": "หิมะ", "photo": "ถ่ายรูป", "festival": "เทศกาล", "culture": "วัฒนธรรม", "anime": "อนิเมะ", "park": "สวนสนุก/สวน", "chill": "ชิลล์", "sakura": "ซากุระ"}
+TH = {"foliage": "ใบไม้เปลี่ยนสี", "food": "อาหาร", "night": "ราตรี", "shop": "ช้อปปิ้ง", "nature": "ธรรมชาติ", "onsen": "ออนเซ็น", "snow": "หิมะ", "photo": "ถ่ายรูป", "festival": "เทศกาล", "culture": "วัฒนธรรม", "anime": "อนิเมะ", "park": "สวนสนุก/สวน", "chill": "ชิลล์", "sakura": "ซากุระ"}
 UPDATED = "2026-11-18"
 
 

@@ -13,7 +13,8 @@
         "redirect/**",
         "scripts/**",
         "README.md",
-        ".github/**"
+        ".github/**",
+        "engine/**"
       ],
       "headers": [
         {

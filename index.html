@@ -686,7 +686,7 @@ details.pgrp>summary::-webkit-details-marker{display:none}
   const MONTHS = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"];
   const MONTH_TH = { jan: "ม.ค.", feb: "ก.พ.", mar: "มี.ค.", apr: "เม.ย.", may: "พ.ค.", jun: "มิ.ย.", jul: "ก.ค.", aug: "ส.ค.", sep: "ก.ย.", oct: "ต.ค.", nov: "พ.ย.", dec: "ธ.ค." };
   const HUB_TH = { tokyo: "โตเกียว", osaka: "โอซาก้า", sendai: "เซนได", nagoya: "นาโกย่า", fukuoka: "ฟุกุโอกะ", sapporo: "ซัปโปโร" };
-  const THEME_TH = { sakura: "ซากุระ", shop: "ช้อปปิ้ง", food: "สายกิน", nature: "ธรรมชาติ", onsen: "ออนเซ็น", snow: "หิมะ & ฤดูหนาว", photo: "ถ่ายรูป/วิวสวย", festival: "เทศกาล/อีเวนต์", culture: "ประวัติศาสตร์/วัฒนธรรม", night: "ไนต์ไลฟ์/ซาเก", anime: "อนิเมะ/ป๊อปคัลเจอร์", park: "สวนสนุก", chill: "ชิลๆ เดินน้อย" };
+  const THEME_TH = { sakura: "ซากุระ", foliage: "ใบไม้เปลี่ยนสี", shop: "ช้อปปิ้ง", food: "สายกิน", nature: "ธรรมชาติ", onsen: "ออนเซ็น", snow: "หิมะ & ฤดูหนาว", photo: "ถ่ายรูป/วิวสวย", festival: "เทศกาล/อีเวนต์", culture: "ประวัติศาสตร์/วัฒนธรรม", night: "ไนต์ไลฟ์/ซาเก", anime: "อนิเมะ/ป๊อปคัลเจอร์", park: "สวนสนุก", chill: "ชิลๆ เดินน้อย" };
   const THEMES = Object.keys(THEME_TH);
   // run = max consecutive long days before a rest/city/short day; maxMin = default one-way cap
   const PACE = {
@@ -943,6 +943,7 @@ details.pgrp>summary::-webkit-details-marker{display:none}
     return themes.filter(t => {
       if (t === "sakura") return RX_SAKURA.test(note) || (has.includes("sakura") && ["mar", "apr", "may"].includes(mo) && !/ไม่มี|หมด|ผ่าน/.test(note));
       if (t === "snow") return has.includes("snow") && (["dec", "jan", "feb", "mar"].includes(mo) || RX_SNOW.test(note));
+      if (t === "foliage") return has.includes("foliage") && ["sep", "oct", "nov", "dec"].includes(mo);
       if (t === "festival") return ev.length > 0 || (has.includes("festival") && RX_FEST.test(note));
       return has.includes(t);
     });
@@ -1810,7 +1811,7 @@ details.pgrp>summary::-webkit-details-marker{display:none}
   const MODES = HB.modes;
   const MODE_KJ = {city:"街",wide:"広",east:"東",hakone:"富",zone:"線",osaka:"関",sendai:"仙",nagoya:"名",fukuoka:"福",sapporo:"札"};
   const MODE_NAME = {city:"ในเมือง",wide:"Tokyo Wide",east:"JR East",hakone:"Hakone·Fuji",zone:"Pass โซน",osaka:"Kansai",sendai:"Tohoku",nagoya:"Chubu",fukuoka:"Kyushu",sapporo:"Hokkaido"}; MODE_NAME.auto = "แผนอัตโนมัติ"; MODE_KJ.auto = "自";
-  const THEMES = [["sakura","ซากุระ"],["shop","ช้อปปิ้ง"],["food","สายกิน"],["nature","ธรรมชาติ"],["onsen","ออนเซ็น"],["snow","หิมะ & ฤดูหนาว"],["photo","ถ่ายรูป/วิวสวย"],["festival","เทศกาล/อีเวนต์"],["culture","ประวัติศาสตร์/วัฒนธรรม"],["night","ไนต์ไลฟ์/ซาเก"],["anime","อนิเมะ/ป๊อปคัลเจอร์"],["park","สวนสนุก"],["chill","ชิลๆ เดินน้อย"]];
+  const THEMES = [["sakura","ซากุระ"],["foliage","ใบไม้เปลี่ยนสี"],["shop","ช้อปปิ้ง"],["food","สายกิน"],["nature","ธรรมชาติ"],["onsen","ออนเซ็น"],["snow","หิมะ & ฤดูหนาว"],["photo","ถ่ายรูป/วิวสวย"],["festival","เทศกาล/อีเวนต์"],["culture","ประวัติศาสตร์/วัฒนธรรม"],["night","ไนต์ไลฟ์/ซาเก"],["anime","อนิเมะ/ป๊อปคัลเจอร์"],["park","สวนสนุก"],["chill","ชิลๆ เดินน้อย"]];
   const TH = Object.fromEntries(THEMES);
   const store = { get(k){ try { return JSON.parse(localStorage.getItem("jp:"+k)); } catch { return null; } },
                   set(k,v){ try { localStorage.setItem("jp:"+k, JSON.stringify(v)); } catch {} } };
