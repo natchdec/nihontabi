@@ -109,9 +109,75 @@ open("guide/pass/index.html", "w", encoding="utf8").write(page("รวมพา�
 urls.append(f"{SITE}/guide/pass/")
 extra_llm.append(f"- [Pass guides]({SITE}/guide/pass/): {len(plinks)} active travel passes with prices, validity, exclusions, where to buy")
 
+# ---- plans-by-length pages and pass comparison
+SHORT = {(m["hub"], m["id"]): m["short"] for m in ALL}
+PLEN = {}
+for hub, (th, en, base) in HUBS.items():
+    H = json.load(open(f"data/hub_{hub}.json", encoding="utf8"))["hub"]
+    plans = list(H.get("plans") or [])
+    if hub == "tokyo":
+        plans = json.load(open("data/plans.json", encoding="utf8")) + plans
+    bylen = {}
+    for pl in plans:
+        n = len(pl.get("days") or [])
+        bylen.setdefault(n, []).append(pl)
+    for n in (3, 4, 5, 6, 7, 8, 10):
+        L = bylen.get(n, [])
+        seen_t, pick = set(), []
+        for pl in sorted(L, key=lambda x: (bool(x.get("gen")), 0)):
+            t = re.sub(r"\s*\([^)]*\)\s*", " ", str(pl.get("title", ""))).strip()
+            if not t or t in seen_t:
+                continue
+            seen_t.add(t); pick.append(pl)
+            if len(pick) >= 12:
+                break
+        if len(pick) < 2:
+            continue
+        PLEN.setdefault(hub, []).append(n)
+        sec = ""
+        for pl in pick:
+            ds = []
+            for i, d in enumerate(pl.get("days") or [], 1):
+                nm = SHORT.get((hub, d.get("mod"))) or str(d.get("title") or d.get("area") or "")[:60] or "เดินทางกลับ"
+                ds.append(f"<li>วัน {i}: {E(nm)}</li>")
+            bud = (pl.get("transportBudget") or {}).get("adultJPY")
+            sec += (f'<h2>{E(pl.get("title", ""))}</h2><p>{E(first_sent(pl.get("tagline", ""), 220))}</p>'
+                    + (f'<p class="m">เหมาะกับ: {E(first_sent(pl.get("who", ""), 180))}</p>' if pl.get("who") else "")
+                    + (f'<p class="m">ค่าเดินทางประมาณ ¥{int(bud):,} ต่อผู้ใหญ่ (ประมาณการ)</p>' if isinstance(bud, (int, float)) and bud else "")
+                    + f'<ul class=l>{"".join(ds)}</ul><p><a href="/?hub={hub}&plan={E(pl.get("id", ""))}">เปิดแผนนี้ในแอป →</a></p>')
+        body = (f'<p class="m"><a href="/">Nihontabi</a> › <a href="/guide/">คู่มือ</a> › <a href="/guide/{hub}/">{E(th)}</a></p>'
+                f'<h1>แพลนเที่ยว{E(th)} {n} วัน: {len(pick)} แพลนแนะนำ ({E(base)})</h1><p>แพลน {n} วันที่นอนฐานเดียว ({E(base)}) แล้วเที่ยวไป-กลับแต่ละวัน เลือกจากหลายสไตล์ (เมือง ธรรมชาติ ออนเซ็น ตามฤดูกาล) พร้อมค่าเดินทางประมาณ</p>'
+                f'<p><a class="cta" href="/?hub={hub}">ให้แอปจัดแพลน {n} วันตามเดือนที่คุณไป →</a></p>{sec}')
+        ld = {"@context": "https://schema.org", "@type": "CollectionPage", "name": f"แพลนเที่ยว{th} {n} วัน", "inLanguage": "th", "url": f"{SITE}/guide/{hub}/plans-{n}-days.html"}
+        safe_write(f"guide/{hub}/plans-{n}-days.html", page(f"แพลนเที่ยว{th} {n} วัน: {len(pick)} แพลนแนะนำ นอนที่เดียว เที่ยวไป-กลับ | Nihontabi", f"รวมแพลนเที่ยว{th} {n} วัน นอนฐานเดียว เที่ยวไป-กลับ ตามเดือนและสไตล์ พร้อมค่าเดินทางประมาณ", f"{SITE}/guide/{hub}/plans-{n}-days.html", body, ld, hub))
+        urls.append(f"{SITE}/guide/{hub}/plans-{n}-days.html")
+for hub, ns in PLEN.items():
+    fp = f"guide/{hub}/index.html"; t = open(fp, encoding="utf8").read(); mk = "<h2>ที่เที่ยวและทริปไปเช้า-เย็นกลับ</h2>"
+    if mk in t and "แพลนตามจำนวนวัน" not in t:
+        links = f'<p class="m">ภาพสรุปสำหรับแชร์ (LINE/IG): <a href="/share/{hub}.jpg">ดาวน์โหลดภาพ</a></p>' + "<h2>แพลนตามจำนวนวัน</h2><p>" + " · ".join(f'<a href="/guide/{hub}/plans-{n}-days.html">{n} วัน</a>' for n in ns) + "</p>"
+        safe_write(fp, t.replace(mk, links + mk, 1))
+extra_llm.append(f"- Plans by trip length: {SITE}/guide/<hub>/plans-<N>-days.html (N = 3..10)")
+
+# pass comparison
+rows = []
+for p in PASSCAT:
+    if p.get("st") != "active":
+        continue
+    pr = [x for x in (p.get("p") or []) if isinstance(x, list) and len(x) >= 2 and isinstance(x[1], (int, float))]
+    lo = min((x[1] for x in pr), default=None)
+    rows.append((p.get("n", p["id"]), p.get("op", ""), p.get("v", ""), lo, p["id"], ", ".join(HUBNAME[h] for h in (p.get("h") or []) if h in HUBNAME)))
+rows.sort(key=lambda r: (r[5] == "", r[5], r[0]))
+tb = "".join(f'<tr><td><a href="/guide/pass/{E(i)}.html">{E(n)}</a></td><td>{E(o)}</td><td>{E(str(v)[:60])}</td><td>{("¥" + format(lo, ",")) if lo else "-"}</td><td>{E(h)}</td></tr>' for n, o, v, lo, i, h in rows)
+safe_write("guide/pass-compare.html", page("เปรียบเทียบพาสท่องเที่ยวญี่ปุ่น: ราคา ระยะเวลา ใช้ที่ไหน | Nihontabi", "ตารางเปรียบเทียบพาสรถไฟและขนส่งในญี่ปุ่นที่เปิดขายอยู่ ราคาเริ่มต้น ระยะเวลาใช้ และเมืองฐานที่เกี่ยวข้อง", f"{SITE}/guide/pass-compare.html",
+    f'<p class="m"><a href="/">Nihontabi</a> › <a href="/guide/">คู่มือ</a></p><h1>เปรียบเทียบพาสท่องเที่ยวญี่ปุ่น</h1><p>พาสที่เปิดขายอยู่ {len(rows)} รายการ เรียงตามเมืองฐาน ราคาเป็นราคาเริ่มต้นของผู้ใหญ่ตามข้อมูลที่เก็บไว้ ควรตรวจราคาล่าสุดกับผู้ให้บริการ</p><p><a class="cta" href="/">ให้แอปช่วยเลือกพาสที่คุ้มกับแพลนของคุณ →</a></p><table><tr><th>พาส</th><th>ผู้ให้บริการ</th><th>ระยะเวลา</th><th>ราคาเริ่มต้น</th><th>เมืองฐาน</th></tr>{tb}</table>',
+    {"@context": "https://schema.org", "@type": "CollectionPage", "name": "เปรียบเทียบพาสท่องเที่ยวญี่ปุ่น", "inLanguage": "th", "url": f"{SITE}/guide/pass-compare.html"}))
+urls.append(f"{SITE}/guide/pass-compare.html")
+extra_llm.append(f"- [Pass comparison table]({SITE}/guide/pass-compare.html)")
+
 # ---- update guide index with the new sections
 idx2 = ('<h2>ตามเดือน</h2><ul class=l>' + "".join(f'<li><a href="/guide/month/{k}.html">เที่ยวญี่ปุ่นเดือน{FULL[k]}</a></li>' for k, lab in MON) + "</ul>"
         '<h2>ตามธีม</h2><ul class=l>' + "".join(f'<li><a href="/guide/theme/{t}.html">สาย{E(tl)}</a> <span class="m">({n} แห่ง)</span></li>' for t, tl, n in tlinks) + "</ul>"
-        f'<h2>พาส</h2><p><a href="/guide/pass/">รวมพาสท่องเที่ยว {len(plinks)} รายการ</a></p>')
+        f'<h2>พาส</h2><p><a href="/guide/pass/">รวมพาสท่องเที่ยว {len(plinks)} รายการ</a> · <a href="/guide/pass-compare.html">ตารางเปรียบเทียบพาส</a></p>'
+        '<h2>แพลนตามจำนวนวัน</h2><ul class=l>' + ''.join(f'<li>เที่ยว{E(HUBS[h][0])}: ' + ' · '.join(f'<a href="/guide/{h}/plans-{n}-days.html">{n} วัน</a>' for n in ns) + '</li>' for h, ns in PLEN.items()) + '</ul>')
 EXTRA_INDEX = idx2
 print("extra pages: months 12, themes", len(tlinks), "passes", len(plinks))

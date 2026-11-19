@@ -1,6 +1,6 @@
 """Generate static, crawlable pages from data/hub_*.json: guide/index.html, guide/<hub>/index.html, guide/<hub>/<place>.html,
 sitemap.xml and llms.txt.  usage: python scripts/build_pages.py   (run from the repo root)"""
-import json, re, html, os, shutil, datetime
+import json, re, html, os, shutil, datetime, urllib.parse
 SITE = "https://nihontabi.web.app"
 HUBS = {"tokyo": ("โตเกียว", "Tokyo", "ฐาน Ueno"), "osaka": ("โอซาก้า", "Osaka", "ฐาน Namba"), "sendai": ("เซนได", "Sendai", "ฐาน Sendai Station"),
         "nagoya": ("นาโกย่า", "Nagoya", "ฐาน Nagoya Station"), "fukuoka": ("ฟุกุโอกะ", "Fukuoka", "ฐาน Hakata"), "sapporo": ("ซัปโปโร", "Sapporo", "ฐาน Sapporo Station")}
@@ -16,12 +16,21 @@ def E(s):
 CSS = ":root{color-scheme:light dark;--bg:#fff;--fg:#1d2330;--mut:#5b6475;--ac:#c0392b;--bd:#e4e7ee}@media(prefers-color-scheme:dark){:root{--bg:#12151c;--fg:#e8ebf2;--mut:#9aa3b5;--ac:#ff7a6b;--bd:#2a3040}}body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.75 system-ui,'Noto Sans Thai',sans-serif}main{max-width:820px;margin:0 auto;padding:20px 16px 64px}a{color:var(--ac)}h1{font-size:26px;line-height:1.3}h2{font-size:19px;margin-top:30px;border-bottom:1px solid var(--bd);padding-bottom:6px}table{border-collapse:collapse;width:100%;font-size:14.5px}td,th{border-bottom:1px solid var(--bd);padding:6px 8px;text-align:left}.m{color:var(--mut);font-size:14px}.cta{display:inline-block;margin:10px 0;padding:10px 16px;border-radius:12px;background:var(--ac);color:#fff;text-decoration:none;font-weight:600}.tag{display:inline-block;margin:2px 4px 2px 0;padding:1px 9px;border:1px solid var(--bd);border-radius:99px;font-size:13px}ul.l{padding-left:20px}"
 
 
+def share_bar(canon):
+    q = urllib.parse.quote(canon, safe="")
+    return ('<p class="m">แชร์หน้านี้: <a href="https://social-plugins.line.me/lineit/share?url=' + q + '" rel="nofollow noopener">LINE</a> · '
+            '<a href="https://www.facebook.com/sharer/sharer.php?u=' + q + '" rel="nofollow noopener">Facebook</a> · '
+            '<a href="#" onclick="navigator.clipboard&amp;&amp;navigator.clipboard.writeText(\'' + canon + '\');this.textContent=\'คัดลอกลิงก์แล้ว ✓\';return false">คัดลอกลิงก์</a></p>')
+
+
 def page(title, desc, canon, body, ld, img="default"):
     return ('<!doctype html><html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">'
             f'<title>{E(title)}</title><meta name="description" content="{E(desc)}"><link rel="canonical" href="{canon}">'
             f'<meta property="og:type" content="article"><meta property="og:title" content="{E(title)}"><meta property="og:description" content="{E(desc)}">'
             f'<meta property="og:url" content="{canon}"><meta property="og:locale" content="th_TH"><meta property="og:image" content="{SITE}/og/{img}.jpg"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:image" content="{SITE}/og/{img}.jpg">'
             f'<style>{CSS}</style><script type="application/ld+json">{json.dumps(ld, ensure_ascii=False)}</script></head><body><main>{body}<hr>'
+            + share_bar(canon) +
+            '<p class="m">ดูเพิ่ม: <a href="/guide/">คู่มือรายเมือง</a> · <a href="/guide/month/nov.html">ตามเดือน</a> · <a href="/guide/theme/foliage.html">ตามธีม</a> · <a href="/guide/pass/">พาสท่องเที่ยว</a> · <a href="/guide/pass-compare.html">เปรียบเทียบพาส</a></p>'
             f'<p class="m">ข้อมูลรวบรวม ณ {UPDATED} จากแหล่งทางการและเว็บท่องเที่ยว ราคา เวลาเปิด-ปิด และเงื่อนไขอาจเปลี่ยน ตรวจกับผู้ให้บริการก่อนเดินทางทุกครั้ง · '
             '<a href="/privacy.html">นโยบายความเป็นส่วนตัว</a> · <a href="/credits.html">เครดิตรูปภาพ</a></p></main><script src="/analytics.js" defer></script></body></html>')
 
@@ -72,6 +81,10 @@ for hub, (th, en, base) in HUBS.items():
     shutil.rmtree(d, ignore_errors=True)
     os.makedirs(d, exist_ok=True)
     mods = [m for m in H["mods"] if m.get("kind") not in ("arrival", "departure") and re.fullmatch(r"[a-z0-9][a-z0-9\-_]*", str(m.get("id", "")))]
+    META = {}
+    for m0 in mods:
+        t0 = m0.get("title", ""); fh0 = m0.get("fromHub") or m0.get("fromUeno") or {}
+        META[m0["id"]] = {"short": t0.split(":")[0].strip() if ":" in t0 else t0, "themes": set(m0.get("themes") or []), "mn": fh0.get("minutes") or 999}
     items = []
     for m in mods:
         fh = m.get("fromHub") or m.get("fromUeno") or {}
@@ -116,6 +129,10 @@ for hub, (th, en, base) in HUBS.items():
             body += "<h2>ข้อควรรู้ / วันปิด / การจอง</h2><ul class=l>" + "".join(f"<li>{E(c)}</li>" for c in cl[:8]) + "</ul>"
         if faq:
             body += "<h2>คำถามที่พบบ่อย</h2>" + "".join(f"<h3>{E(q)}</h3><p>{E(a)}</p>" for q, a in faq)
+        rel = sorted([(len(META[m["id"]]["themes"] & v["themes"]), -abs((v["mn"] or 999) - (mn or 999)), k) for k, v in META.items() if k != m["id"] and (META[m["id"]]["themes"] & v["themes"])], reverse=True)[:6]
+        if rel:
+            body += "<h2>ที่เที่ยวใกล้เคียง/คล้ายกัน</h2><ul class=l>" + "".join(f'<li><a href="/guide/{hub}/{k}.html">{E(META[k]["short"])}</a></li>' for _, _, k in rel) + "</ul>"
+        body += f'<p class="m">ดูทั้งหมดของ <a href="/guide/{hub}/">เที่ยวจาก{E(th)}</a> · <a href="/guide/{hub}/plans-5-days.html">แพลน 5 วัน{E(th)}</a></p>'
         if src:
             body += f"<h2>แหล่งอ้างอิง</h2><ul class=l>{src}</ul>"
         ld = [clean({"@context": "https://schema.org", "@type": "TouristAttraction", "name": short, "alternateName": m.get("jp"), "description": first_sent(m.get("pitch"), 300),
@@ -127,7 +144,7 @@ for hub, (th, en, base) in HUBS.items():
                   {"@type": "ListItem", "position": 3, "name": short}]}]
         if faq:
             ld.append({"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": q, "acceptedAnswer": {"@type": "Answer", "text": a}} for q, a in faq]})
-        safe_write(f"{d}/{m['id']}.html", page(f"{short} – เที่ยวจาก{th} | Nihontabi", first_sent(m.get("pitch"), 150), f"{SITE}/guide/{hub}/{m['id']}.html", body, ld, hub))
+        safe_write(f"{d}/{m['id']}.html", page(f"{short} เที่ยวจาก{th}: เดินทางยังไง ค่าเข้า เดือนไหนดี | Nihontabi", first_sent(m.get("pitch"), 150), f"{SITE}/guide/{hub}/{m['id']}.html", body, ld, hub))
         urls.append(f"{SITE}/guide/{hub}/{m['id']}.html")
         items.append((short, m["id"], mn, first_sent(m.get("pitch"), 130)))
         total += 1
