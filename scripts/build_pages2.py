@@ -154,10 +154,10 @@ for hub, (th, en, base) in HUBS.items():
                     + (f'<p class="m">ค่าเดินทางประมาณ ¥{int(bud):,} ต่อผู้ใหญ่ (ประมาณการ)</p>' if isinstance(bud, (int, float)) and bud else "")
                     + f'<ul class=l>{"".join(ds)}</ul><p><a href="/?hub={hub}&plan={E(pl.get("id", ""))}">เปิดแผนนี้ในแอป →</a></p>')
         body = (f'<p class="m"><a href="/">Nihontabi</a> › <a href="/guide/">คู่มือ</a> › <a href="/guide/{hub}/">{E(th)}</a></p>'
-                f'<h1>แพลนเที่ยว{E(th)} {n} วัน: {len(pick)} แพลนแนะนำ ({E(base)})</h1><p>แพลน {n} วันที่นอนฐานเดียว ({E(base)}) แล้วเที่ยวไป-กลับแต่ละวัน เลือกจากหลายสไตล์ (เมือง ธรรมชาติ ออนเซ็น ตามฤดูกาล) พร้อมค่าเดินทางประมาณ</p>'
+                f'<h1>แพลนเที่ยว{E(th)} {n} วัน: {len(pick)} แพลนแนะนำ ({E(base)})</h1><p>แพลน {n} วันจากฐาน {E(base)} เลือกจากหลายสไตล์ (เมือง ธรรมชาติ ออนเซ็น ตามฤดูกาล) พร้อมค่าเดินทางประมาณ</p>'
                 f'<p><a class="cta" href="/?hub={hub}">ให้แอปจัดแพลน {n} วันตามเดือนที่คุณไป →</a></p>{sec}')
         ld = {"@context": "https://schema.org", "@type": "CollectionPage", "name": f"แพลนเที่ยว{th} {n} วัน", "inLanguage": "th", "url": f"{SITE}/guide/{hub}/plans-{n}-days.html"}
-        safe_write(f"guide/{hub}/plans-{n}-days.html", page(f"แพลนเที่ยว{th} {n} วัน: {len(pick)} แพลนแนะนำ นอนที่เดียว เที่ยวไป-กลับ | Nihontabi", f"รวมแพลนเที่ยว{th} {n} วัน นอนฐานเดียว เที่ยวไป-กลับ ตามเดือนและสไตล์ พร้อมค่าเดินทางประมาณ", f"{SITE}/guide/{hub}/plans-{n}-days.html", body, ld, hub))
+        safe_write(f"guide/{hub}/plans-{n}-days.html", page(f"แพลนเที่ยว{th} {n} วัน: {len(pick)} แพลนแนะนำ | Nihontabi", f"รวมแพลนเที่ยว{th} {n} วัน ตามเดือนและสไตล์ พร้อมค่าเดินทางประมาณ", f"{SITE}/guide/{hub}/plans-{n}-days.html", body, ld, hub))
         urls.append(f"{SITE}/guide/{hub}/plans-{n}-days.html")
 for hub, ns in PLEN.items():
     fp = f"guide/{hub}/index.html"; t = open(fp, encoding="utf8").read(); mk = "<h2>ที่เที่ยวและทริปไปเช้า-เย็นกลับ</h2>"

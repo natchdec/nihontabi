@@ -1,5 +1,5 @@
 # Nihontabi
-> Thai-language Japan trip planner. Stay in one hub city and make day trips all year round. Covers 6 hubs (Tokyo, Osaka/Namba, Sendai, Nagoya, Fukuoka/Hakata, Sapporo) with routes, fares, passes, best months and estimated flight prices from Bangkok.
+> Thai-language Japan trip planner. Pick a hub city as your starting point and plan by month, with ready-made plans, flight prices and passes. Covers 6 hubs (Tokyo, Osaka/Namba, Sendai, Nagoya, Fukuoka/Hakata, Sapporo) with routes, fares, passes, best months and estimated flight prices from Bangkok.
 
 Facts are compiled from official sites and travel sites (data as of 2026-11-18); prices and hours change, so verify with the provider before travel. Flight prices are sampled estimates, not live fares.
 

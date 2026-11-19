@@ -183,7 +183,7 @@ for hub, (th, en, base) in HUBS.items():
 exec(open("scripts/build_pages2.py", encoding="utf8").read())
 idx = "".join(f'<li><a href="/guide/{h}/">เที่ยวจาก{E(t)}</a> <span class="m">({n} จุดหมาย)</span></li>' for h, t, n in hub_links)
 open("guide/index.html", "w", encoding="utf8").write(page("คู่มือเที่ยวญี่ปุ่นรายเมือง | Nihontabi",
-    "รวมคู่มือที่เที่ยวญี่ปุ่นแบบนอนเมืองเดียวแล้วเที่ยวไป-กลับ 6 เมืองฐาน: Tokyo, Osaka, Sendai, Nagoya, Fukuoka, Sapporo", SITE + "/guide/",
+    "รวมคู่มือที่เที่ยวญี่ปุ่นจาก 6 เมืองฐาน: Tokyo, Osaka, Sendai, Nagoya, Fukuoka, Sapporo", SITE + "/guide/",
     f'<h1>คู่มือเที่ยวญี่ปุ่นรายเมืองฐาน</h1><h2>รายเมืองฐาน</h2><ul class=l>{idx}</ul>{EXTRA_INDEX}<p><a class="cta" href="/">เปิดแอปวางแผน →</a></p>',
     {"@context": "https://schema.org", "@type": "CollectionPage", "name": "คู่มือเที่ยวญี่ปุ่นรายเมืองฐาน", "inLanguage": "th", "url": SITE + "/guide/"}))
 today = datetime.date.today().isoformat()
@@ -191,7 +191,7 @@ open("sitemap.xml", "w", encoding="utf8").write('<?xml version="1.0" encoding="U
                                                 + "\n".join(f"<url><loc>{u}</loc><lastmod>{today}</lastmod></url>" for u in urls) + "\n</urlset>\n")
 NL = "\n"
 open("llms.txt", "w", encoding="utf8").write(f"""# Nihontabi
-> Thai-language Japan trip planner. Stay in one hub city and make day trips all year round. Covers 6 hubs (Tokyo, Osaka/Namba, Sendai, Nagoya, Fukuoka/Hakata, Sapporo) with routes, fares, passes, best months and estimated flight prices from Bangkok.
+> Thai-language Japan trip planner. Pick a hub city as your starting point and plan by month, with ready-made plans, flight prices and passes. Covers 6 hubs (Tokyo, Osaka/Namba, Sendai, Nagoya, Fukuoka/Hakata, Sapporo) with routes, fares, passes, best months and estimated flight prices from Bangkok.
 
 Facts are compiled from official sites and travel sites (data as of {UPDATED}); prices and hours change, so verify with the provider before travel. Flight prices are sampled estimates, not live fares.
 
