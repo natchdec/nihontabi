@@ -151,8 +151,8 @@ for hub, (th, en, base) in HUBS.items():
     pf = (px.get(hub) or {}).get("flights") or []
     pr = ""
     if pf:
-        pr = (f'<h2>ราคาตั๋วเครื่องบินโดยประมาณ (BKK → {E(en)})</h2><table><tr><th>ออกเดินทาง</th><th>ถูกสุดที่พบ (ไป-กลับ)</th></tr>'
-              + "".join(f'<tr><td>{E(f["dep"])}</td><td>฿{f["thb"]:,}</td></tr>' for f in pf[:12])
+        pr = (f'<h2>ราคาตั๋วเครื่องบินโดยประมาณ (BKK → {E(en)})</h2><table><tr><th>ออกเดินทาง</th><th>ถูกสุดที่พบ (ไป-กลับ)</th><th>บินตรง</th></tr>'
+              + "".join(f'<tr><td>{E(f["dep"])}</td><td>฿{f["thb"]:,}</td><td>{("฿" + format(f["directThb"], ",")) if f.get("directThb") else "–"}</td></tr>' for f in pf[:12])
               + f'</table><p class="m">ราคาแคชจากการค้นหาล่าสุด ณ {E((px.get(hub) or {}).get("asOf", ""))} อาจเป็นสายการบินต้นทุนต่ำและไม่รวมสัมภาระ ไม่ใช่ราคาตอนจอง</p>')
     plans = (H.get("decide") or [])[:12]
     pl = ""
