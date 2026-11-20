@@ -2108,8 +2108,8 @@ details.pgrp>summary::-webkit-details-marker{display:none}
     return `<button class="pc pc-${sty} rv ${p.id === S.planId ? "sel" : ""} ${S.themes.length && !s ? "dim" : ""}" style="--i:${i}" data-mode="${esc(p.mode)}" data-act="open" data-id="${esc(p.id)}">
       <div class="cover ${col ? "has-col" : ""}">${col}<span class="modetag">${esc(MODE_NAME[p.mode] || p.mode)}</span>${S.themes.length && s ? `<span class="match">${ic("check","sm")}ตรงแนว</span>` : ""}<span class="kj" aria-hidden="true">${MODE_KJ[p.mode] || "旅"}</span></div>
       <div class="pc-body"><h3>${E(dispTitle)}</h3>${strip}
-      <div class="row">${adTag}${patTag}${th3}</div></div>
-      <div class="pc-foot"><span class="pass" title="${E(pass)}">${ic("ticket","sm")}<span>${E(((p.passes || [])[0] || {}).name && !/suica/i.test(p.passes[0].name) ? p.passes[0].name.replace(/\s*\(.*$/, "").replace(/\s*\+.*$/, "") : "ตั๋วเดี่ยว")}</span></span>${costFoot(p)}</div>
+      <div class="row">${p.overnight ? `<span class="tag">ค้างคืน</span>` : ""}${th3}</div></div>
+      <div class="pc-foot"><span class="pass"></span>${costFoot(p)}</div>
     </button>`;
   }
   // ---------- plan picker: Kanto map + whole-region map (OpenStreetMap backgrounds) + plans grouped by pass
