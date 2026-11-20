@@ -1979,7 +1979,9 @@ details.pgrp>summary::-webkit-details-marker{display:none}
   const cur = () => { let p = PLANS.find(x => x.id === S.planId); if (p && p.gen && (p._orig || p).nDays) { adaptGen(p); p = PLANS.find(x => x.id === S.planId); } return p; };
   const nd = p => (p._orig || p).nDays;
   const planTitle = p => { const t = String((p && p.title) || ""); let n = 0; try { n = planDays(p).length; } catch (e) { } if (!n) return t; let done = false;
-    return t.replace(/(\d{1,2})(\s*วัน)(?!\s*แรก)/g, (m, a, b, off) => { if (done) return m; if (/(pass|พาส|ticket|ตั๋ว)\s*$/i.test(t.slice(Math.max(0, off - 14), off))) return m; done = true; return n + b; }); };
+    let out = t.replace(/(\d{1,2})(\s*วัน)(?!\s*แรก)/g, (m, a, b, off) => { if (done) return m; if (/(pass|พาส|ticket|ตั๋ว)\s*$/i.test(t.slice(Math.max(0, off - 14), off))) return m; done = true; return n + b; });
+    if (!S.mall && MTH[S.month]) out = out.replace(PT_MON, "(" + MTH[S.month] + ")"); return out; };
+  const PT_MON = (() => { const M = String.raw`(?:ม\.ค\.|ก\.พ\.|มี\.ค\.|เม\.ย\.|พ\.ค\.|มิ\.ย\.|ก\.ค\.|ส\.ค\.|ก\.ย\.|ต\.ค\.|พ\.ย\.|ธ\.ค\.)`; return new RegExp(String.raw`\(\s*` + M + String.raw`(?:\s*[/–,\-]\s*` + M + String.raw`)*\s*\)`); })();
 
   const ADAPT = {};
   function adaptGen(p) {
