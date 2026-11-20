@@ -2499,7 +2499,24 @@ details.pgrp>summary::-webkit-details-marker{display:none}
         const dest = d => { const f = {}; far.filter(p => planDir(p) === d).forEach(p => new Set((p.days || []).map(x => x.mod)).forEach(id => { if (id && MOD[id] && catOf(MOD[id]) === "far" && dirOf(id) === d) f[id] = (f[id] || 0) + 1; })); return Object.keys(f).sort((a, b) => f[b] - f[a]).slice(0, 4).map(id => (((HUBDATA[HB.id].lab || {})[id] || [])[0]) || shortT(MOD[id]).split(/[:：(（]/)[0].trim()); };
         return Object.keys(cnt).sort((a, b) => cnt[b] - cnt[a]).map(d => ({ k: "h:far:" + d, t: "ไปไกล · ทางทิศ" + TH[d] + "ของ " + HB.short, sb: "ปลายทางยอดนิยม: " + dest(d).join(" · ") + catHint("h:far") })); })()
     ].map(c => ({ ...c, f: p => (c.k.startsWith("h:far:") ? planCat(p) === "h:far" && p._dir === c.k.slice(6) : planCat(p) === c.k) && (!hsel || hpcMatch(p, S.pcat)) }));
-    const groups = xgroup || (hubCat ? hubSecs.map((c, i) => grp(esc(c.t), esc(c.sb), byScore(PLANS.filter(p => c.f(p) && lenOk(p))), i + 2)).join("") : CATS.filter(c => S.pcat === "all" || S.pcat === c[0]).map((c, i) => grp(esc(c[1]), esc(c[2]), byScore(PLANS.filter(p => p.mode === c[0] && lenOk(p))), i + 2)).join(""));
+    const planKeys = p => { if (p._ck) return p._ck; const ids = (p.days || []).map(d => d.mod).filter(id => id && MOD[id] && MOD[id].kind !== "arrival" && MOD[id].kind !== "departure"), n = Math.max(1, ids.length), K = new Set(),
+        sh = (ts) => ids.filter(id => (MOD[id].themes || []).some(t => ts.includes(t))).length / n, isCity = id => MOD[id].kind === "city" || cmin(MOD[id]) <= 45, far = ids.some(id => cmin(MOD[id]) > 90 || MOD[id].overnight) || ((p.base || []).length > 1);
+      if (ids.length && ids.every(isCity)) K.add("city"); else if (!far) K.add("near"); else K.add("far");
+      const CUL = /วัด|ปราสาท|ศาล|เมืองเก่า|มรดกโลก|temple|shrine|castle|[寺神社城]/i, cul = ids.filter(id => (MOD[id].themes || []).includes("culture") || CUL.test((MOD[id].title || "") + (MOD[id].jp || ""))).length / n; if (cul >= 0.4) K.add("culture"); if (sh(["nature", "park"]) >= 0.6 && cul < 0.4) K.add("nature"); if (sh(["onsen"]) >= 0.25) K.add("onsen");
+      return p._ck = K; };
+    const topPop = (() => { try { return new Set(byScore(PLANS.filter(p => lenOk(p))).slice(0, 6).map(p => p.id)); } catch (e) { return new Set(); } })();
+    const destOf = f => { const c = {}; PLANS.filter(f).forEach(p => new Set((p.days || []).map(x => x.mod)).forEach(id => { if (id && MOD[id] && MOD[id].kind !== "arrival" && MOD[id].kind !== "departure" && !(MOD[id].kind === "city")) c[id] = (c[id] || 0) + 1; })); return Object.keys(c).sort((a, b) => c[b] - c[a]).slice(0, 4).map(id => (((HUBDATA[HB.id] || {}).lab || {})[id] || [])[0] || shortT(MOD[id]).split(/[:：(（]/)[0].trim()).join(" · "); };
+    const NC = [
+      { k: "pop", t: "แพลนยอดนิยม · เริ่มจากตรงนี้", sb: "เหมาะกับเดือนและจำนวนวันที่เลือก คะแนนสูงสุดของ " + HB.short, f: p => topPop.has(p.id) },
+      { k: "city", t: "เที่ยวในเมือง · ย่านใกล้ " + HB.short, sb: "ไม่ออกนอกเมือง ใช้บัตร IC ใบเดียวพอ", f: p => planKeys(p).has("city") },
+      { k: "near", t: "ไปกลับวันเดียว · เมืองใกล้ๆ", sb: "ขึ้นรถไฟไม่เกิน ~1.5 ชม. แล้วกลับมานอนที่เดิม", f: p => planKeys(p).has("near") },
+      { k: "culture", t: "วัด ปราสาท เมืองเก่า", sb: "ประวัติศาสตร์และวัฒนธรรมเป็นหลัก", f: p => planKeys(p).has("culture") },
+      { k: "nature", t: "ธรรมชาติ วิว และฤดูกาล", sb: "ภูเขา ทะเล สวน ซากุระ ใบไม้เปลี่ยนสี หิมะ", f: p => planKeys(p).has("nature") },
+      { k: "onsen", t: "ออนเซ็นและพักผ่อน", sb: "แช่น้ำแร่ เดินช้าๆ", f: p => planKeys(p).has("onsen") },
+      { k: "far", t: "ไปไกลและค้างคืนเมืองอื่น", sb: "ทริปที่ย้ายที่พักหรือไปเมืองไกลกว่า 1.5 ชม.", f: p => planKeys(p).has("far") }
+    ].map(c => ({ ...c, f2: p => c.f(p) && (!hsel || hpcMatch(p, S.pcat)), dst: c.k === "pop" || c.k === "city" ? "" : destOf(p => c.f(p) && lenOk(p)) }));
+    const useNew = HB.id !== "tokyo" || S.pcat === "all" || String(S.pcat).startsWith("p:");
+    const groups = xgroup || (useNew ? NC.map((c, i) => { const L = byScore(PLANS.filter(p => c.f2(p) && lenOk(p))); return grp(esc(c.t), esc(c.sb + (c.dst ? " · ปลายทางเด่น: " + c.dst : "")), c.k === "pop" ? L.slice(0, 6) : L, i + 2); }).join("") : (hubCat ? hubSecs.map((c, i) => grp(esc(c.t), esc(c.sb), byScore(PLANS.filter(p => c.f(p) && lenOk(p))), i + 2)).join("") : CATS.filter(c => S.pcat === "all" || S.pcat === c[0]).map((c, i) => grp(esc(c[1]), esc(c[2]), byScore(PLANS.filter(p => p.mode === c[0] && lenOk(p))), i + 2)).join("")));
     const legacy = PLANS.filter(p => p.legacy);
     const legacyHtml = (false && legacy.length) ? `<details class="pgrp rv" style="--i:7"><summary class="listhead" style="cursor:pointer"><h2>แพลนเดิม (ฐานนอนเดิม ไม่ใช่ Tokyo)</h2><span>${legacy.length} แพลน</span></summary><div class="cards" style="margin-top:12px">${byScore(legacy).map((p, k) => card(p, score(p), k)).join("")}</div></details>` : "";
     return `<div class="hero glass rv" style="--i:0"><div class="hero-in"><span class="hero-kanji" aria-hidden="true">${HB.kanji}</span>
