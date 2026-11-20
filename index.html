@@ -1978,6 +1978,9 @@ details.pgrp>summary::-webkit-details-marker{display:none}
     .map(p => ({ p, s: score(p) })).sort((a, b) => b.s - a.s);
   const cur = () => { let p = PLANS.find(x => x.id === S.planId); if (p && p.gen && (p._orig || p).nDays) { adaptGen(p); p = PLANS.find(x => x.id === S.planId); } return p; };
   const nd = p => (p._orig || p).nDays;
+  const planTitle = p => { const t = String((p && p.title) || ""); let n = 0; try { n = planDays(p).length; } catch (e) { } if (!n) return t; let done = false;
+    return t.replace(/(\d{1,2})(\s*วัน)(?!\s*แรก)/g, (m, a, b, off) => { if (done) return m; if (/(pass|พาส|ticket|ตั๋ว)\s*$/i.test(t.slice(Math.max(0, off - 14), off))) return m; done = true; return n + b; }); };
+
   const ADAPT = {};
   function adaptGen(p) {
     const base = p._orig || p, len = Math.max(LEN_MIN, Math.min(LEN_MAX, S.len || 6)), i = PLANS.findIndex(x => x.id === p.id);
@@ -2005,7 +2008,7 @@ details.pgrp>summary::-webkit-details-marker{display:none}
 
   function draw() {
     const grp = ["pick", "plan", "cmp"].includes(S.tab) ? "pick" : S.tab; document.querySelectorAll(".tab").forEach(el => el.setAttribute("aria-selected", String(el.dataset.tab === grp)));
-    const p = cur(); $("#selPill").textContent = grp === "pick" ? (p ? `${p.title} · ${p.nDays || S.len} วัน` : "แพลนสำเร็จรูป") : `ทริปของฉัน · ${TRIP.days.length} วัน`; $("#selPill").dataset.tab = grp === "pick" ? (p ? "plan" : "pick") : "trip";
+    const p = cur(); $("#selPill").textContent = grp === "pick" ? (p ? `${planTitle(p)} · ${p.nDays || S.len} วัน` : "แพลนสำเร็จรูป") : `ทริปของฉัน · ${TRIP.days.length} วัน`; $("#selPill").dataset.tab = grp === "pick" ? (p ? "plan" : "pick") : "trip";
     const v = { vote: vPoll, px: vPx, lib: vLib, trip: vTrip, pick: vPick, plan: vPlan, cmp: vCmp, info: () => vInfo() + eventsCalendar() }[S.tab]();
     $("#app").innerHTML = `<section class="view ${anim ? "anim" : ""}">${v}</section>`;
     anim = false;
@@ -2095,7 +2098,7 @@ details.pgrp>summary::-webkit-details-marker{display:none}
     return `<span class="cost" title="รวมตั๋วบินเฉลี่ย ${thb(k(c.flight))} + โรงแรมเฉลี่ย ${thb(k(c.hotel))} (2 คน/ห้อง) + เดินทาง/อาหาร/กิจกรรมในญี่ปุ่น ${thb(k(c.other))}"><b>~${thb(k(c.avg))}</b><span>${c.n} วัน · ต่อคน</span></span>`; };
   function card(p, s, i, rank) {
     const sty = "E", col = cardCollage(p);
-    const L0 = S.len || 6, tm0 = /(\d+)\s*วัน/.exec(p.title || ""), base0 = nd(p) || (tm0 ? +tm0[1] : 0), adapted0 = !!(tm0 && base0 && base0 !== L0), dispTitle = adapted0 && p.gen ? String(p.title).replace(/\d+\s*วัน/, L0 + " วัน") : p.title, adTag = adapted0 ? (p.gen ? `<span class="tag warn" title="แผนนี้ปรับจำนวนวันให้พอดีเมื่อเปิดดู">ปรับจาก ${base0} วัน</span>` : `<span class="tag warn" title="แพลนนี้ออกแบบไว้ ${base0} วัน แสดงเพราะใกล้กับ ${L0} วันที่เลือก">แพลน ${base0} วัน (ใกล้ ${L0} วัน)</span>`) : "";
+    const L0 = S.len || 6, tm0 = /(\d+)\s*วัน/.exec(p.title || ""), base0 = nd(p) || (tm0 ? +tm0[1] : 0), adapted0 = !!(tm0 && base0 && base0 !== L0), dispTitle = planTitle(p), adTag = adapted0 ? (p.gen ? `<span class="tag warn" title="แผนนี้ปรับจำนวนวันให้พอดีเมื่อเปิดดู">ปรับจาก ${base0} วัน</span>` : `<span class="tag warn" title="แพลนนี้ออกแบบไว้ ${base0} วัน แสดงเพราะใกล้กับ ${L0} วันที่เลือก">แพลน ${base0} วัน (ใกล้ ${L0} วัน)</span>`) : "";
     const midD = (p.days || []).filter(d => d.mod && !/^(arrival|departure)$|arrival$|departure$/.test(d.mod) && d.passUsed != null), noP = d => String(d.passUsed).startsWith("ไม่ใช้พาส"), underN = midD.filter(d => !noP(d)).length, nPass = new Set(p.xpass || []).size;
     const patTxt = !midD.length ? "" : !underN ? "ไม่ใช้พาส" : underN === midD.length ? (nPass > 1 ? "พาสคลุมทุกวัน · " + nPass + " ใบ" : "พาสคลุมทุกวัน") : nPass > 1 ? "มิกซ์ " + nPass + " พาส + ตั๋วเดี่ยว" : "พาส 1 ใบ + ตั๋วเดี่ยว";
     const patTag = (patTxt ? `<span class="tag ${nPass > 1 ? "ok" : ""}" title="รูปแบบการใช้พาสของแผนนี้">${esc(patTxt)}</span>` : "") + (p.overnight ? `<span class="tag">ค้างคืน</span>` : "");
@@ -3657,7 +3660,7 @@ ${apSteps()}</div></section>
     const dayChips = days.map((x, i) => `<button class="dchip" aria-current="${i === S.day}" data-act="day" data-v="${i}"><b>D${i + 1}</b><span>${E(x.title)}</span>${passBadge2(x)}${x.optional && S.len === 6 ? `<em class="opt">ตัดได้ถ้า 5 วัน</em>` : ""}</button>`).join("");
     return `<header class="ph glass rv" style="--i:0" data-mode="${esc(p.mode)}">
         <div class="cover"><span class="kj" aria-hidden="true">${MODE_KJ[p.mode] || "旅"}</span><div class="label">${esc(MODE_NAME[p.mode])} · ${p.themes.map(t => esc(TH[t] || t)).join(" · ")}</div>
-        <h1>${E(p.title)}</h1></div><div class="ph-body"><p class="tl">${E(p.tagline)}</p>${!p.gen && days.length !== (S.len || 6) ? `<p class="ap-warn" style="margin:6px 0">แพลนนี้ออกแบบไว้ ${days.length} วัน (คุณเลือก ${S.len || 6} วัน) จึงแสดงเป็น ${days.length} วัน ถ้าต้องการวันอื่น ดูแพลนที่ตรงจำนวนวันในรายการ หรือคัดลอกไปปรับในแท็บ "ทริปของฉัน"</p>` : ""}
+        <h1>${E(planTitle(p))}</h1></div><div class="ph-body"><p class="tl">${E(p.tagline)}</p>${!p.gen && days.length !== (S.len || 6) ? `<p class="ap-warn" style="margin:6px 0">แพลนนี้ออกแบบไว้ ${days.length} วัน (คุณเลือก ${S.len || 6} วัน) จึงแสดงเป็น ${days.length} วัน ถ้าต้องการวันอื่น ดูแพลนที่ตรงจำนวนวันในรายการ หรือคัดลอกไปปรับในแท็บ "ทริปของฉัน"</p>` : ""}
         <dl class="facts">
           <div><dt>จำนวนวัน</dt><dd class="big">${days.length} วัน</dd></div>
           <div><dt>ค่าเดินทาง / ผู้ใหญ่</dt><dd class="big">${yen(p.transportBudget?.adultJPY)}${days.length !== 6 ? ` <small style="font-weight:400;font-size:11px">ประมาณจากแพลน 6 วัน</small>` : ""}</dd></div>
@@ -3708,7 +3711,7 @@ ${apSteps()}</div></section>
   function vCmp() {
     const max = Math.max(...PLANS.map(p => p.transportBudget?.adultJPY || 0), 1);
     const rows = PLANS.map(p => `<tr class="${p.id === S.planId ? "sel" : ""}">
-      <td><button data-act="open" data-id="${esc(p.id)}"><i class="dot" data-mode="${esc(p.mode)}"></i>${E(p.title)}</button><div style="font-size:12px;color:var(--muted)">${esc(MODE_NAME[p.mode])}</div></td>
+      <td><button data-act="open" data-id="${esc(p.id)}"><i class="dot" data-mode="${esc(p.mode)}"></i>${E(planTitle(p))}</button><div style="font-size:12px;color:var(--muted)">${esc(MODE_NAME[p.mode])}</div></td>
       <td>${p.themes.map(t => esc(TH[t] || t)).join(", ")}</td>
       <td>${E((p.passes || []).map(x => x.name).join(" + ") || HB.ic)}</td>
       <td class="num">${yen(p.transportBudget?.adultJPY)}<div class="bar"><i style="width:${Math.round((p.transportBudget?.adultJPY || 0) / max * 100)}%"></i></div></td>
@@ -3893,12 +3896,12 @@ ${apSteps()}</div></section>
       try { navigator.clipboard.writeText(txt).then(() => done(true), () => done(false)); } catch (e) { done(false); } return; }
     if (a === "printpage") { const p = cur(); if (!p) return; const days = applyPassOpt(p, planDays(p)), label = t.textContent;
       const eh = x => String(x == null ? "" : x).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
-      const body = `<h1>${eh(p.title)}</h1><p class="tl">${eh(p.tagline)}</p><p>${days.length} วัน · ฐานที่พัก ${eh(HB.short)} · เดือน ${eh(MTH[S.month])} · ค่าเดินทาง/คน ประมาณ ${eh(yen(p.transportBudget && p.transportBudget.adultJPY))}</p>`
+      const body = `<h1>${eh(planTitle(p))}</h1><p class="tl">${eh(p.tagline)}</p><p>${days.length} วัน · ฐานที่พัก ${eh(HB.short)} · เดือน ${eh(MTH[S.month])} · ค่าเดินทาง/คน ประมาณ ${eh(yen(p.transportBudget && p.transportBudget.adultJPY))}</p>`
         + ((p.passes || []).length ? `<h2>Pass</h2><ul>${p.passes.map(x => `<li><b>${eh(x.name)}</b> ${eh(x.days)} · ${eh(yen(x.adult))}<br>${eh(x.note)}</li>`).join("")}</ul>` : "")
         + days.map((d, i) => `<section><h2>วัน ${i + 1}: ${eh(d.title)}</h2><p class="m">${eh(d.area)}</p><p><b>การเดินทาง:</b> ${eh(d.transit)}</p><p><b>Pass:</b> ${eh(d.passUsed)}</p><p><b>ห้ามพลาด:</b> ${eh(d.must)}</p><p><b>ถ้าฝนตก/ปิด:</b> ${eh(d.planB)}</p>`
           + `<ol>${(d.stops || []).map(x => `<li><b>${eh(x.time)} ${eh(x.name)}</b>${x.dur ? " · " + eh(x.dur) : ""}${x.cost ? " · " + eh(x.cost) : ""}<br>${eh(x.hi)}</li>`).join("")}</ol>`
           + ((d.eats || []).length ? `<p><b>กินอะไรดี:</b> ${d.eats.map(e => eh(e.name) + (e.price ? " (" + eh(e.price) + ")" : "")).join(" · ")}</p>` : "") + `</section>`).join("");
-      const doc = `<!doctype html><html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${eh(p.title)}</title><style>body{font:15px/1.6 system-ui,"Noto Sans Thai",sans-serif;max-width:780px;margin:24px auto;padding:0 16px;color:#222}h1{font-size:24px;margin:0 0 4px}h2{font-size:18px;margin:22px 0 6px;border-bottom:1px solid #ccc;padding-bottom:4px}.tl,.m{color:#666}li{margin:5px 0}section{break-inside:avoid-page}.pb{margin:16px 0}@media print{.pb{display:none}body{margin:0}}</style></head><body><div class="pb"><button onclick="window.print()">พิมพ์ / บันทึกเป็น PDF</button></div>${body}</body></html>`;
+      const doc = `<!doctype html><html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${eh(planTitle(p))}</title><style>body{font:15px/1.6 system-ui,"Noto Sans Thai",sans-serif;max-width:780px;margin:24px auto;padding:0 16px;color:#222}h1{font-size:24px;margin:0 0 4px}h2{font-size:18px;margin:22px 0 6px;border-bottom:1px solid #ccc;padding-bottom:4px}.tl,.m{color:#666}li{margin:5px 0}section{break-inside:avoid-page}.pb{margin:16px 0}@media print{.pb{display:none}body{margin:0}}</style></head><body><div class="pb"><button onclick="window.print()">พิมพ์ / บันทึกเป็น PDF</button></div>${body}</body></html>`;
       const fname = "japan-" + p.id + "-" + days.length + "d.html";
       const fail = m => { t.textContent = m; setTimeout(() => { t.textContent = label; }, 3500); };
       (async () => { try { const dl = await window.claude.use("downloads"); if (!dl) return fail("บันทึกไฟล์ไม่ได้ในหน้านี้");
@@ -3908,7 +3911,7 @@ ${apSteps()}</div></section>
     if (a === "shareplan") { const p = cur(), url = location.origin + "/?hub=" + HB.id + "&plan=" + encodeURIComponent(p.id); if (navigator.share) { navigator.share({ title: p.title, text: p.title + " · Nihontabi", url }).catch(() => { }); } else { (navigator.clipboard ? navigator.clipboard.writeText(url) : Promise.reject()).then(() => { t.textContent = "คัดลอกลิงก์แล้ว ✓"; setTimeout(() => { t.textContent = "แชร์ลิงก์แพลนนี้"; }, 2500); }).catch(() => { prompt("คัดลอกลิงก์นี้", url); }); } return; }
     if (a === "useplan") { importPlan(t.dataset.id); return go("trip"); }
     if (a === "chk") { S.chk = S.chk || {}; S.chk[v] = !S.chk[v]; save(); return render(); }
-    if (a === "copyplan") { const p = cur(), days = applyPassOpt(p, planDays(p)), tx = ["✈ " + p.title, p.tagline, `${days.length} วัน · ฐาน ${HB.short} · ค่าเดินทาง/คน ~${yen(p.transportBudget?.adultJPY)}`, ""];
+    if (a === "copyplan") { const p = cur(), days = applyPassOpt(p, planDays(p)), tx = ["✈ " + planTitle(p), p.tagline, `${days.length} วัน · ฐาน ${HB.short} · ค่าเดินทาง/คน ~${yen(p.transportBudget?.adultJPY)}`, ""];
       (p.passes || []).forEach(x => tx.push(`🎫 ${x.name} ${x.days} ${yen(x.adult)}`));
       days.forEach((d, i) => tx.push("", `วัน ${i + 1}: ${d.title}`, `  ไป: ${d.transit}`, `  ห้ามพลาด: ${d.must}`));
       tx.push("", "ดูรายละเอียด: " + location.origin + "/?hub=" + HB.id + "&plan=" + encodeURIComponent(p.id));
