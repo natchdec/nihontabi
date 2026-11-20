@@ -4109,17 +4109,19 @@ window.addEventListener('resize',function(){document.querySelectorAll('.ig').for
 document.addEventListener('load',function(){clearTimeout(t);document.querySelectorAll('.ig').forEach(function(g){g.removeAttribute('data-lf')});t=setTimeout(fix,150)},true)}catch(e){}})();</script>
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged, deleteUser, reauthenticateWithPopup } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, signOut, onAuthStateChanged, deleteUser, reauthenticateWithPopup } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import { getFirestore, doc, getDoc, setDoc, deleteDoc, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 try {
-  const app = initializeApp({ apiKey: "AIzaSyD1saeTD5-B6JNJ8oTDHxn5BRZdpmWA3tI", authDomain: "nihontabi-63523.firebaseapp.com", projectId: "nihontabi-63523", appId: "1:316641884656:web:d7a51bf071a6934e038535" });
+  const IS_MOBILE = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent), OWN_AUTH = IS_MOBILE && /\.web\.app$/.test(location.hostname);
+  const app = initializeApp({ apiKey: "AIzaSyD1saeTD5-B6JNJ8oTDHxn5BRZdpmWA3tI", authDomain: OWN_AUTH ? location.hostname : "nihontabi-63523.firebaseapp.com", projectId: "nihontabi-63523", appId: "1:316641884656:web:d7a51bf071a6934e038535" });
   const auth = getAuth(app), db = getFirestore(app), KEY = "jp:state";
   const host = document.querySelector("header.top"), btn = document.createElement("button");
   btn.className = "pill"; btn.id = "authBtn"; btn.type = "button"; btn.style.marginLeft = "8px"; host && host.appendChild(btn);
   let uid = null, last = null;
   const paint = u => { btn.textContent = u ? ((u.displayName || u.email || "บัญชี").split(" ")[0] + " · ออก") : "เข้าสู่ระบบ Google"; btn.title = u ? "แพลนของคุณซิงก์ข้ามเครื่องแล้ว" : "เข้าสู่ระบบเพื่อเก็บแพลนข้ามเครื่อง"; };
   paint(null);
-  btn.onclick = async () => { try { if (auth.currentUser) { if (confirm("ออกจากระบบ? แพลนในเครื่องนี้ยังอยู่")) await signOut(auth); } else await signInWithPopup(auth, new GoogleAuthProvider()); } catch (e) { if (e && e.code !== "auth/popup-closed-by-user" && e.code !== "auth/cancelled-popup-request") alert("เข้าสู่ระบบไม่สำเร็จ (" + (e.code || e.message || "") + ")"); } };
+  getRedirectResult(auth).catch(e => { if (e && e.code) alert("เข้าสู่ระบบไม่สำเร็จ (" + e.code + ")"); });
+  btn.onclick = async () => { try { if (auth.currentUser) { if (confirm("ออกจากระบบ? แพลนในเครื่องนี้ยังอยู่")) await signOut(auth); } else { if (/Line\/|FBAN|FBAV|Instagram|MicroMessenger/i.test(navigator.userAgent)) { alert("Google ไม่อนุญาตให้ล็อกอินในเบราว์เซอร์ของแอป (LINE/Facebook) กรุณากดเมนู แล้วเลือก \"เปิดใน Chrome/Safari\" ก่อนเข้าสู่ระบบ"); return; } if (IS_MOBILE) await signInWithRedirect(auth, new GoogleAuthProvider()); else await signInWithPopup(auth, new GoogleAuthProvider()); } } catch (e) { if (e && e.code !== "auth/popup-closed-by-user" && e.code !== "auth/cancelled-popup-request") alert("เข้าสู่ระบบไม่สำเร็จ (" + (e.code || e.message || "") + ")"); } };
   const push = async str => { try { await setDoc(doc(db, "users", uid), { state: str, t: Date.now() }); } catch (e) { console.warn("sync", e); } };
   onAuthStateChanged(auth, async u => {
     paint(u); if (!u) { uid = null; return; } uid = u.uid;
