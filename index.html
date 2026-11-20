@@ -2117,7 +2117,7 @@ details.pgrp>summary::-webkit-details-marker{display:none}
   const KMAPS = { kanto: { img: "img/kanto_map.webp", w: 801, h: 968, lon0: 138.4, lon1: 140.6, my0: 0.6517715781342543, my1: 0.6981748242262712, label: "ใกล้ Tokyo (Kanto)" },
     wide: { img: "img/tokyo_wide2.webp", w: 1500, h: 1951, lon0: 136.4429666082568, lon1: 143.0070333917432, my0: 0.6369290155441228, my1: 0.7858629665445437, label: "ทั้งภูมิภาค ถึง Aomori" } };
   (HUBDATA._maps = HUBDATA._maps || {}).tokyo = { near: KMAPS.kanto, wide: KMAPS.wide };
-  S.pmap = KMAPS[S.pmap] ? S.pmap : "kanto";
+  S.pmap = "wide";
   const mercY = lat => Math.asinh(Math.tan(lat * Math.PI / 180));
   const kx = (lon, M) => ((lon - M.lon0) / (M.lon1 - M.lon0) * 100);
   const ky = (lat, M) => ((M.my1 - mercY(lat)) / (M.my1 - M.my0) * 100);
@@ -2347,7 +2347,7 @@ details.pgrp>summary::-webkit-details-marker{display:none}
     const mapChips = Object.entries(KMAPS).map(([k, v]) => `<button class="chip" aria-pressed="${S.pmap === k}" data-act="pmap" data-v="${k}">${esc(v.label)}</button>`).join("");
     const sel = S.pcity && MOD[S.pcity] ? modCard(MOD[S.pcity], 0) : `<p class="empty">แตะจุดบนแผนที่เพื่อดูรายละเอียดเมือง แล้วเพิ่มเข้าทริปได้เลย</p>`;
     return `<section class="glass rv kmapcard" style="--i:1"><div class="sec-h"><h2>แผนที่เมืองที่ไปกลับจาก Tokyo</h2><span class="aside">สีบอกเวลาเดินทาง</span></div>
-      <div class="kgrid"><div><div class="kmap ${wide ? "wide" : "kmapr"}" style="aspect-ratio:${M.w}/${M.h};--ar:${(M.w / M.h).toFixed(4)}"><img class="kimg" src="${M.img}" alt="" decoding="async" fetchpriority="high"><svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">${lines}</svg>${dots}${hub}</div>
+      <div class="kgrid"><div><div class="kmap ${wide ? "wide kmapr" : "kmapr"}" style="aspect-ratio:${M.w}/${M.h};--ar:${(M.w / M.h).toFixed(4)}"><img class="kimg" src="${M.img}" alt="" decoding="async" fetchpriority="high"><svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">${lines}</svg>${dots}${hub}</div>
         <p class="mp-note">แผนที่ © ผู้ร่วมจัดทำ OpenStreetMap · ตำแหน่งเมืองเป็นจุดกลางคร่าวๆ${wide ? " · ในแผนที่นี้เมืองแถว Kanto ซ่อนชื่อไว้ แตะจุดเพื่อดูชื่อ" : " · Tohoku, Nagano, Niigata ดูได้ที่แผนที่ ‘ทั้งภูมิภาค’"}</p></div>
       <div class="kside"><div class="step"><span class="label">มุมมองแผนที่</span><div class="chips">${mapChips}</div></div>
         <div class="step" style="margin-top:12px"><span class="label">ดูเมืองที่แพลนหมวดนี้ไป</span><div class="chips">${catChips}</div></div>
