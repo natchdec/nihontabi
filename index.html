@@ -594,7 +594,7 @@ details.pgrp>summary::-webkit-details-marker{display:none}
 <nav class="tabbar" aria-label="เมนูหลัก"><div class="inner" role="tablist">
   <button class="tab" role="tab" data-act="tab" data-tab="pick"><svg class="ico"><use href="#i-grid"/></svg>แพลน</button>
   <button class="tab" role="tab" data-act="tab" data-tab="trip"><svg class="ico"><use href="#i-route"/></svg>ทริปของฉัน</button>
-  <button class="tab" role="tab" data-act="tab" data-tab="lib"><svg class="ico"><use href="#i-map"/></svg>เมือง</button>
+  <button class="tab" role="tab" data-act="tab" data-tab="lib"><svg class="ico"><use href="#i-map"/></svg>ที่เที่ยว</button>
     <button class="tab" role="tab" data-act="tab" data-tab="px"><svg class="ico"><use href="#i-coin"/></svg>ราคา</button>
   <button class="tab" role="tab" data-act="tab" data-tab="info"><svg class="ico"><use href="#i-book"/></svg>ข้อมูล</button>
 </div></nav>
@@ -1896,7 +1896,7 @@ details.pgrp>summary::-webkit-details-marker{display:none}
       const exp = { cur: "ตามแพลนเดิม: ใช้ Pass เฉพาะวันที่ไปเมืองไกล วันมาถึงและวันกลับใช้ตั๋วเดี่ยว",
         A: `แนะนำ (ถ้าเครื่องถึงเช้า ก่อน ~11:00): เปิด Pass วันแรกที่สนามบิน ขึ้น Narita Express แล้วไปเที่ยวเมืองที่ใกล้ที่สุดของแพลนต่อเลย (รวมวันมาถึงเข้ากับวันเที่ยว) ใช้ Pass ครบ ${k} วัน D1–D${k}; วันสุดท้ายช้อป + ไปสนามบินด้วยตั๋วเดี่ยว/Skyliner`,
         B: `ถ้าเครื่องถึงสาย/เย็น: เริ่ม Pass วันที่ 2 ใช้ครบ ${k} วัน D${n - k + 1}–D${n} วันสุดท้ายช้อปปิ้งแล้วไปสนามบินด้วย Narita Express หรือ Tokyo Monorail (Pass ครอบคลุม)` }[curOpt(p)] || "";
-      const worth = known.length === paid.length && paid.length ? `ค่าตั๋วเดี่ยวไป-กลับของวันที่ใช้ Pass รวม ~${yen(sum)} เทียบ Pass ${yen(35000)} → ${sum > 35000 ? "ประหยัดประมาณ " + yen(sum - 35000) : "ตั๋วเดี่ยวถูกกว่า Pass ประมาณ " + yen(35000 - sum)}` : (known.length ? `ค่าตั๋วเดี่ยวที่ทราบ ~${yen(sum)} (บางวันยังไม่มีข้อมูล) เทียบ Pass ${yen(35000)}` : "ยังไม่มีค่าโดยสารรายวันของแพลนนี้ — ดูตัวช่วยเลือก Pass ในแท็บ \"สร้างเอง\"");
+      const worth = known.length === paid.length && paid.length ? `ค่าตั๋วเดี่ยวไป-กลับของวันที่ใช้ Pass รวม ~${yen(sum)} เทียบ Pass ${yen(35000)} → ${sum > 35000 ? "ประหยัดประมาณ " + yen(sum - 35000) : "ตั๋วเดี่ยวถูกกว่า Pass ประมาณ " + yen(35000 - sum)}` : (known.length ? `ค่าตั๋วเดี่ยวที่ทราบ ~${yen(sum)} (บางวันยังไม่มีข้อมูล) เทียบ Pass ${yen(35000)}` : "ยังไม่มีค่าโดยสารรายวันของแพลนนี้ — ดูตัวช่วยเลือก Pass ในแท็บ \"ทริปของฉัน\"");
       return sec(`${ic("ticket", "sm")} ใช้ JR East Pass ให้คุ้ม (5 วันติดกัน)`, "", `<div class="chips">${opt("cur", "ตามแพลน")}${opt("A", "A · ถึงเช้า เริ่มวันแรก")}${opt("B", "B · ถึงสาย เริ่มวันที่ 2")}</div><p style="margin:10px 0 0">${E(exp)}</p><p class="sub" style="margin:6px 0 0">${E(worth)}</p>`, 1);
     }
     if (p.mode === "wide" || days.some(d => passInfo(d) === "wide")) {
@@ -3057,11 +3057,11 @@ ${apSteps()}</div></section>
         <div class="opts">${opts}</div>${warn}${(() => { const sg = farSuggest(null, m); return sg ? `<p class="mc-note warnt">${ic("warn", "sm")} ${E(sg)}</p>` : ""; })()}</div>`; }).join("");
     const starters = STARTERS.map((s, i) => `<button class="chip" data-act="starter" data-v="${i}" title="${esc(s.d)}">${esc(s.t)}</button>`).join("");
     return planNotesCard() + sec(`${ic("route", "sm")} ทริปของฉัน · ${n} วัน`, `ฐานที่พัก ${HB.short}`,
-      `<div class="step"><span class="label">เริ่มทริป</span><div class="chips"><button class="chip" data-act="tab" data-tab="lib">+ เลือกจากเมือง</button></div>
+      `<div class="step"><span class="label">เริ่มทริป</span><div class="chips"><button class="chip" data-act="tab" data-tab="lib">+ เลือกจากที่เที่ยว</button></div>
          <select id="impPlan" class="inp" style="margin-top:10px"><option value="">หรือคัดลอกจากแพลนสำเร็จรูป (แล้วปรับเองต่อ)…</option>${CATS.map(c => `<optgroup label="${esc(c[1])}">${PLANS.filter(p => p.mode === c[0]).map(p => `<option value="${esc(p.id)}">${E(p.title)}</option>`).join("")}</optgroup>`).join("")}</select>${S.importNote ? `<p class="sub" style="margin:6px 0 0">${E(S.importNote)}</p>` : ""}</div>
        <div class="step" style="margin-top:12px"><span class="label">เดือนที่ไป</span><div class="chips">${MONTHS.map(([v, l]) => `<button class="chip" aria-pressed="${S.month === v}" data-act="month" data-v="${v}">${l}</button>`).join("")}</div></div>
        <div class="days">${days}</div>
-       <div class="actions"><button class="btn pri" data-act="tab" data-tab="lib">+ เพิ่มเมือง</button><button class="btn" data-act="copytrip" id="copyBtn">คัดลอกสรุปส่งเพื่อน</button><button class="btn" data-act="addday" data-id="arrival">+ วันมาถึง</button><button class="btn" data-act="addday" data-id="departure">+ วันกลับ</button><button class="btn" data-act="shrtoggle">แชร์ทริป (รหัส)</button><button class="btn" data-act="imptoggle">นำเข้าทริป</button></div>${sharePanel()}
+       <div class="actions"><button class="btn pri" data-act="tab" data-tab="lib">+ เพิ่มที่เที่ยว</button><button class="btn" data-act="copytrip" id="copyBtn">คัดลอกสรุปส่งเพื่อน</button><button class="btn" data-act="addday" data-id="arrival">+ วันมาถึง</button><button class="btn" data-act="addday" data-id="departure">+ วันกลับ</button><button class="btn" data-act="shrtoggle">แชร์ทริป (รหัส)</button><button class="btn" data-act="imptoggle">นำเข้าทริป</button></div>${sharePanel()}
        <p class="sub" style="margin:10px 0 0">วันที่มีหลายตัวเลือก (A/B/C) คือให้แต่ละคนเลือกเอง แตะตัวเลือกที่คุณจะไปเพื่อดูแผนและคำนวณ pass ของตัวเอง</p>`, 0)
       + `<div class="strip rv" style="--i:3" role="tablist" aria-label="ดูแผนรายวัน">${TRIP.days.map((d, i) => `<button class="dchip" aria-current="${i === S.tday}" data-act="viewday" data-v="${i}"><b>D${i + 1}</b><span>${E(pickOf(d).title)}</span>${passBadge2(modDay(pickOf(d)))}</button>`).join("")}</div>`
       + hubCard(tripPlan().days.map(x => Object.assign({}, x, { mod: x.mid })), "") + ticketRecCard(tripPlan().days.map(x => ({ id: x.mid }))) + mixCard(tripPlan().days.map(x => x.mid)) + sec(`${ic("ticket", "sm")} วันไหนใช้ Pass / วันไหนไม่ต้องใช้`, "", `<p style="margin:0">${passSummary(tripPlan().days)}</p>`, 4) + tripDayDetail() + passCard() + budgetCard() + packCard() + prepCard() + mapsCard() + icsCard("icstrip") + tripWarnsCard() + tripSourcesCard();
@@ -3505,11 +3505,13 @@ ${apSteps()}</div></section>
     return { out, hidden };
   };
   const warnMonthChips = () => `<div class="chips" style="margin:10px 0">${MONTHS.map(([v, l]) => `<button class="chip" aria-pressed="${S.month === v}" data-act="month" data-v="${v}">${l}</button>`).join("")}</div>`;
+  const warnHtml = items => { const li = x => `<li>${ic("warn", "sm")}<span>${E(x)}</span></li>`, N = 4; return items.length <= N + 1 ? `<ul class="warnlist">${items.map(li).join("")}</ul>` : `<ul class="warnlist">${items.slice(0, N).map(li).join("")}</ul><details style="margin-top:8px"><summary style="cursor:pointer;color:var(--muted);font-size:13px">ดูข้อควรรู้อีก ${items.length - N} ข้อ</summary><ul class="warnlist">${items.slice(N).map(li).join("")}</ul></details>`; };
   function tripWarnsCard() {
     const items = [];
     TRIP.days.forEach((d, i) => { const m = pickOf(d); const ids = m.combo ? m.combo : [m.id];
-      ids.forEach(id => { const mm = MOD[id]; (mm.closures || []).forEach(x => { if (monthOk(x, S.month)) items.push(`วัน ${i + 1} · ${shortT(mm)}: ${x}`); }); }); });
-    return sec(`${ic("warn", "sm")} ข้อควรรู้ก่อนจอง`, `เฉพาะเมืองในทริปนี้ · ${MTH[S.month]}`, `${warnMonthChips()}${items.length ? `<ul class="warnlist">${items.map(x => `<li>${ic("warn", "sm")}<span>${E(x)}</span></li>`).join("")}</ul>` : `<p class="empty">ไม่มีข้อควรรู้เฉพาะเดือนนี้ในเมืองที่เลือก</p>`}<p class="mp-note">ซ่อนรายการที่ระบุช่วงเดือนอื่น ราคาและเวลาทั้งหมดเป็นค่าประมาณ ตรวจก่อนจองจริง</p>`, 4);
+      ids.forEach(id => { const mm = MOD[id]; (mm.closures || []).forEach(x => { if (!monthOk(x, S.month)) return; const key = shortT(mm) + ": " + x, f = items.find(y => y.key === key); if (f) f.days.push(i + 1); else items.push({ key, days: [i + 1] }); }); }); });
+    const lines = items.map(y => "วัน " + y.days.join(", ") + " · " + y.key);
+    return sec(`${ic("warn", "sm")} ข้อควรรู้ก่อนจอง`, `เฉพาะเมืองในทริปนี้ · ${MTH[S.month]}`, `${warnMonthChips()}${lines.length ? warnHtml(lines) : `<p class="empty">ไม่มีข้อควรรู้เฉพาะเดือนนี้ในเมืองที่เลือก</p>`}<p class="mp-note">ซ่อนรายการที่ระบุช่วงเดือนอื่น ราคาและเวลาทั้งหมดเป็นค่าประมาณ ตรวจก่อนจองจริง</p>`, 4);
   }
 
   // ---------- sources limited to the cities in this plan/trip and events of the selected month
@@ -3655,7 +3657,7 @@ ${apSteps()}</div></section>
     const dayChips = days.map((x, i) => `<button class="dchip" aria-current="${i === S.day}" data-act="day" data-v="${i}"><b>D${i + 1}</b><span>${E(x.title)}</span>${passBadge2(x)}${x.optional && S.len === 6 ? `<em class="opt">ตัดได้ถ้า 5 วัน</em>` : ""}</button>`).join("");
     return `<header class="ph glass rv" style="--i:0" data-mode="${esc(p.mode)}">
         <div class="cover"><span class="kj" aria-hidden="true">${MODE_KJ[p.mode] || "旅"}</span><div class="label">${esc(MODE_NAME[p.mode])} · ${p.themes.map(t => esc(TH[t] || t)).join(" · ")}</div>
-        <h1>${E(p.title)}</h1></div><div class="ph-body"><p class="tl">${E(p.tagline)}</p>${!p.gen && days.length !== (S.len || 6) ? `<p class="ap-warn" style="margin:6px 0">แพลนนี้ออกแบบไว้ ${days.length} วัน (คุณเลือก ${S.len || 6} วัน) จึงแสดงเป็น ${days.length} วัน ถ้าต้องการวันอื่น ดูแพลนที่ตรงจำนวนวันในรายการ หรือคัดลอกไปปรับในแท็บ "สร้างเอง"</p>` : ""}
+        <h1>${E(p.title)}</h1></div><div class="ph-body"><p class="tl">${E(p.tagline)}</p>${!p.gen && days.length !== (S.len || 6) ? `<p class="ap-warn" style="margin:6px 0">แพลนนี้ออกแบบไว้ ${days.length} วัน (คุณเลือก ${S.len || 6} วัน) จึงแสดงเป็น ${days.length} วัน ถ้าต้องการวันอื่น ดูแพลนที่ตรงจำนวนวันในรายการ หรือคัดลอกไปปรับในแท็บ "ทริปของฉัน"</p>` : ""}
         <dl class="facts">
           <div><dt>จำนวนวัน</dt><dd class="big">${days.length} วัน</dd></div>
           <div><dt>ค่าเดินทาง / ผู้ใหญ่</dt><dd class="big">${yen(p.transportBudget?.adultJPY)}${days.length !== 6 ? ` <small style="font-weight:400;font-size:11px">ประมาณจากแพลน 6 วัน</small>` : ""}</dd></div>
@@ -3699,7 +3701,7 @@ ${apSteps()}</div></section>
       ${p.auto ? apBanner() : mixCard(days.map(d => modOfDay(d)))}
       ${planBudgetCard(p, days)}
       ${packCard()}${icsCard()}
-      ${sec("ข้อควรรู้ก่อนจอง", `เฉพาะแพลนนี้ · ${MTH[S.month]}`, `${warnMonthChips()}${warns ? `<ul class="warnlist">${warns}</ul>` : `<p class="empty">ไม่มีข้อควรรู้เฉพาะเดือนนี้</p>`}${wl.hidden ? `<p class="mp-note">ซ่อน ${wl.hidden} รายการที่ไม่เกี่ยวกับเดือนนี้หรือวันที่ตัดออก</p>` : ""}`, 7)}
+      ${sec("ข้อควรรู้ก่อนจอง", `เฉพาะแพลนนี้ · ${MTH[S.month]}`, `${warnMonthChips()}${wl.out.length ? warnHtml(wl.out) : `<p class="empty">ไม่มีข้อควรรู้เฉพาะเดือนนี้</p>`}${wl.hidden ? `<p class="mp-note">ซ่อน ${wl.hidden} รายการที่ไม่เกี่ยวกับเดือนนี้หรือวันที่ตัดออก</p>` : ""}`, 7)}
       ${planSources(p, days)}`;
   }
 
