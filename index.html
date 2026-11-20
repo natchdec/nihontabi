@@ -593,10 +593,9 @@ details.pgrp>summary::-webkit-details-marker{display:none}
 </div></div>
 <nav class="tabbar" aria-label="เมนูหลัก"><div class="inner" role="tablist">
   <button class="tab" role="tab" data-act="tab" data-tab="pick"><svg class="ico"><use href="#i-grid"/></svg>แพลน</button>
-  <button class="tab" role="tab" data-act="tab" data-tab="trip"><svg class="ico"><use href="#i-route"/></svg>สร้างเอง</button>
+  <button class="tab" role="tab" data-act="tab" data-tab="trip"><svg class="ico"><use href="#i-route"/></svg>ทริปของฉัน</button>
   <button class="tab" role="tab" data-act="tab" data-tab="lib"><svg class="ico"><use href="#i-map"/></svg>เมือง</button>
-  <button class="tab" role="tab" data-act="tab" data-tab="vote"><svg class="ico"><use href="#i-check"/></svg>โหวต</button>
-  <button class="tab" role="tab" data-act="tab" data-tab="px"><svg class="ico"><use href="#i-coin"/></svg>ราคา</button>
+    <button class="tab" role="tab" data-act="tab" data-tab="px"><svg class="ico"><use href="#i-coin"/></svg>ราคา</button>
   <button class="tab" role="tab" data-act="tab" data-tab="info"><svg class="ico"><use href="#i-book"/></svg>ข้อมูล</button>
 </div></nav>
 
@@ -1998,7 +1997,7 @@ details.pgrp>summary::-webkit-details-marker{display:none}
     }
     if (np) { PLANS[i] = np; ORIG[i] = JSON.parse(JSON.stringify(np.days)); }
   }
-  const save = () => store.set("state", { base:S.base, mode:S.mode, themes:S.themes, len:S.len, planId:S.planId, day:S.day, tab:S.tab, month:S.month, people:S.people, rooms:S.rooms, lt:S.lt, sel:S.sel, want:S.want, planDays:S.planDays, pairOn:S.pairOn, arrOn:S.arrOn, depOn:S.depOn, pcat:S.pcat, pmap:S.pmap, pxw:S.pxw, lpass:S.lpass, hsel:S.hsel, hcity:S.hcity, fwin:S.fwin, pxn:S.pxn, pxd:S.pxd, pxt:S.pxt });
+  const save = () => store.set("state", { base:S.base, mode:S.mode, themes:S.themes, len:S.len, planId:S.planId, day:S.day, tab:S.tab, month:S.month, people:S.people, rooms:S.rooms, lt:S.lt, chk:S.chk, trip:(() => { try { return TRIP; } catch (e) { return undefined; } })(), sel:S.sel, want:S.want, planDays:S.planDays, pairOn:S.pairOn, arrOn:S.arrOn, depOn:S.depOn, pcat:S.pcat, pmap:S.pmap, pxw:S.pxw, lpass:S.lpass, hsel:S.hsel, hcity:S.hcity, fwin:S.fwin, pxn:S.pxn, pxd:S.pxd, pxt:S.pxt });
   const render = () => { draw(); save(); };
   const go = tab => { S.tab = tab; anim = true; render(); window.scrollTo({ top: 0 }); };
   const sec = (title, aside, body, i = 0, cls = "") => `<section class="glass rv ${cls}" style="--i:${i}"><div class="sec-h"><h2>${title}</h2>${aside ? `<span class="aside">${aside}</span>` : ""}</div>${body}</section>`;
@@ -2308,11 +2307,11 @@ details.pgrp>summary::-webkit-details-marker{display:none}
     const ln = (k, v) => v ? `<div style="margin-top:4px"><b>${k}</b> ${esc(v)}</div>` : "";
     let brief = "";
     if (sp) {
-      const price = sp.p[0] ? yenF(sp.p[0][1]) + (sp.p[0][0] ? " · " + sp.p[0][0].slice(0, 40) : "") : "";
+      const price = sp.p[0] ? yenF(sp.p[0][1]) + (sp.p[0][0] ? " · " + sp.p[0][0].replace(/\s*[(（].*$/, "").slice(0, 40) : "") : "";
       brief = `<div class="passline" style="margin-top:12px"><b>${E(nm(sp))}</b>${price ? " · " + E(price) : ""}</div>`;
       if (cv) {
         const real = m => m.kind !== "arrival" && m.kind !== "departure", worth = mods.filter(m => real(m) && (m.passes.ok || []).includes(sp.id)).map(m => m.id), fullO = (cv.full || []).filter(id => !worth.includes(id) && mods.some(m => m.id === id && real(m))), part = (cv.partial || []).filter(x => !worth.includes(x.m)).map(x => x.m), away = cv.away || [];
-        brief += `<div style="font-size:13px;line-height:1.6;color:var(--ink-2)">${ln("✓ คุ้ม", worth.map(nmOf).join(" · "))}${ln("◐ ใช้ได้แต่ไม่คุ้ม", fullO.map(nmOf).join(" · "))}${ln("◔ จ่ายเพิ่มบางช่วง", part.map(nmOf).join(" · "))}${ln("→ ไปไกลได้", away.slice(0, 4).join(" · ") + (away.length > 4 ? " +" + (away.length - 4) : ""))}${!worth.length && !fullO.length && !part.length ? "<div>ไม่ครอบคลุมเมืองในแผนที่นี้</div>" : ""}<div style="margin-top:4px;color:var(--muted);font-size:12px">${cv.confidence === "verified" ? "ตรวจกับหน้าทางการแล้ว" : "ยังไม่ยืนยันกับหน้าทางการ"}</div></div>`;
+        brief += `<div style="font-size:13px;line-height:1.6;color:var(--ink-2)">${worth.length ? `<div style="margin-top:4px"><b>✓ คุ้มกับ ${worth.length} ที่:</b> ${esc(worth.slice(0, 5).map(nmOf).join(" · "))}${worth.length > 5 ? " +" + (worth.length - 5) : ""}</div>` : ""}<details style="margin-top:6px"><summary style="cursor:pointer;color:var(--muted);font-size:12.5px">ดูรายละเอียดเพิ่ม</summary>${worth.length > 5 ? ln("✓ คุ้มทั้งหมด", worth.map(nmOf).join(" · ")) : ""}${ln("◐ ใช้ได้แต่ไม่คุ้ม", fullO.map(nmOf).join(" · "))}${ln("◔ จ่ายเพิ่มบางช่วง", part.map(nmOf).join(" · "))}${ln("→ ไปไกลได้", away.slice(0, 4).join(" · ") + (away.length > 4 ? " +" + (away.length - 4) : ""))}${!worth.length && !fullO.length && !part.length ? "<div>ไม่ครอบคลุมเมืองในแผนที่นี้</div>" : ""}<div style="margin-top:4px;color:var(--muted);font-size:12px">${cv.confidence === "verified" ? "ตรวจกับหน้าทางการแล้ว" : "ยังไม่ยืนยันกับหน้าทางการ"}</div></details></div>`;
       } else brief += `<div style="font-size:13px;color:var(--muted)">${HUBDATA[h] ? "ยังไม่มีข้อมูลครอบคลุมของ Pass นี้" : "ฐานนี้ยังไม่มีรายการเมือง จึงยังไม่ไฮไลต์เมือง"}</div>`;
     }
     return `<div class="step" style="margin-top:12px">${head}${brief}<div class="actions"><button class="btn sm" data-act="hubpass" data-v="${h}">ดู Pass ของฐานนี้ทั้งหมด</button></div></div>`;
@@ -2804,7 +2803,7 @@ details.pgrp>summary::-webkit-details-marker{display:none}
   let MEDITS = store.get("medits") || {};
   const saveMEdits = () => store.set("medits", MEDITS);
   const defaultTrip = () => STARTERS[1].days.map(o => o.filter(id => MOD[id])).filter(o => o.length).map(o => ({ opts: o, pick: 0 }));
-  let TRIP = store.get("trip");
+  let TRIP = store.get("trip") || (store.get("state") || {}).trip || null;
   const validTrip = t => t && Array.isArray(t.days) && t.days.length && t.days.every(d => Array.isArray(d.opts) && d.opts.length && d.opts.every(id => MOD[id]));
   if (TRIP && Array.isArray(TRIP.days)) TRIP.days.forEach(d => (d.opts || []).forEach(ensureCombo));
   if (!validTrip(TRIP)) TRIP = { days: defaultTrip() };
@@ -3065,7 +3064,7 @@ ${apSteps()}</div></section>
        <div class="actions"><button class="btn pri" data-act="tab" data-tab="lib">+ เพิ่มเมือง</button><button class="btn" data-act="copytrip" id="copyBtn">คัดลอกสรุปส่งเพื่อน</button><button class="btn" data-act="addday" data-id="arrival">+ วันมาถึง</button><button class="btn" data-act="addday" data-id="departure">+ วันกลับ</button><button class="btn" data-act="shrtoggle">แชร์ทริป (รหัส)</button><button class="btn" data-act="imptoggle">นำเข้าทริป</button></div>${sharePanel()}
        <p class="sub" style="margin:10px 0 0">วันที่มีหลายตัวเลือก (A/B/C) คือให้แต่ละคนเลือกเอง แตะตัวเลือกที่คุณจะไปเพื่อดูแผนและคำนวณ pass ของตัวเอง</p>`, 0)
       + `<div class="strip rv" style="--i:3" role="tablist" aria-label="ดูแผนรายวัน">${TRIP.days.map((d, i) => `<button class="dchip" aria-current="${i === S.tday}" data-act="viewday" data-v="${i}"><b>D${i + 1}</b><span>${E(pickOf(d).title)}</span>${passBadge2(modDay(pickOf(d)))}</button>`).join("")}</div>`
-      + hubCard(tripPlan().days.map(x => Object.assign({}, x, { mod: x.mid })), "") + ticketRecCard(tripPlan().days.map(x => ({ id: x.mid }))) + mixCard(tripPlan().days.map(x => x.mid)) + sec(`${ic("ticket", "sm")} วันไหนใช้ Pass / วันไหนไม่ต้องใช้`, "", `<p style="margin:0">${passSummary(tripPlan().days)}</p>`, 4) + tripDayDetail() + passCard() + budgetCard() + packCard() + icsCard("icstrip") + tripWarnsCard() + tripSourcesCard();
+      + hubCard(tripPlan().days.map(x => Object.assign({}, x, { mod: x.mid })), "") + ticketRecCard(tripPlan().days.map(x => ({ id: x.mid }))) + mixCard(tripPlan().days.map(x => x.mid)) + sec(`${ic("ticket", "sm")} วันไหนใช้ Pass / วันไหนไม่ต้องใช้`, "", `<p style="margin:0">${passSummary(tripPlan().days)}</p>`, 4) + tripDayDetail() + passCard() + budgetCard() + packCard() + prepCard() + mapsCard() + icsCard("icstrip") + tripWarnsCard() + tripSourcesCard();
   }
 
   const tripTools = () => [{ name: "set_trip_day", description: "เปลี่ยนเมือง/ตัวเลือกของหนึ่งวันในทริปของฉัน (planId mytrip) mode=replace แทนที่ตัวเลือกที่เลือกอยู่ด้วย moduleId, addOption เพิ่มเป็นตัวเลือกให้แยกกลุ่ม, remove เอา moduleId ออกจากวัน, newDay (dayN=0) เพิ่มเป็นวันใหม่ moduleId ต้องเป็น id จากรายการเมืองในแอปเท่านั้น",
@@ -3604,6 +3603,20 @@ ${apSteps()}</div></section>
     fukuoka: [[10, 3, 10], [11, 4, 9], [14, 7, 11], [19, 11, 10], [24, 16, 10], [27, 21, 12], [31, 25, 10], [33, 26, 9], [29, 22, 10], [24, 16, 6], [18, 10, 8], [12, 5, 9]],
     sapporo: [[-1, -7, 17], [0, -7, 14], [4, -3, 13], [11, 2, 10], [17, 8, 10], [21, 13, 9], [25, 18, 10], [26, 19, 10], [22, 14, 12], [15, 7, 12], [8, 1, 14], [1, -4, 17]]
   };
+
+  const prepCard = () => { S.chk = S.chk || {}; const px = PXLINKS(); const I = [
+      ["vjw", "ลงทะเบียน Visit Japan Web (ตรวจคนเข้าเมืองและศุลกากรล่วงหน้า)", "ทำก่อนบินได้ เช็กเงื่อนไขวีซ่าและขั้นตอนล่าสุดกับสถานทูตญี่ปุ่นอีกครั้ง", ['<a class="aff-a" href="https://www.vjw.digital.go.jp/" target="_blank" rel="noopener noreferrer">Visit Japan Web (ทางการ) ↗</a>']],
+      ["flight", "จองตั๋วเครื่องบิน", "ดูราคาถูกสุดรายเดือนที่แท็บ ราคา แล้วค่อยเทียบก่อนจอง", [px[0], px[1]]],
+      ["hotel", "จองที่พักฐาน " + HB.short, "เลือกที่ยกเลิกฟรีไว้ก่อน ช่วงเทศกาลเต็มเร็ว", [px[2], px[3]]],
+      ["esim", "eSIM หรือซิมข้อมูล", "ติดตั้ง eSIM ก่อนออกเดินทางสะดวกที่สุด", [affA("airalo", "", "eSIM Airalo"), affA("klook", "Japan eSIM", "eSIM บน Klook"), affA("kkday", "Japan eSIM", "eSIM บน KKday")]],
+      ["pass", "ซื้อตั๋วเหมา (Pass) หรือบัตร IC ที่ต้องซื้อล่วงหน้า", "ดูว่าทริปของคุณคุ้มพาสไหนที่การ์ด Pass ด้านบน", [affA("klook", "Japan Rail Pass", "Pass บน Klook"), affA("kkday", "Japan Rail Pass", "Pass บน KKday")]],
+      ["ins", "ประกันการเดินทาง", "เปรียบเทียบความคุ้มครองการรักษาพยาบาลต่างประเทศ", []],
+      ["cash", "แลกเงินเยนและเตรียมบัตร", "ร้านเล็กหลายแห่งยังรับเงินสดเท่านั้น", []],
+      ["tix", "จองตั๋วสถานที่ที่ต้องจอง (สวนสนุก พิพิธภัณฑ์ดัง ฯลฯ)", "บางแห่งขายหมดก่อนวันเที่ยว", [affA("klook", HB.short, "ตั๋วเข้าชมบน Klook"), affA("kkday", HB.short, "ตั๋วเข้าชมบน KKday")]]];
+    const done = I.filter(x => S.chk[x[0]]).length;
+    return sec("เช็กลิสต์ก่อนเดินทาง", done + "/" + I.length + " เสร็จแล้ว", `<ul class="xl" style="list-style:none;padding:0">${I.map(([k, t, n, L]) => `<li style="display:flex;gap:10px;align-items:flex-start;margin:0 0 10px"><button class="chip" aria-pressed="${!!S.chk[k]}" data-act="chk" data-v="${k}" style="min-width:34px">${S.chk[k] ? "✓" : "○"}</button><div><b${S.chk[k] ? ' style="text-decoration:line-through;opacity:.6"' : ""}>${E(t)}</b><p class="sub" style="margin:2px 0 4px">${E(n)}</p>${L.filter(Boolean).length ? `<div class="aff-row">${L.filter(Boolean).join("")}</div>` : ""}</div></li>`).join("")}</ul>${affNote()}`, 6); };
+  const mapsCard = () => { const rows = TRIP.days.map((d, i) => { const m = pickOf(d); if (!m || m.kind === "arrival" || m.kind === "departure") return ""; const md = modDay(m), pts = ((md && md.stops) || []).map(x => pg(x.gps)).filter(Boolean).slice(0, 9); if (pts.length < 2) return ""; return `<a class="btn sm" href="${esc("https://www.google.com/maps/dir/" + pts.map(q => q.join(",")).join("/"))}" target="_blank" rel="noopener">วัน ${i + 1} · ${E(String(m.title || "").split(/[:：(（]/)[0].trim().slice(0, 28))}</a>`; }).filter(Boolean);
+    return rows.length ? sec("เปิดเส้นทางแต่ละวันใน Google Maps", "ส่งไปมือถือไว้นำทาง", `<div class="actions">${rows.join("")}</div><p class="mp-note">เปิดเส้นทางตามจุดแวะของแต่ละวัน (สูงสุด 9 จุด) ปรับลำดับและวิธีเดินทางใน Google Maps ได้</p>`, 5) : ""; };
   const packCard = () => {
     const mi = MONTHS.findIndex(x => x[0] === S.month), c = (CLIM[HB.id] || CLIM.tokyo)[mi < 0 ? 0 : mi]; if (!c) return "";
     const [hi, lo, rain] = c, cold = hi < 10, cool = hi >= 10 && hi < 18, mild = hi >= 18 && hi < 26, snowy = lo <= 1 && ["sapporo", "sendai"].includes(HB.id) || (lo <= 0);
@@ -3651,7 +3664,7 @@ ${apSteps()}</div></section>
           <div class="wide"><dt>ฤดูที่ดีที่สุด</dt><dd>${E(p.bestSeason)}</dd></div>
           ${p.april ? `<div class="wide"><dt>${esc("เดือนเมษายน " + starStr(p.april.stars))}</dt><dd><b>${E(p.april.verdict)}</b><br>${E(p.april.bloom)}<br><span class="sub">${E(p.april.tips)}</span></dd></div>` : ""}
         </dl>
-        <div class="actions">${lenCtl()}<button class="btn" data-act="tab" data-tab="pick">${ic("left","sm")}เปลี่ยนแพลน</button><button class="btn pri" data-act="shareplan">แชร์ลิงก์แพลนนี้</button><button class="btn" data-act="copyplan">คัดลอกสรุป (วางใน LINE)</button><button class="btn" data-act="printpage">ดาวน์โหลดสรุป (พิมพ์/PDF)</button></div>
+        <div class="actions">${lenCtl()}<button class="btn" data-act="tab" data-tab="pick">${ic("left","sm")}เปลี่ยนแพลน</button><button class="btn pri" data-act="useplan" data-id="${esc(p.id)}">ใช้แพลนนี้เป็นทริปของฉัน</button><button class="btn" data-act="shareplan">แชร์ลิงก์แพลนนี้</button><button class="btn" data-act="copyplan">คัดลอกสรุป (วางใน LINE)</button><button class="btn" data-act="printpage">ดาวน์โหลดสรุป (พิมพ์/PDF)</button></div>
       </div></header>
       ${passPlanCard(p, days)}
       ${hubCard(days, "")}
@@ -3891,6 +3904,8 @@ ${apSteps()}</div></section>
         } catch (e) { fail(e && e.code === "declined" ? "ยกเลิกแล้ว" : "บันทึกไฟล์ไม่ได้"); } })();
       return; }
     if (a === "shareplan") { const p = cur(), url = location.origin + "/?hub=" + HB.id + "&plan=" + encodeURIComponent(p.id); if (navigator.share) { navigator.share({ title: p.title, text: p.title + " · Nihontabi", url }).catch(() => { }); } else { (navigator.clipboard ? navigator.clipboard.writeText(url) : Promise.reject()).then(() => { t.textContent = "คัดลอกลิงก์แล้ว ✓"; setTimeout(() => { t.textContent = "แชร์ลิงก์แพลนนี้"; }, 2500); }).catch(() => { prompt("คัดลอกลิงก์นี้", url); }); } return; }
+    if (a === "useplan") { importPlan(t.dataset.id); return go("trip"); }
+    if (a === "chk") { S.chk = S.chk || {}; S.chk[v] = !S.chk[v]; save(); return render(); }
     if (a === "copyplan") { const p = cur(), days = applyPassOpt(p, planDays(p)), tx = ["✈ " + p.title, p.tagline, `${days.length} วัน · ฐาน ${HB.short} · ค่าเดินทาง/คน ~${yen(p.transportBudget?.adultJPY)}`, ""];
       (p.passes || []).forEach(x => tx.push(`🎫 ${x.name} ${x.days} ${yen(x.adult)}`));
       days.forEach((d, i) => tx.push("", `วัน ${i + 1}: ${d.title}`, `  ไป: ${d.transit}`, `  ห้ามพลาด: ${d.must}`));
@@ -4103,7 +4118,7 @@ try {
     paint(u); if (!u) { uid = null; return; } uid = u.uid;
     try {
       const snap = await getDoc(doc(db, "users", uid)), loc = localStorage.getItem(KEY), cs = snap.exists() ? snap.data().state : null;
-      if (cs && cs !== loc && sessionStorage.getItem("fbapplied") !== uid) { sessionStorage.setItem("fbapplied", uid); localStorage.setItem(KEY, cs); location.reload(); return; }
+      if (cs && cs !== loc && sessionStorage.getItem("fbapplied") !== uid) { sessionStorage.setItem("fbapplied", uid); localStorage.setItem(KEY, cs); try { const tt = JSON.parse(cs).trip; if (tt) localStorage.setItem("jp:trip", JSON.stringify(tt)); } catch (e) { } location.reload(); return; }
       sessionStorage.setItem("fbapplied", uid); last = cs || null; if (loc && loc !== last) { last = loc; await push(loc); }
     } catch (e) { console.warn("sync", e); }
   });
