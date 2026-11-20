@@ -37,6 +37,12 @@ jobs:
         run: |
           git config user.name "price-bot"; git config user.email "price-bot@users.noreply.github.com"
           git add data/px_summary.json data/px_history.json guide sitemap.xml llms.txt && (git diff --cached --quiet || git commit -m "update prices $(date -u +%F)") && git push || true
+      - name: Remove old hosting versions before deploying
+        if: env.TARGET == 'live'
+        continue-on-error: true
+        env:
+          SA: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        run: node scripts/cleanup_versions.mjs
       - name: Deploy to Firebase Hosting
         env:
           SA: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
