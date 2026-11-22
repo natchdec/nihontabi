@@ -3548,7 +3548,7 @@ ${apSteps()}</div></section>
   };
   const apToPlan = r => {
     const mn = MONTHS.find(m => m[0] === r.month)[1], y = n => "¥" + Math.round(n).toLocaleString(), ref = PLANS.find(x => x.id !== "auto-plan" && x.base && x.base.length) || {};
-    const days = r.days.map(d => { const o = { n: d.n, optional: false, mod: d.mod }; fillDay(o, MOD); o.passUsed = d.passId ? ((r.passes.find(p => p.id === d.passId) || {}).name || "Pass") + (d.covered ? " (ใช้คุ้ม)" : " (อยู่ในช่วงพาส)") : "ไม่ใช้พาส: ตั๋วเดี่ยว / IC card"; if ((d.why || []).length) o.season = d.why.join(" · "); return o; });
+    const days = r.days.map(d => { const o = { n: d.n, optional: false, mod: d.mod }; fillDay(o, MOD); o.passUsed = d.passId ? ((r.passes.find(p => p.id === d.passId) || {}).name || "Pass") + (d.covered ? " (ใช้คุ้ม)" : " (อยู่ในช่วงพาส)") : "ไม่ใช้พาส: ตั๋วเดี่ยว / IC card"; if ((d.why || []).length) { o.whyFull = d.why.join(" · "); o.season = seasonShort(d.why, d.mod, r.month); } return o; });
     const cnt = {}; r.days.forEach(d => ((MOD[d.mod] || {}).themes || []).forEach(t => { cnt[t] = (cnt[t] || 0) + 1; }));
     const themes = (S.themes.length ? S.themes.slice() : Object.keys(cnt).sort((a, b) => cnt[b] - cnt[a])).filter(t => TH[t]).slice(0, 4); if (!themes.length) themes.push("culture");
     return { id: "auto-plan", mode: "auto", hub: HB.id, auto: true, title: `${(() => { const ids = [...new Set(r.days.map(d => d.mod).filter(m => m && MOD[m] && MOD[m].kind !== "arrival" && MOD[m].kind !== "departure"))], pp = id => ((POPULARITY[id] || {}).p) || 0, top = ids.slice().sort((x, y) => pp(y) - pp(x)).slice(0, 3).map(id => shortT(MOD[id]).split(/[:：(（]/)[0].trim()); const lab = S.themes.length ? (TH[S.themes[0]] || "เที่ยวครบรส") : "เที่ยวครบรส"; return lab + " " + r.totalDays + " วัน (" + mn + "): " + top.join(" · "); })()}${r.passes.length ? " · " + r.passes.map(p => p.name).join(" + ") : ""}`, tagline: r.summary || "", who: "ระบบจัดจากเดือน แนวที่ชอบ และจำนวนวันที่เลือก โดยเลือกเมืองที่เหมาะกับเดือนนั้นและช่วงวันที่ใช้ Pass ให้คุ้ม ปรับเงื่อนไขเพิ่มได้ในกล่องแผนอัตโนมัติ",
@@ -3667,6 +3667,15 @@ ${apSteps()}</div></section>
     }
     return set;
   };
+  // "ตามฤดู" shows only what depends on the chosen month: suitability + highlights, this month's events, and closures that apply this month
+  const seasonShort = (why, id, mo) => { const out = [], ws = (why || []).map(String), first = ws.find(x => /^เดือน.{1,14}เหมาะ/.test(x)), ev = ws.find(x => x.indexOf("มีอีเวนต์เดือนนี้") === 0);
+    const cut = (t, n) => { t = String(t); if (t.length <= n) return t; const k = t.lastIndexOf(" ", n); return t.slice(0, k > n * 0.6 ? k : n) + "…"; };
+    if (first) out.push(cut(first, 170)); if (ev) out.push(cut(ev, 150));
+    const m = id && MOD[id], cl = ((m && m.kind !== "arrival" && m.kind !== "departure" && m.closures) || []).filter(x => x && monthOk(x, mo)).slice(0, 1); if (cl.length) out.push("ข้อจำกัด/วันปิด: " + cut(cl[0], 130));
+    return out.join(" · "); };
+  const daySeasonLine = d => { const id = d.mod || d.mid; let t = String(d.season || "");
+    if (!d.whyFull && id && MOD[id] && MOD[id].months && MOD[id].months[S.month]) { const mm = MOD[id].months[S.month], sc = +mm.score || 0; if (mm.note) { let plan = null; try { plan = cur(); } catch (e) { } if (!plan || !(plan.months || []).includes(S.month) || !t) t = "เดือน" + (MTH[S.month] || "") + (sc ? " เหมาะ " + sc + "/5" : "") + ": " + mm.note; } }
+    return t; };
   const monthOk = (text, mo) => { const set = monthsIn(text); return !set.size || set.has(MONNUM[mo]); };
   const warnList = (p, days) => {
     const shown = new Set(days.map(d => d.mod).filter(Boolean)), all = new Map();
@@ -3859,7 +3868,7 @@ ${apSteps()}</div></section>
         <div class="notes">
           <div class="note n1"><span>ห้ามพลาด</span><p>${E(d.must)}</p></div>
           <div class="note"><span>ฝนตก</span><p>${E(d.planB)}</p></div>
-          <div class="note"><span>ตามฤดู</span><p>${E(d.season)}</p></div>
+          <div class="note"><span>ตามฤดู</span>${(() => { const t = daySeasonLine(d), short = t.length > 230 ? t.slice(0, t.lastIndexOf(" ", 230) > 120 ? t.lastIndexOf(" ", 230) : 230) + "…" : t; return `${short ? `<p>${E(short)}</p>` : ""}${t.length > 230 ? `<details><summary style="cursor:pointer;color:var(--muted);font-size:12.5px">ดูทั้งหมด</summary><p>${E(t)}</p></details>` : ""}`; })()}${d.whyFull ? `<details><summary style="cursor:pointer;color:var(--muted);font-size:12.5px">ทำไมระบบเลือกวันนี้</summary><p>${E(d.whyFull)}</p></details>` : ""}</div>
           ${timingNote(d, !d.extra)}
           ${farSuggest(d) ? `<div class="note"><span>ที่นอน</span><p>${E(farSuggest(d))}</p></div>` : ""}
         </div>
