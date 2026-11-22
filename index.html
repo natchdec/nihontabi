@@ -6,6 +6,8 @@
  .pc .proute{-webkit-line-clamp:1}.pc .row .tag:nth-child(n+3){display:none}
  .sec-h .aside{display:none}
 }
+.stripw{position:relative;min-width:0;max-width:100%;width:100%;overflow:hidden}.stripw>.strip{min-width:0;max-width:100%}.stripw .sn{position:absolute;top:50%;transform:translateY(-60%);z-index:4;width:30px;height:30px;border-radius:50%;border:1px solid var(--line);background:var(--card);color:var(--ink);font:600 18px/1 system-ui;display:grid;place-items:center;box-shadow:0 2px 8px rgba(0,0,0,.25);cursor:pointer;padding:0}.stripw .sn.l{left:2px}.stripw .sn.r{right:2px}
+.strip{overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch;scroll-snap-type:none;touch-action:pan-x pan-y}
 </style><title>Nihontabi · แพลนเที่ยวญี่ปุ่นตามเดือน พร้อมราคาตั๋วและพาส</title><meta name="description" content="เลือกเมืองฐานที่จะไปเป็นจุดตั้งต้น ระบบเรียงแพลนตามเดือน จำนวนวัน และพาสที่คุ้ม พร้อมแผนที่ ค่าเดินทาง และคู่มือที่เที่ยว 550+ แห่ง (Tokyo, Osaka, Sendai, Nagoya, Fukuoka, Sapporo)"><link rel="canonical" href="https://nihontabi.web.app/"><meta property="og:type" content="website"><meta property="og:site_name" content="Nihontabi"><meta property="og:locale" content="th_TH"><meta property="og:url" content="https://nihontabi.web.app/"><meta property="og:title" content="Nihontabi · แพลนเที่ยวญี่ปุ่นตามเดือน พร้อมราคาตั๋วและพาส"><meta property="og:description" content="เลือกเมืองฐานที่จะไปเป็นจุดตั้งต้น ระบบเรียงแพลนตามเดือน จำนวนวัน และพาสที่คุ้ม พร้อมแผนที่ ค่าเดินทาง และคู่มือที่เที่ยว 550+ แห่ง (Tokyo, Osaka, Sendai, Nagoya, Fukuoka, Sapporo)"><meta name="twitter:card" content="summary_large_image"><link rel="manifest" href="/manifest.webmanifest"><meta name="theme-color" content="#12151c"><link rel="icon" href="/icons/icon-192.png"><link rel="apple-touch-icon" href="/icons/icon-192.png"><meta property="og:image" content="https://nihontabi.web.app/og/default.jpg"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta name="twitter:image" content="https://nihontabi.web.app/og/default.jpg"><script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"Nihontabi","url":"https://nihontabi.web.app/","inLanguage":"th","description":"เลือกเมืองฐานที่จะไปเป็นจุดตั้งต้น ระบบเรียงแพลนตามเดือน จำนวนวัน และพาสที่คุ้ม พร้อมแผนที่ ค่าเดินทาง และคู่มือที่เที่ยว 550+ แห่ง (Tokyo, Osaka, Sendai, Nagoya, Fukuoka, Sapporo)"}</script><script>if(!window.claude){window.claude={use:async n=>n==="downloads"?{save:async({filename,data})=>{const b=new Blob([data],{type:/\.ics$/.test(filename)?"text/calendar":"text/html"}),a=document.createElement("a");a.href=URL.createObjectURL(b);a.download=filename;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},1500)}}:null}}</script><script>try{var h=new URLSearchParams(location.search).get("hub");if(/^(tokyo|osaka|sendai|nagoya|fukuoka|sapporo)$/.test(h)){var st=JSON.parse(localStorage.getItem("jp:state")||"{}");if(st.base!==h){st.base=h;localStorage.setItem("jp:state",JSON.stringify(st))}}var pl=new URLSearchParams(location.search).get("plan");if(pl&&/^[A-Za-z0-9_\-]{3,80}$/.test(pl)){var st2=JSON.parse(localStorage.getItem("jp:state")||"{}");st2.planId=pl;st2.tab="plan";st2.day=0;localStorage.setItem("jp:state",JSON.stringify(st2))}}catch(e){}</script><script src="/analytics.js" defer></script><script data-cmp-ab="2">(function(){var s=document.createElement("script");s.async=1;s.setAttribute("data-cmp-ab","2");s.src="https://emrldtp.cc/NjAzMjQ3.js?t=603247";document.head.appendChild(s)})();</script></head><body>
 <title>Japan Trip Planner</title>
 <meta name="claude:viewport-fit-sides" content="cover">
@@ -940,7 +942,7 @@ details.pgrp>summary::-webkit-details-marker{display:none}
         maxOneWayMin, allowOvernight: !!o.allowOvernight, mustInclude: must, avoid, budgetJPY: budget,
         arrival, departure, free,
         yenPerPoint: o.yenPerPoint > 0 ? +o.yenPerPoint : DEFAULT_YEN_PER_POINT,
-        popExp: o.popExp > 0 ? +o.popExp : 1
+        popExp: o.popExp > 0 ? +o.popExp : (days >= 7 ? 1.8 : 1)
       }
     };
   }
@@ -950,7 +952,7 @@ details.pgrp>summary::-webkit-details-marker{display:none}
     const x = (data.popularity || {})[id];
     const p = typeof x === "number" ? x : x && +x.p;
     if (p >= 1 && p <= 5) return { p, src: "data" };
-    return { p: 3, src: "default" };
+    return { p: 2.5, src: "default" };
   }
   function themeMatch(data, P, m, mo, themes) {
     if (!themes.length) return [];
@@ -987,7 +989,7 @@ details.pgrp>summary::-webkit-details-marker{display:none}
       const tf = o.themes.length ? THEME_FIT[Math.min(3, matched.length)] : 1;
       const pf = paceFit(o.pace, mins);
       const freq = Math.min(0.5, 0.1 * (P.planFreq[id] || 0));
-      const q = 10 * Math.pow((pop.p + freq) / 3, o.popExp) * fit * tf * pf;
+      const awayPen = (m.away && data.hubId !== "tokyo" && !must) ? 0.35 : 1, q = 10 * Math.pow((pop.p + freq) / 3, o.popExp) * fit * tf * pf * awayPen;
       out.push({
         id, m, q, s, mins, fare: fareOf(m), extra: extraOf(m), city: isCity(m), long: !isCity(m) && (mins >= LONG_MIN || m.overnight === true),
         overnight: m.overnight === true && o.allowOvernight, pop, matched, must, forcedWhy: why,
@@ -2112,8 +2114,8 @@ details.pgrp>summary::-webkit-details-marker{display:none}
     const midD = (p.days || []).filter(d => d.mod && !/^(arrival|departure)$|arrival$|departure$/.test(d.mod) && d.passUsed != null), noP = d => String(d.passUsed).startsWith("ไม่ใช้พาส"), underN = midD.filter(d => !noP(d)).length, nPass = new Set(p.xpass || []).size;
     const patTxt = !midD.length ? "" : !underN ? "ไม่ใช้พาส" : underN === midD.length ? (nPass > 1 ? "พาสคลุมทุกวัน · " + nPass + " ใบ" : "พาสคลุมทุกวัน") : nPass > 1 ? "มิกซ์ " + nPass + " พาส + ตั๋วเดี่ยว" : "พาส 1 ใบ + ตั๋วเดี่ยว";
     const patTag = (patTxt ? `<span class="tag ${nPass > 1 ? "ok" : ""}" title="รูปแบบการใช้พาสของแผนนี้">${esc(patTxt)}</span>` : "") + (p.overnight ? `<span class="tag">ค้างคืน</span>` : "");
-    const route = (() => { const n = p.days.length; return p.days.map((d, di) => ({ d, di })).filter(x => x.di > 0 && x.di < n - 1).map(({ d, di }) => { const id = modOfDay(d); const nm = id && MOD[id] ? shortT(MOD[id]) : String(d.area || d.title || "").split(/[·/→]/)[0].trim().slice(0, 22); return { n: di + 1, nm }; }); })();
-    const strip = `<p class="proute">${route.slice(0, 6).map(r => E(r.nm)).join(" → ")}</p>`;
+    const route = (() => { const n = p.days.length; return p.days.map((d, di) => ({ d, di })).filter(x => x.di > 0 && x.di < n - 1).map(({ d, di }) => { const id = modOfDay(d); const nm = id && MOD[id] ? shortT(MOD[id]) : String(d.area || d.title || "").split(/[·/→]/)[0].trim().slice(0, 22); return { n: di + 1, nm, pop: id ? (((POPULARITY[id] || {}).p) || 0) : 0 }; }); })();
+    const strip = `<p class="proute">${(route.length > 5 ? route.slice().sort((x, y) => y.pop - x.pop || x.n - y.n).slice(0, 5).sort((x, y) => x.n - y.n) : route).map(r => E(r.nm)).join(" → ")}${route.length > 5 ? " …" : ""}</p>`;
     const th3 = themesEff(p).slice().sort((x, y) => S.themes.includes(y) - S.themes.includes(x)).slice(0, 3).map(t => `<span class="tag ${S.themes.includes(t) ? "shu" : ""}">${esc(TH[t] || t)}</span>`).join(""), cn = planCostNums(p), kk = v => Math.round(v / 100) * 100;
     const stats = sty === "F" ? `<div class="pstats"><div><span>งบ/คน</span><b>~${thb(kk(cn.avg))}</b></div><div><span>วัน</span><b>${cn.n}</b></div><div><span>Pass</span><b>${E(((p.passes || [])[0] || {}).name && !/suica/i.test(p.passes[0].name) ? p.passes[0].name.replace(/\s*\(.*$/, "").replace(/^(JR\s+)?(Tokyo\s+)?/i, "").slice(0, 12) : "ตั๋วเดี่ยว")}</b></div></div>` : "";
     const th = themesEff(p).slice(0, 5).map(t => `<span class="tag ${S.themes.includes(t) ? "shu" : ""}">${esc(TH[t] || t)}</span>`).join("");
@@ -2415,11 +2417,11 @@ details.pgrp>summary::-webkit-details-marker{display:none}
       <g clip-path="url(#jpcl)">${Z.map(z => `<rect x="${z.x}" y="${z.y}" width="${z.w}" height="${z.h}" fill="${z.c}" fill-opacity="${cur && cur.zone !== z.id ? 0.12 : 0.3}"/>`).join("")}</g>
       <path d="${JPMAP.d}" fill="none" stroke="var(--line)" stroke-width="1"/>
       ${H.map(h => { const on = h.id === sel, r = h.alt ? 8 : 12, left = ["osaka", "nagoya", "hiroshima", "kanazawa"].includes(h.id);
-        return `<g data-act="hub" data-v="${h.id}" style="cursor:pointer" role="button" tabindex="0" aria-label="${esc(h.t)}"><circle cx="${h.x}" cy="${h.y}" r="${r}" fill="${liveH(h) ? "var(--info)" : "var(--card)"}" stroke="${on ? "var(--ink)" : "#fff"}" stroke-width="${on ? 3 : 1.5}" ${liveH(h) ? "" : 'stroke-dasharray="3 2"'}/>
-          ${liveH(h) ? `<text x="${h.x}" y="${h.y + 4}" text-anchor="middle" font-size="11" font-weight="600" fill="#fff">✓</text>` : ""}
+        return `<g data-act="hub" data-v="${h.id}" style="cursor:pointer" role="button" tabindex="0" aria-label="${esc(h.t)}"><circle cx="${h.x}" cy="${h.y}" r="${h.id === HB.id ? r + 3 : r}" fill="${h.id === HB.id ? "var(--shu, #e8590c)" : liveH(h) ? "var(--info)" : "var(--card)"}" stroke="${h.id === HB.id ? "#fff" : on ? "var(--ink)" : "#fff"}" stroke-width="${h.id === HB.id ? 3 : on ? 3 : 1.5}" ${liveH(h) ? "" : 'stroke-dasharray="3 2"'}/>
+          
           <text x="${h.x + (left ? -r - 4 : r + 4)}" y="${h.y + 4}" text-anchor="${left ? "end" : "start"}" font-size="12" fill="var(--ink)">${esc(h.n)}</text></g>`; }).join("")}</svg>`;
     const zp = id => PASSCAT.filter(p => p.h.includes(id) && p.st === "active");
-    const cards = H.map(h => `<button class="hubc" aria-pressed="${h.id === sel}" data-act="hub" data-v="${h.id}"><i class="dot" style="background:${zc[h.zone] || "#999"}"></i><span><b>${E(h.t)}</b><small>${h.id === HB.id ? "ฐานที่ใช้อยู่ (แพลนและเมืองอยู่ด้านล่าง)" : liveH(h) ? "พร้อมใช้ · แตะเพื่อเปลี่ยนฐานทันที" : "กำลังจัดทำแพลน · มี Pass " + zp(h.id).length + " รายการ"}</small></span></button>`).join("");
+    const cards = H.map(h => `<button class="hubc" aria-pressed="${h.id === HB.id}" data-act="hub" data-v="${h.id}"><i class="dot" style="background:${zc[h.zone] || "#999"}"></i><span><b>${E(h.t)}</b><small>${h.id === HB.id ? "ฐานที่ใช้อยู่ (แพลนและเมืองอยู่ด้านล่าง)" : liveH(h) ? "พร้อมใช้ · แตะเพื่อเปลี่ยนฐานทันที" : "กำลังจัดทำแพลน · มี Pass " + zp(h.id).length + " รายการ"}</small></span></button>`).join("");
     let panel = "";
     if (false && cur) {
       const ps = zp(cur.id).sort((a, b) => (b.ck ? 1 : 0) - (a.ck ? 1 : 0)).slice(0, 5);
@@ -2428,7 +2430,7 @@ details.pgrp>summary::-webkit-details-marker{display:none}
         <div class="actions">${liveH(cur) && cur.id !== HB.id ? `<button class="btn sm pri" data-act="setbase" data-v="${cur.id}">ใช้ ${esc(cur.n)} เป็นฐาน</button>` : ""}<button class="btn sm" data-act="hubpass" data-v="${cur.id}">ดู Pass ของฐานนี้ทั้งหมด</button></div></div>`;
     }
     return sec(`${ic("map", "sm")} เริ่มตรงนี้ · แตะเมืองบนแผนที่เพื่อเลือกฐาน`, "ฐานปัจจุบัน: " + esc(HB.name) + " · สีพื้น = โซน Pass โดยประมาณ", `<div class="hubmap"><div>${svg}</div><div><div class="hubcards">${cards}</div></div></div>${panel}
-      <p class="sub" style="font-size:12px;color:var(--muted);margin:10px 0 0">ขอบเขตสีเป็นการประมาณ ไม่ใช่ขอบเขตทางการของ Pass · ฐานที่พร้อมใช้: ${Object.values(HUBCFG).map(c => c.name).join(" · ")} · ฐานนอก Tokyo ยังไม่มีรูปถ่ายและแผนที่รายวัน</p>`, 1);
+      <p class="sub" style="font-size:12px;color:var(--muted);margin:10px 0 0">วงส้ม = ฐานที่ใช้อยู่ · วงฟ้า = พร้อมใช้ แตะเพื่อเปลี่ยนฐาน · วงประ = กำลังจัดทำ · ขอบเขตสีเป็นการประมาณ ไม่ใช่ขอบเขตทางการของ Pass · ฐานที่พร้อมใช้: ${Object.values(HUBCFG).map(c => c.name).join(" · ")} · ฐานนอก Tokyo ยังไม่มีรูปถ่ายและแผนที่รายวัน</p>`, 1);
   }
 
   const seasonLine = () => {
@@ -2459,7 +2461,10 @@ details.pgrp>summary::-webkit-details-marker{display:none}
       const np = apToPlan(r); np.id = [HB.id, "pf", pid, mo, L, added].join("-"); np.mode = HB.id; np.gen = true; np.auto = false; np.hub = HB.id; np.months = [mo]; np.xpass = [pid];
       PLANS.push(np); ORIG.push(JSON.parse(JSON.stringify(np.days))); have.push(ids); added++; }
   }
+  const THEME_MON = { sakura: ["mar", "apr", "may"], foliage: ["sep", "oct", "nov", "dec"], snow: ["dec", "jan", "feb", "mar"] };
+  const themeOkNow = t => S.mall || !THEME_MON[t] || THEME_MON[t].includes(S.month);
   function vPick() {
+    if (!S.mall && (S.themes || []).some(t => !themeOkNow(t))) { S.themes = S.themes.filter(themeOkNow); save(); }
     passFill();
     const chips = (arr, key, multi) => arr.map(([v, l]) => { const on = multi ? S[key].includes(v) : S[key] === v;
       return `<button class="chip" aria-pressed="${on}" data-act="${key}" data-v="${esc(v)}">${esc(l)}</button>`; }).join("");
@@ -2528,7 +2533,7 @@ details.pgrp>summary::-webkit-details-marker{display:none}
       { k: "far", t: "ไปไกลและค้างคืนเมืองอื่น", sb: "ทริปที่ย้ายที่พักหรือไปเมืองไกลกว่า 1.5 ชม.", f: p => planKeys(p).has("far") }
     ].map(c => ({ ...c, f2: p => c.f(p) && (!hsel || hpcMatch(p, S.pcat)), dst: c.k === "pop" || c.k === "city" ? "" : destOf(p => c.f(p) && lenOk(p)) }));
     const useNew = HB.id !== "tokyo" || S.pcat === "all" || String(S.pcat).startsWith("p:");
-    const groups = xgroup || (useNew ? NC.map((c, i) => { const L = byScore(PLANS.filter(p => c.f2(p) && lenOk(p))); return grp(esc(c.t), esc(c.sb + (c.dst ? " · ปลายทางเด่น: " + c.dst : "")), c.k === "pop" ? L.slice(0, 6) : L, i + 2); }).join("") : (hubCat ? hubSecs.map((c, i) => grp(esc(c.t), esc(c.sb), byScore(PLANS.filter(p => c.f(p) && lenOk(p))), i + 2)).join("") : CATS.filter(c => S.pcat === "all" || S.pcat === c[0]).map((c, i) => grp(esc(c[1]), esc(c[2]), byScore(PLANS.filter(p => p.mode === c[0] && lenOk(p))), i + 2)).join("")));
+    const groups = xgroup || (useNew ? (() => { const seenP = new Set(), seenS = new Set(); return NC.map((c, i) => { let L = byScore(PLANS.filter(p => c.f2(p) && lenOk(p) && !seenP.has(p.id))).filter(p => { const sg = (p.days || []).map(d => d.mod).join(","); if (seenS.has(sg)) return false; return true; }); if (c.k === "pop") L = L.slice(0, 6); L.forEach(p => { seenP.add(p.id); seenS.add((p.days || []).map(d => d.mod).join(",")); }); return grp(esc(c.t), esc(c.sb + (c.dst ? " · ปลายทางเด่น: " + c.dst : "")), L, i + 2); }).join(""); })() : (hubCat ? hubSecs.map((c, i) => grp(esc(c.t), esc(c.sb), byScore(PLANS.filter(p => c.f(p) && lenOk(p))), i + 2)).join("") : CATS.filter(c => S.pcat === "all" || S.pcat === c[0]).map((c, i) => grp(esc(c[1]), esc(c[2]), byScore(PLANS.filter(p => p.mode === c[0] && lenOk(p))), i + 2)).join("")));
     const legacy = PLANS.filter(p => p.legacy);
     const legacyHtml = (false && legacy.length) ? `<details class="pgrp rv" style="--i:7"><summary class="listhead" style="cursor:pointer"><h2>แพลนเดิม (ฐานนอนเดิม ไม่ใช่ Tokyo)</h2><span>${legacy.length} แพลน</span></summary><div class="cards" style="margin-top:12px">${byScore(legacy).map((p, k) => card(p, score(p), k)).join("")}</div></details>` : "";
     return `<div class="hero glass rv" style="--i:0"><div class="hero-in"><span class="hero-kanji" aria-hidden="true">${HB.kanji}</span>
@@ -2539,11 +2544,11 @@ details.pgrp>summary::-webkit-details-marker{display:none}
       ${hubRegion()}
       <section class="glass rv" style="--i:2"><div class="pick">
         <div class="step"><span class="label"><i>1</i>เดือนที่ไป</span><div class="chips">${chips(MONTHS, "month", false).replace(/aria-pressed="true"/, S.mall ? 'aria-pressed="false"' : 'aria-pressed="true"')}<button class="chip" aria-pressed="${!!S.mall}" data-act="mall">ทุกเดือน</button></div>${seasonLine()}${["jan", "feb", "mar", "apr"].includes(S.month) ? "" : `<p class="mp-note" style="margin:8px 0 0">ข้อมูลเดือน ${esc(MTH[S.month])} เป็นข้อมูลเบื้องต้นจากความรู้ทั่วไปเรื่องฤดูกาล ยังไม่ได้ตรวจกับแหล่งทางการทุกจุด วันงานและช่วงดอกไม้ใบไม้เปลี่ยนสีเป็น "ราวช่วง" ตรวจก่อนไป`}</div>
-        <div class="step"><span class="label"><i>2</i>แนวที่ชอบ (เลือกได้หลายแบบ)</span><div class="chips"><button class="chip" aria-pressed="${!S.themes.length}" data-act="themeall">เลือกทั้งหมด</button>${chips(THEMES, "themes", true)}</div></div>
+        <div class="step"><span class="label"><i>2</i>แนวที่ชอบ (เลือกได้หลายแบบ)</span><div class="chips"><button class="chip" aria-pressed="${!S.themes.length}" data-act="themeall">เลือกทั้งหมด</button>${chips(THEMES.filter(([v]) => themeOkNow(v)), "themes", true)}</div></div>
         <div class="step"><span class="label"><i>3</i>จำนวนวัน</span><div class="chips">${lenCtl()}</div></div>
       </div></section>
       ${(() => { const vis = PLANS.filter(p => planVisible(p) && lenOk(p) && (!S.themes.length || score(p) > 0) && (!String(S.pcat).startsWith("p:") || hpcMatch(p, S.pcat)) && (HB.id !== "tokyo" || (xsel ? p.mode === "zone" && (p.xpass || []).some(x => xids.includes(x)) : S.pcat === "all" || p.mode === S.pcat))).length; const pnote = String(S.pcat).startsWith("p:") && S.pcat !== "p:none" && vis === 0 ? `<p class="ap-warn" style="margin:4px 2px 10px">${NOPLAN.has(S.pcat.slice(2)) ? "Pass นี้ยังจัดแผนอัตโนมัติไม่ได้ (ไม่ครอบคลุมสถานที่ในฐานนี้หรือยังไม่มีราคาในระบบ) ดูรายละเอียด Pass ด้านล่างได้" : "ไม่มีแผนที่ใช้ Pass นี้ในเดือน/จำนวนวันที่เลือก ลองเปลี่ยนเดือนหรือจำนวนวัน"}</p>` : ""; return pnote + `<p class="sub" style="margin:4px 2px 10px;font-size:13px;color:var(--ink-2)">แสดง <b>${vis}</b> แพลน (${S.mall ? "ทุกเดือน" : "เดือน " + esc(MTH[S.month])} · ยาว ${Math.max(3, (S.len || 6) - 1) + "–" + ((S.len || 6) + 1) + " วัน" + (lenFB() ? " + แผนที่สั้นกว่าเล็กน้อย ปรับให้พอดีเมื่อเปิดแผน" : "")}) จากแผนทั้งหมด ${PLANS.length} แผน (ยาว 3–15 วัน ทุกเดือน) · เปลี่ยนจำนวนวันด้านบนเพื่อดูแผนช่วงอื่น แต่ละหมวดแสดง 5 แผนแรก กด “ดูเพิ่ม” เพื่อดูที่เหลือ</p>`; })()}
-      ${groups || (String(S.pcat).startsWith("x:") ? `<p class="empty">ยังไม่มีแพลนสำเร็จรูปสำหรับ Pass นี้ — แตะเมืองบนแผนที่เพื่อเพิ่มเข้าทริป หรือดูรายละเอียดที่แท็บ "ข้อมูล"</p>` : `<p class="empty">ไม่มีแพลนที่ตรงแนวนี้ในหมวดที่เลือก ลองกด "เลือกทั้งหมด" หรือเปลี่ยนหมวด</p>`)}${legacyHtml}
+      ${groups || (String(S.pcat).startsWith("x:") ? `<p class="empty">ยังไม่มีแพลนสำเร็จรูปสำหรับ Pass นี้ — แตะเมืองบนแผนที่เพื่อเพิ่มเข้าทริป หรือดูรายละเอียดที่แท็บ "ข้อมูล"</p>` : `<p class="empty">ไม่มีแพลนที่ตรงเงื่อนไขนี้ ลองเลือกแนวอื่น หรือกดปุ่มด้านล่าง</p><div class="actions"><button class="btn" data-act="themeall">เลือกทุกแนว</button><button class="btn" data-act="mall">ดูทุกเดือน</button></div>`)}${legacyHtml}
       <div class="actions"><button class="btn" data-act="tab" data-tab="cmp">เทียบทุกแพลน</button></div>`;
   }
 
@@ -2665,6 +2670,38 @@ details.pgrp>summary::-webkit-details-marker{display:none}
       return parts.join(`<p class="combo-link">${ic("train", "sm")} ${E(shortT(MOD[ids[0]]))} → ${E(shortT(MOD[ids[1]]))}${pm ? " · นั่งรถไฟ ~" + pm + " นาที" : ""}</p>`);
     }
     return dayMap1(d);
+  }
+  // ---------- trip overview: numbered map of the cities visited + one-line-per-day table
+  function overviewCard(ids) {
+    const real = id => id && MOD[id] && MOD[id].kind !== "arrival" && MOD[id].kind !== "departure";
+    if (!(ids || []).some(real)) return "";
+    const SKIPN = /สถานี|มื้อ|รถ|ฝากกระเป๋า|เช็ค|สนามบิน|กลับ|station|airport|lunch|dinner|check/i;
+    const city = id => shortT(MOD[id]).split(/[:：(（]/)[0].trim();
+    const hl = id => { const st = ((modDay(MOD[id]) || {}).stops || []).filter(x => x && x.name && !SKIPN.test(x.name)); const pick = st.filter(x => x.star).concat(st.filter(x => !x.star)).slice(0, 3); return pick.map(x => String(x.name).replace(EMO, "").replace(/\s*[(（].*$/, "").trim().slice(0, 26)).filter(Boolean).join(" · "); };
+    const rows = ids.map((id, i) => `<tr><td class="num"><b>${i + 1}</b></td><td>${real(id) ? `<b>${E(city(id))}</b><div class="sub" style="margin:2px 0 0">${E(hl(id))}</div>` : `<span class="sub">วันเดินทาง (มาถึง/กลับ)</span>`}</td></tr>`).join("");
+    // map
+    let map = "";
+    try {
+      const base = HB.coord, byId = {}; ids.forEach((id, i) => { if (!real(id)) return; (byId[id] = byId[id] || { id, days: [] }).days.push(i + 1); });
+      const pts = Object.values(byId).map(o => { const c = modCenter(MOD[o.id]); return c ? Object.assign(o, { ll: c }) : null; }).filter(Boolean);
+      const mm = (HUBDATA._maps || {})[HB.id] || {}, fit = M => M && pts.every(q => q.ll[1] >= M.lon0 && q.ll[1] <= M.lon1 && mercY(q.ll[0]) >= M.my0 && mercY(q.ll[0]) <= M.my1) && base && base[1] >= M.lon0 && base[1] <= M.lon1;
+      const BG = fit(mm.near) ? mm.near : fit(mm.wide) ? mm.wide : null;
+      if (pts.length && BG) {
+        const W = 640, H = Math.round(W * BG.h / BG.w), X = ll => (ll[1] - BG.lon0) / (BG.lon1 - BG.lon0) * W, Y = ll => (BG.my1 - mercY(ll[0])) / (BG.my1 - BG.my0) * H;
+        const order = []; ids.forEach(id => { if (real(id) && byId[id] && byId[id].ll && !order.includes(id)) order.push(id); });
+        const allp = [base].concat(pts.map(q => q.ll)), xs = allp.map(X), ys = allp.map(Y);
+        let x0 = Math.min(...xs), x1 = Math.max(...xs), y0 = Math.min(...ys), y1 = Math.max(...ys);
+        let vw = Math.max(x1 - x0, 90) * 1.35, vh = Math.max(y1 - y0, 90) * 1.35; const cx = (x0 + x1) / 2, cy = (y0 + y1) / 2;
+        if (vw / vh > 1.5) vh = vw / 1.5; else if (vh / vw > 1.3) vw = vh / 1.3;
+        vw = Math.min(vw, W); vh = Math.min(vh, H);
+        const vx = Math.max(0, Math.min(W - vw, cx - vw / 2)), vy = Math.max(0, Math.min(H - vh, cy - vh / 2)), k = vw / 640 * 1.1;
+        const path = `<polyline fill="none" class="mp-l tr" style="stroke-width:${(3 * k).toFixed(1)};stroke-dasharray:${(8 * k).toFixed(1)} ${(7 * k).toFixed(1)}" points="${[base].concat(order.map(id => byId[id].ll)).concat([base]).map(ll => X(ll).toFixed(1) + "," + Y(ll).toFixed(1)).join(" ")}"/>`;
+        const marks = pts.map(q => `<g><circle class="mp-m" cx="${X(q.ll).toFixed(1)}" cy="${Y(q.ll).toFixed(1)}" r="${(12 * k).toFixed(1)}" style="stroke-width:${(2 * k).toFixed(1)}"/><text class="mp-n" x="${X(q.ll).toFixed(1)}" y="${(Y(q.ll) + 4 * k).toFixed(1)}" text-anchor="middle" style="font-size:${(12 * k).toFixed(1)}px">${q.days[0]}</text><title>${esc(city(q.id))} · วัน ${q.days.join(", ")}</title></g>`).join("");
+        const home = `<g><circle class="mp-m star" cx="${X(base).toFixed(1)}" cy="${Y(base).toFixed(1)}" r="${(9 * k).toFixed(1)}" style="stroke-width:${(2 * k).toFixed(1)}"/><text class="mp-n" x="${X(base).toFixed(1)}" y="${(Y(base) + 22 * k).toFixed(1)}" text-anchor="middle" style="font-size:${(12 * k).toFixed(1)}px">ฐาน</text></g>`;
+        map = `<svg class="mp bg" viewBox="${vx.toFixed(1)} ${vy.toFixed(1)} ${vw.toFixed(1)} ${vh.toFixed(1)}" role="img" aria-label="แผนที่เมืองที่ไปในทริป"><image href="${BG.img}" x="0" y="0" width="${W}" height="${H}" preserveAspectRatio="none"/>${path}${marks}${home}</svg>`;
+      }
+    } catch (e) { map = ""; }
+    return sec(`${ic("map", "sm")} ภาพรวมทริป · ไปที่ไหนบ้าง`, `${ids.filter(real).length} วันเที่ยว`, `${map}<div class="tblwrap" style="margin-top:12px"><table class="cmp"><thead><tr><th>วัน</th><th>เมือง · จุดเด่น</th></tr></thead><tbody>${rows}</tbody></table></div><p class="mp-note">เลขในวงกลมคือวันแรกที่ไปเมืองนั้น เส้นประเรียงตามลำดับวัน ตำแหน่งเป็นจุดกลางคร่าวๆ ของแต่ละเมือง</p>`, 1);
   }
   function dayMap1(d) {
     const BG = DMAPS[d.mid || d.mod || d.bgk];
@@ -3076,7 +3113,8 @@ ${apSteps()}</div></section>
        <div class="days">${days}</div>
        <div class="actions"><button class="btn pri" data-act="tab" data-tab="lib">+ เพิ่มที่เที่ยว</button><button class="btn" data-act="copytrip" id="copyBtn">คัดลอกสรุปส่งเพื่อน</button><button class="btn" data-act="addday" data-id="arrival">+ วันมาถึง</button><button class="btn" data-act="addday" data-id="departure">+ วันกลับ</button><button class="btn" data-act="shrtoggle">แชร์ทริป (รหัส)</button><button class="btn" data-act="imptoggle">นำเข้าทริป</button></div>${sharePanel()}
        <p class="sub" style="margin:10px 0 0">วันที่มีหลายตัวเลือก (A/B/C) คือให้แต่ละคนเลือกเอง แตะตัวเลือกที่คุณจะไปเพื่อดูแผนและคำนวณ pass ของตัวเอง</p>`, 0)
-      + `<div class="strip rv" style="--i:3" role="tablist" aria-label="ดูแผนรายวัน">${TRIP.days.map((d, i) => `<button class="dchip" aria-current="${i === S.tday}" data-act="viewday" data-v="${i}"><b>D${i + 1}</b><span>${E(pickOf(d).title)}</span>${passBadge2(modDay(pickOf(d)))}</button>`).join("")}</div>`
+      + overviewCard(TRIP.days.map(d => pickOf(d).id))
+      + `<div class="stripw"><button type="button" class="sn l" data-act="stripgo" data-v="-1" aria-label="ก่อนหน้า">‹</button><button type="button" class="sn r" data-act="stripgo" data-v="1" aria-label="ถัดไป">›</button><div class="strip rv" style="--i:3" role="tablist" aria-label="ดูแผนรายวัน">${TRIP.days.map((d, i) => `<button class="dchip" aria-current="${i === S.tday}" data-act="viewday" data-v="${i}"><b>D${i + 1}</b><span>${E(pickOf(d).title)}</span>${passBadge2(modDay(pickOf(d)))}</button>`).join("")}</div></div>`
       + hubCard(tripPlan().days.map(x => Object.assign({}, x, { mod: x.mid })), "") + ticketRecCard(tripPlan().days.map(x => ({ id: x.mid }))) + mixCard(tripPlan().days.map(x => x.mid)) + sec(`${ic("ticket", "sm")} วันไหนใช้ Pass / วันไหนไม่ต้องใช้`, "", `<p style="margin:0">${passSummary(tripPlan().days)}</p>`, 4) + tripDayDetail() + passCard() + budgetCard() + packCard() + prepCard() + mapsCard() + icsCard("icstrip") + tripWarnsCard() + tripSourcesCard();
   }
 
@@ -3389,7 +3427,7 @@ ${apSteps()}</div></section>
     const days = r.days.map(d => { const o = { n: d.n, optional: false, mod: d.mod }; fillDay(o, MOD); o.passUsed = d.passId ? ((r.passes.find(p => p.id === d.passId) || {}).name || "Pass") + (d.covered ? " (ใช้คุ้ม)" : " (อยู่ในช่วงพาส)") : "ไม่ใช้พาส: ตั๋วเดี่ยว / IC card"; if ((d.why || []).length) o.season = d.why.join(" · "); return o; });
     const cnt = {}; r.days.forEach(d => ((MOD[d.mod] || {}).themes || []).forEach(t => { cnt[t] = (cnt[t] || 0) + 1; }));
     const themes = (S.themes.length ? S.themes.slice() : Object.keys(cnt).sort((a, b) => cnt[b] - cnt[a])).filter(t => TH[t]).slice(0, 4); if (!themes.length) themes.push("culture");
-    return { id: "auto-plan", mode: "auto", hub: HB.id, auto: true, title: `แผนอัตโนมัติ ${r.totalDays} วัน (${mn})${r.passes.length ? " · " + r.passes.map(p => p.name).join(" + ") : " · ไม่ใช้พาส"}`, tagline: r.summary || "", who: "ระบบจัดจากเดือน แนวที่ชอบ และจำนวนวันที่เลือก โดยเลือกเมืองที่เหมาะกับเดือนนั้นและช่วงวันที่ใช้ Pass ให้คุ้ม ปรับเงื่อนไขเพิ่มได้ในกล่องแผนอัตโนมัติ",
+    return { id: "auto-plan", mode: "auto", hub: HB.id, auto: true, title: `${(() => { const ids = [...new Set(r.days.map(d => d.mod).filter(m => m && MOD[m] && MOD[m].kind !== "arrival" && MOD[m].kind !== "departure"))], pp = id => ((POPULARITY[id] || {}).p) || 0, top = ids.slice().sort((x, y) => pp(y) - pp(x)).slice(0, 3).map(id => shortT(MOD[id]).split(/[:：(（]/)[0].trim()); const lab = S.themes.length ? (TH[S.themes[0]] || "เที่ยวครบรส") : "เที่ยวครบรส"; return lab + " " + r.totalDays + " วัน (" + mn + "): " + top.join(" · "); })()}${r.passes.length ? " · " + r.passes.map(p => p.name).join(" + ") : ""}`, tagline: r.summary || "", who: "ระบบจัดจากเดือน แนวที่ชอบ และจำนวนวันที่เลือก โดยเลือกเมืองที่เหมาะกับเดือนนั้นและช่วงวันที่ใช้ Pass ให้คุ้ม ปรับเงื่อนไขเพิ่มได้ในกล่องแผนอัตโนมัติ",
       base: ref.base || [{ area: HB.name, nights: "ทุกคืน", why: "ฐานที่เลือก", hotelTip: "ห้องกลุ่ม: แยกจองหลายห้องใกล้กัน ขอยกเลิกฟรี" }],
       passes: r.passes.map(p => ({ name: p.name + " " + p.days + " วัน", days: "D" + p.startDay + "–D" + p.endDay, adult: p.price, child: 0, note: (p.arithmetic || "") + " · ประหยัดราว " + y(p.saving) })).concat([{ name: "Suica / PASMO / ICOCA", days: "ทุกวัน", adult: 0, child: 0, note: "ใช้กับรถไฟ/รถเมล์ส่วนที่นอกพาส" }]),
       xpass: r.passes.map(p => p.id), transportBudget: { adultJPY: Math.round(r.cost.withPasses), note: `ตั๋วเดี่ยวทั้งหมด ${y(r.cost.payPerRide)} → ใช้พาสแล้ว ${y(r.cost.withPasses)} (ประหยัด ${y(r.cost.saving)}) ราคาเดินทางต่อวันเป็นค่าประมาณจากข้อมูลโมดูล (ควรเช็คอีกครั้ง)` },
@@ -3683,7 +3721,8 @@ ${apSteps()}</div></section>
       </div></header>
       ${passPlanCard(p, days)}
       ${hubCard(days, "")}
-      <div class="strip rv" style="--i:1" role="tablist" aria-label="เลือกวัน">${dayChips}</div>
+      ${overviewCard(days.map(d => modOfDay(d)))}
+      <div class="stripw"><button type="button" class="sn l" data-act="stripgo" data-v="-1" aria-label="ก่อนหน้า">‹</button><button type="button" class="sn r" data-act="stripgo" data-v="1" aria-label="ถัดไป">›</button><div class="strip rv" style="--i:1" role="tablist" aria-label="เลือกวัน">${dayChips}</div></div>
       <header class="dh glass rv" style="--i:2">
         <div class="label"><span class="dnum">DAY ${S.day + 1}</span>${E(d.area)}${d.optional ? ` · <span class="tag warn">ตัดได้ถ้าไป 5 วัน</span>` : ""}${d.aiEdited ? ` · <span class="tag shu">${d.userEdited ? "ปรับเอง" : "แก้ด้วย AI"}</span> <button class="btn sm" data-act="resetday" data-v="${esc(d.n)}">คืนค่าเดิม</button>` : ""}</div>
         <h2>${E(d.title)}</h2>
@@ -3873,6 +3912,7 @@ ${apSteps()}</div></section>
     if (a === "pxd") { S.pxd = Math.max(500, Math.min(10000, (S.pxd || 2000) + (+v))); return render(); }
     if (a === "pxt") { S.pxt = +v; return render(); }
     if (a === "pxm") { S.pxm = v; return render(); }
+    if (a === "stripgo") { const st = t.closest(".stripw") && t.closest(".stripw").querySelector(".strip"); if (st) st.scrollBy({ left: (+v) * Math.max(160, st.clientWidth * 0.8), behavior: "smooth" }); return; }
     if (a === "people") { S.people = Math.max(1, Math.min(60, S.people + (+v))); return render(); }
     if (a === "addday") { const id = t.dataset.id, k = MOD[id] && MOD[id].kind, last = TRIP.days[TRIP.days.length - 1];
       const at = k === "arrival" ? 0 : k === "departure" ? TRIP.days.length : (MOD[last.opts[0]].kind === "departure" ? TRIP.days.length - 1 : TRIP.days.length);
@@ -4141,7 +4181,7 @@ try {
   });
   const del = document.getElementById("delAcct");
   if (del) del.onclick = async e => { e.preventDefault(); const u = auth.currentUser; if (!u) { alert("เข้าสู่ระบบก่อนจึงจะลบข้อมูลบัญชีได้"); return; } if (!confirm("ลบข้อมูลแพลนที่ซิงก์ไว้และบัญชีผู้ใช้ทั้งหมด? (แพลนในเบราว์เซอร์นี้ยังอยู่ ลบแล้วกู้คืนไม่ได้)")) return; uid = null; try { if (window.__ntPollCleanup) await window.__ntPollCleanup(u.uid); await deleteDoc(doc(db, "users", u.uid)); try { await deleteUser(u); } catch (er) { if (er && er.code === "auth/requires-recent-login") { await reauthenticateWithPopup(u, new GoogleAuthProvider()); await deleteUser(auth.currentUser); } else throw er; } sessionStorage.removeItem("fbapplied"); alert("ลบข้อมูลบัญชีแล้ว"); } catch (er) { alert("ลบไม่สำเร็จ (" + ((er && (er.code || er.message)) || "") + ")"); } };
-  const nd = document.createElement("div"); nd.hidden = true; nd.style.cssText = "position:fixed;left:50%;transform:translateX(-50%);bottom:84px;z-index:50;max-width:min(560px,calc(100vw - 24px));background:#1f2430;color:#fff;border-radius:14px;padding:10px 12px;display:flex;gap:10px;align-items:center;box-shadow:0 6px 24px rgba(0,0,0,.35);font:14px/1.4 system-ui,sans-serif";
+  const nd = document.createElement("div"); nd.hidden = true; nd.style.cssText = "position:fixed;left:12px;right:12px;margin:0 auto;width:fit-content;bottom:84px;z-index:50;max-width:min(560px,calc(100vw - 24px));background:#1f2430;color:#fff;border-radius:14px;padding:10px 12px;display:flex;gap:10px;align-items:center;box-shadow:0 6px 24px rgba(0,0,0,.35);font:14px/1.4 system-ui,sans-serif";
   nd.innerHTML = '<span>เก็บทริปนี้ไว้เปิดต่อจากมือถือหรือเครื่องอื่น</span><button type="button" id="ndGo" style="border:0;border-radius:10px;padding:7px 12px;background:#e8ecf4;color:#111;font:600 13px system-ui;cursor:pointer;white-space:nowrap">เข้าสู่ระบบ</button><button type="button" id="ndX" aria-label="ปิด" style="border:0;background:none;color:#fff;font-size:18px;cursor:pointer">✕</button>'; document.body.appendChild(nd);
   const ndKey = "jp:nudge"; nd.querySelector("#ndGo").onclick = () => { nd.hidden = true; btn.click(); }; nd.querySelector("#ndX").onclick = () => { nd.hidden = true; try { localStorage.setItem(ndKey, String(Date.now())); } catch (e) { } };
   setInterval(() => { try { if (auth.currentUser || localStorage.getItem(ndKey)) { nd.hidden = true; return; } const st = JSON.parse(localStorage.getItem(KEY) || "{}"); nd.hidden = !(st.planId || (st.lt && st.lt.length) || (st.sel && st.sel.length)); } catch (e) { } }, 5000);

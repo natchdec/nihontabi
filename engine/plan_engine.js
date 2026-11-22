@@ -259,7 +259,7 @@
         maxOneWayMin, allowOvernight: !!o.allowOvernight, mustInclude: must, avoid, budgetJPY: budget,
         arrival, departure, free,
         yenPerPoint: o.yenPerPoint > 0 ? +o.yenPerPoint : DEFAULT_YEN_PER_POINT,
-        popExp: o.popExp > 0 ? +o.popExp : 1
+        popExp: o.popExp > 0 ? +o.popExp : (days >= 7 ? 1.8 : 1)
       }
     };
   }
@@ -269,7 +269,7 @@
     const x = (data.popularity || {})[id];
     const p = typeof x === "number" ? x : x && +x.p;
     if (p >= 1 && p <= 5) return { p, src: "data" };
-    return { p: 3, src: "default" };
+    return { p: 2.5, src: "default" };
   }
   function themeMatch(data, P, m, mo, themes) {
     if (!themes.length) return [];
@@ -306,7 +306,7 @@
       const tf = o.themes.length ? THEME_FIT[Math.min(3, matched.length)] : 1;
       const pf = paceFit(o.pace, mins);
       const freq = Math.min(0.5, 0.1 * (P.planFreq[id] || 0));
-      const q = 10 * Math.pow((pop.p + freq) / 3, o.popExp) * fit * tf * pf;
+      const awayPen = (m.away && data.hubId !== "tokyo" && !must) ? 0.35 : 1, q = 10 * Math.pow((pop.p + freq) / 3, o.popExp) * fit * tf * pf * awayPen;
       out.push({
         id, m, q, s, mins, fare: fareOf(m), extra: extraOf(m), city: isCity(m), long: !isCity(m) && (mins >= LONG_MIN || m.overnight === true),
         overnight: m.overnight === true && o.allowOvernight, pop, matched, must, forcedWhy: why,
