@@ -2234,10 +2234,10 @@ details.pgrp>summary::-webkit-details-marker{display:none}
   const cityPanel = id => { const m = MOD[id], d = HUBDATA[HB.id] || {}, CM = d.cmap || {}, c = CM[id]; if (!m) return ""; if (!c || isNatM(m)) return modCard(m, 0);
     const mods = MODS.filter(x => CM[x.id] && CM[x.id][0] === c[0] && !isNatM(x)), st = cityStops(mods);
     return `<div class="citypanel"><h3>${E(c[2])} <span class="jpn">${E(c[1])}</span></h3><p class="sub">${st.length} สถานที่เที่ยว · ${mods.length} แพ็คเที่ยว</p><ul class="plain citypl">${st.slice(0, 12).map(x => `<li data-ph="${esc(x.n)}">${x.star ? "★ " : ""}${E(x.n)}</li>`).join("")}</ul>${st.length > 12 ? `<details class="hlm"><summary>ดูสถานที่ทั้งหมดอีก ${st.length - 12} แห่ง</summary><ul class="plain citypl">${st.slice(12).map(x => `<li data-ph="${esc(x.n)}">${x.star ? "★ " : ""}${E(x.n)}</li>`).join("")}</ul></details>` : ""}<p class="sub" style="margin:10px 0 6px">แพ็คเที่ยวของเมืองนี้ (เลือกเข้าทริปได้)</p><div class="cards">${mods.map((x, q) => modCard(x, q)).join("")}</div></div>`; };
-  // city-tab filters (themes / pass) also apply to the map pins and the "best of month" strip
-  const libFilterOn = () => !!(S.lt.length || (AP.strat === "select" && AP.passes.length) || AP.strat === "none");
+  // city-tab theme filter (the front-page pass filter no longer touches this map) also applies to the map pins and the "best of month" strip
+  const libFilterOn = () => !!S.lt.length;
   const libOk = e => { if (!libFilterOn()) return true; const CM = (HUBDATA[HB.id] || {}).cmap || {}, ms = e.city ? MODS.filter(x => CM[x.id] && CM[x.id][0] === e.city) : [e.m];
-    return ms.filter(Boolean).some(m => (!S.lt.length || S.lt.some(t => mThemes(m).includes(t))) && (AP.strat !== "select" || !AP.passes.length || m.kind === "city" || AP.passes.some(pid => passCovers(pid, m.id))) && (AP.strat !== "none" || m.kind === "city" || (m.kind !== "arrival" && m.kind !== "departure" && !apAnyPass(m.id)))); };
+    return ms.filter(Boolean).some(m => (!S.lt.length || S.lt.some(t => mThemes(m).includes(t)))); };
   function regionMapCard(h, M, ents, act, selId, side, note) {
     const inExt = e => e.lon >= M.lon0 && e.lon <= M.lon1 && mercY(e.lat) >= M.my0 && mercY(e.lat) <= M.my1, dropped = ents.filter(e => !inExt(e));
     ents = ents.filter(inExt);
