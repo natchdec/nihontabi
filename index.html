@@ -2818,7 +2818,7 @@ details.pgrp>summary::-webkit-details-marker{display:none}
     const inBG = p => BG && p.ll[1] >= BG.lon0 && p.ll[1] <= BG.lon1 && mercY(p.ll[0]) >= BG.my0 && mercY(p.ll[0]) <= BG.my1;
     let pts = (d.stops || []).map((s, i) => ({ n: i + 1 + (d._off || 0), s, ll: pg(s.gps) })).filter(p => p.ll);
     { let ext = 0; for (let a = 0; a < pts.length; a++) for (let b = a + 1; b < pts.length; b++) ext = Math.max(ext, hav(pts[a].ll, pts[b].ll));
-      if (pts.length >= 2 && (!BG || forceRegion || ext > 7 || !pts.every(inBG))) { const HM = (HUBDATA._maps || {})[HB.id] || {}, fitM = M => M && pts.every(p => p.ll[1] >= M.lon0 && p.ll[1] <= M.lon1 && mercY(p.ll[0]) >= M.my0 && mercY(p.ll[0]) <= M.my1), R = fitM(HM.near) ? HM.near : fitM(HM.wide) ? HM.wide : null; if (R) { BG = R; regionBG = true; } } }
+      if (pts.length >= 2 && (!BG || forceRegion || ext > 7 || !pts.every(inBG) || (BG.lon1 - BG.lon0) > 1.2)) { const fitM = M => M && M.img && pts.every(p => p.ll[1] >= M.lon0 && p.ll[1] <= M.lon1 && mercY(p.ll[0]) >= M.my0 && mercY(p.ll[0]) <= M.my1), cands = []; Object.values(HUBDATA._maps || {}).forEach(m => { if (m && m.near) cands.push(m.near); if (m && m.wide) cands.push(m.wide); }); const R = cands.filter(fitM).sort((x, y) => (x.lon1 - x.lon0) - (y.lon1 - y.lon0))[0] || null; if (R && (!BG || R !== BG)) { BG = R; regionBG = true; } } }
     const bgPts = BG ? pts.filter(inBG) : []; let bgOK = bgPts.length >= 2;
     if (bgOK) pts = bgPts;
     if (pts.length < 2) { const sts = (d.stops || []).filter(x => x && x.name && !/สนามบิน|สถานี|มื้อ|ที่พัก|เช็ค/i.test(x.name)).slice(0, 9); if (sts.length < 2) return "";
@@ -2833,7 +2833,7 @@ details.pgrp>summary::-webkit-details-marker{display:none}
       x += k * 9; y -= k * 9; p._xy = [x, y]; return p._xy; });
     let vx = 0, vy = 0, vw = W, vh = H, kk = 1;
     if (bgOK && pos.length) { const px = pos.map(q => q[0]), py = pos.map(q => q[1]); const x0 = Math.min(...px), x1 = Math.max(...px), y0 = Math.min(...py), y1 = Math.max(...py);
-      const mn0 = regionBG ? 70 : 60; let bw0 = Math.max(x1 - x0, mn0) * 1.5 + 50, bh0 = Math.max(y1 - y0, mn0) * 1.5 + 50; const ratio = bw0 / bh0; if (ratio > 1.8) bh0 = bw0 / 1.8; else if (ratio < 0.9) bw0 = bh0 * 0.9;
+      const pk0 = W / ((BG.lon1 - BG.lon0) * 111.32 * Math.cos(midLat * Math.PI / 180)), mn0 = regionBG ? Math.max(12, (32 * pk0 - 50) / 1.5) : 60; let bw0 = Math.max(x1 - x0, mn0) * 1.5 + 50, bh0 = Math.max(y1 - y0, mn0) * 1.5 + 50; const ratio = bw0 / bh0; if (ratio > 1.8) bh0 = bw0 / 1.8; else if (ratio < 0.9) bw0 = bh0 * 0.9;
       bw0 = Math.min(bw0, W); bh0 = Math.min(bh0, H); const cx = (x0 + x1) / 2, cy = (y0 + y1) / 2; vx = Math.max(0, Math.min(W - bw0, cx - bw0 / 2)); vy = Math.max(0, Math.min(H - bh0, cy - bh0 / 2)); vw = bw0; vh = bh0; kk = vw / W; if (!regionBG && !forceRegion && (vw / vh < 0.75 || vw / vh > 2.4)) { const alt = dayMap1(d, true); if (alt) return alt; } }
     let lines = "", totalKm = 0, walkMin = 0;
     for (let i = 0; i < pts.length - 1; i++) { const L = legOf(pts[i].ll, pts[i + 1].ll); totalKm += L.km; if (L.mode === "walk" || L.mode === "either") walkMin += L.min;
