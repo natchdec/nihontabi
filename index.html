@@ -43,6 +43,9 @@
 .igcap{position:absolute;left:8px;top:8px;z-index:2;background:rgba(255,255,255,.9);color:#2b3a4a;font:600 12px/1.2 system-ui;border-radius:999px;padding:4px 10px;box-shadow:0 1px 5px rgba(0,0,0,.25);pointer-events:none}@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .igcap{background:rgba(20,32,48,.92);color:#e6eef8}}:root[data-theme="dark"] .igcap{background:rgba(20,32,48,.92);color:#e6eef8}
 .mp-s line{vector-effect:non-scaling-stroke}
 .mpscroll{max-height:560px;overflow-y:auto;border-radius:16px;margin-top:12px;border:1px solid var(--tile-edge)}.mpscroll svg.mp{margin-top:0;border:0;border-radius:0}
+.dmv{position:relative;height:clamp(320px,58vw,480px);border-radius:16px;overflow:hidden;margin-top:12px;border:1px solid var(--tile-edge);background:var(--tile)}.dmv .dmc{position:absolute !important;inset:0;width:100%;height:100%;opacity:0}.dmv.live .dmc{opacity:1}.dmfb{position:absolute;inset:0;display:grid;place-items:center;overflow:hidden}.dmv.live .dmfb{display:none}.dmfb svg.mp{height:100%;width:auto;max-width:100%;margin:0;border:0;border-radius:0}
+.dmpin{min-width:24px;height:24px;padding:0 4px;box-sizing:border-box;border-radius:12px;background:#1b2230;color:#fff;border:2px solid #fff;font:700 12px/20px system-ui,sans-serif;text-align:center;box-shadow:0 1px 5px rgba(0,0,0,.45);cursor:pointer}.dmpin.star{background:#f06a4e}
+.maplibregl-popup-content{font:600 12.5px/1.3 system-ui,sans-serif;color:#1b2230;padding:6px 10px;border-radius:10px}.maplibregl-ctrl-attrib{font-size:10px}
 </style><title>Nihontabi · แพลนเที่ยวญี่ปุ่นตามเดือน พร้อมราคาตั๋วและพาส</title><meta name="description" content="เลือกเมืองฐานที่จะไปเป็นจุดตั้งต้น ระบบเรียงแพลนตามเดือน จำนวนวัน และพาสที่คุ้ม พร้อมแผนที่ ค่าเดินทาง และคู่มือที่เที่ยว 550+ แห่ง (Tokyo, Osaka, Sendai, Nagoya, Fukuoka, Sapporo)"><link rel="canonical" href="https://nihontabi.web.app/"><meta property="og:type" content="website"><meta property="og:site_name" content="Nihontabi"><meta property="og:locale" content="th_TH"><meta property="og:url" content="https://nihontabi.web.app/"><meta property="og:title" content="Nihontabi · แพลนเที่ยวญี่ปุ่นตามเดือน พร้อมราคาตั๋วและพาส"><meta property="og:description" content="เลือกเมืองฐานที่จะไปเป็นจุดตั้งต้น ระบบเรียงแพลนตามเดือน จำนวนวัน และพาสที่คุ้ม พร้อมแผนที่ ค่าเดินทาง และคู่มือที่เที่ยว 550+ แห่ง (Tokyo, Osaka, Sendai, Nagoya, Fukuoka, Sapporo)"><meta name="twitter:card" content="summary_large_image"><link rel="manifest" href="/manifest.webmanifest"><meta name="theme-color" content="#12151c"><link rel="icon" href="/icons/icon-192.png"><link rel="apple-touch-icon" href="/icons/icon-192.png"><meta property="og:image" content="https://nihontabi.web.app/og/default.jpg"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta name="twitter:image" content="https://nihontabi.web.app/og/default.jpg"><script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"Nihontabi","url":"https://nihontabi.web.app/","inLanguage":"th","description":"เลือกเมืองฐานที่จะไปเป็นจุดตั้งต้น ระบบเรียงแพลนตามเดือน จำนวนวัน และพาสที่คุ้ม พร้อมแผนที่ ค่าเดินทาง และคู่มือที่เที่ยว 550+ แห่ง (Tokyo, Osaka, Sendai, Nagoya, Fukuoka, Sapporo)"}</script><script>if(!window.claude){window.claude={use:async n=>n==="downloads"?{save:async({filename,data})=>{const b=new Blob([data],{type:/\.ics$/.test(filename)?"text/calendar":"text/html"}),a=document.createElement("a");a.href=URL.createObjectURL(b);a.download=filename;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},1500)}}:null}}</script><script>try{var h=new URLSearchParams(location.search).get("hub");if(/^(tokyo|osaka|sendai|nagoya|fukuoka|sapporo)$/.test(h)){var st=JSON.parse(localStorage.getItem("jp:state")||"{}");if(st.base!==h){st.base=h;localStorage.setItem("jp:state",JSON.stringify(st))}}var pl=new URLSearchParams(location.search).get("plan");if(pl&&/^[A-Za-z0-9_\-]{3,80}$/.test(pl)){var st2=JSON.parse(localStorage.getItem("jp:state")||"{}");st2.planId=pl;st2.tab="plan";st2.day=0;localStorage.setItem("jp:state",JSON.stringify(st2))}}catch(e){}</script><script src="/analytics.js" defer></script><script data-cmp-ab="2">(function(){var s=document.createElement("script");s.async=1;s.setAttribute("data-cmp-ab","2");s.src="https://emrldtp.cc/NjAzMjQ3.js?t=603247";document.head.appendChild(s)})();</script></head><body>
 <title>Japan Trip Planner</title>
 <meta name="claude:viewport-fit-sides" content="cover">
@@ -2059,6 +2062,7 @@ details.pgrp>summary::-webkit-details-marker{display:none}
     const v = { vote: vPoll, px: vPx, lib: vLib, trip: vTrip, pick: vPick, plan: vPlan, cmp: vCmp, info: () => vInfo() + eventsCalendar() }[S.tab]();
     $("#app").innerHTML = `<section class="view ${anim ? "anim" : ""}">${v}</section>`;
     anim = false;
+    setTimeout(initDayMaps, 0);
   }
 
   const PIC_ALLOC = {}, PIC_NM = {};
@@ -2596,6 +2600,37 @@ details.pgrp>summary::-webkit-details-marker{display:none}
   const legOf = (a, b) => { const km = hav(a, b), road = km * 1.3, min = Math.max(1, Math.round(road / 4 * 60));
     return { km, road, min, mode: km < 0.05 ? "same" : road <= 1.2 ? "walk" : road <= 2.5 ? "either" : "transit" }; };
   const dirUrl = (o, d, mode) => "https://www.google.com/maps/dir/?api=1&origin=" + encodeURIComponent(o) + "&destination=" + encodeURIComponent(d) + "&travelmode=" + mode;
+  // ---------- live day map: MapLibre GL + OpenFreeMap vector tiles, labels forced to Latin (English) letters; the raster map stays as fallback
+  const latinOf = n => { const m = String(n || "").replace(EMO, "").match(/[A-Za-z][A-Za-z0-9'’.&\-\/ ]*[A-Za-z0-9.]/g) || [], best = m.sort((a, b) => b.length - a.length)[0]; return (best ? best.trim() : String(n || "").replace(EMO, "").replace(/\s*[(（].*$/, "").trim()).slice(0, 48); };
+  let MLP = null, MLSTYLE = null; const MLINST = [];
+  const loadML = () => MLP || (MLP = new Promise((res, rej) => { const css = document.createElement("link"); css.rel = "stylesheet"; css.href = "https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css"; document.head.appendChild(css); const sc = document.createElement("script"); sc.src = "https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"; sc.onload = () => window.maplibregl ? res(window.maplibregl) : rej(new Error("no maplibre")); sc.onerror = () => rej(new Error("load")); document.head.appendChild(sc); }));
+  const loadMLStyle = () => MLSTYLE || (MLSTYLE = fetch("https://tiles.openfreemap.org/styles/liberty").then(r => { if (!r.ok) throw new Error("style"); return r.json(); }).then(st => { (st.layers || []).forEach(l => { const tf = l.layout && l.layout["text-field"]; if (tf && JSON.stringify(tf).indexOf("name") >= 0) l.layout["text-field"] = ["coalesce", ["get", "name:latin"], ["get", "name_en"], ["get", "name"]]; }); return st; }));
+  function initDayMaps() {
+    for (let i = MLINST.length - 1; i >= 0; i--) { const m = MLINST[i]; if (!document.body.contains(m.getContainer())) { try { m.remove(); } catch (e) { } MLINST.splice(i, 1); } }
+    document.querySelectorAll(".dmv[data-j]:not([data-init])").forEach(el => {
+      el.setAttribute("data-init", "1"); let J; try { J = JSON.parse(el.dataset.j); } catch (e) { return; } if (!J || J.length < 2) return;
+      Promise.all([loadML(), loadMLStyle()]).then(([ml, style]) => {
+        if (!document.body.contains(el)) return;
+        const box = el.querySelector(".dmc"), b = new ml.LngLatBounds(); J.forEach(q => b.extend([q.lon, q.lat]));
+        const map = new ml.Map({ container: box, style, bounds: b, fitBoundsOptions: { padding: 48, maxZoom: 15 }, attributionControl: false, cooperativeGestures: true, locale: { "CooperativeGesturesHandler.WindowsHelpText": "กด Ctrl + เลื่อนเมาส์เพื่อซูมแผนที่", "CooperativeGesturesHandler.MacHelpText": "กด ⌘ + เลื่อนเมาส์เพื่อซูมแผนที่", "CooperativeGesturesHandler.MobileHelpText": "ใช้สองนิ้วเลื่อนแผนที่" } });
+        map.addControl(new ml.NavigationControl({ showCompass: false }), "top-right"); map.addControl(new ml.ScaleControl({ unit: "metric" }), "bottom-left");
+        map.addControl(new ml.AttributionControl({ compact: true }), "bottom-right");
+        MLINST.push(map); window.__dmMaps = MLINST;
+        try { new ResizeObserver(() => { map.resize(); }).observe(box); } catch (e) { }
+        map.on("load", () => {
+          map.resize(); map.fitBounds(b, { padding: 48, maxZoom: 15, duration: 0 });
+          const feats = []; for (let k = 0; k < J.length - 1; k++) feats.push({ type: "Feature", properties: { m: J[k].m === "transit" ? "t" : "w" }, geometry: { type: "LineString", coordinates: [[J[k].lon, J[k].lat], [J[k + 1].lon, J[k + 1].lat]] } });
+          map.addSource("dmroute", { type: "geojson", data: { type: "FeatureCollection", features: feats } });
+          map.addLayer({ id: "dm-w", type: "line", source: "dmroute", filter: ["==", ["get", "m"], "w"], paint: { "line-color": "#4f6df0", "line-width": 4, "line-opacity": .9 }, layout: { "line-cap": "round" } });
+          map.addLayer({ id: "dm-t", type: "line", source: "dmroute", filter: ["==", ["get", "m"], "t"], paint: { "line-color": "#f06a4e", "line-width": 3.5, "line-dasharray": [2, 1.6] }, layout: { "line-cap": "round" } });
+          J.forEach(q => { const e = document.createElement("div"); e.className = "dmpin" + (q.star ? " star" : ""); e.textContent = q.n; const pop = new ml.Popup({ offset: 16, closeButton: false }).setText(q.n + ". " + q.name); new ml.Marker({ element: e }).setLngLat([q.lon, q.lat]).setPopup(pop).addTo(map); });
+          el.classList.add("live"); el.dataset.st = "loaded";
+        });
+        map.on("idle", () => { el.dataset.idle = "1"; });
+        map.on("error", e => { try { const msg = String((e && e.error && e.error.message) || e); (window.__dmErr = window.__dmErr || []).push(msg); el.dataset.err = (el.dataset.err || "") + msg.slice(0, 80) + "|"; } catch (x) { } });
+      }).catch(() => { el.classList.remove("live"); });
+    });
+  }
   const nameQ = s => String(s.name || "").replace(EMO, "").trim() + " Japan";
   function legRow(s1, s2) {
     const a = pg(s1.gps), b = pg(s2.gps);
@@ -2817,6 +2852,7 @@ details.pgrp>summary::-webkit-details-marker{display:none}
     let BG = DMAPS[d.mid || d.mod || d.bgk], regionBG = false;
     const inBG = p => BG && p.ll[1] >= BG.lon0 && p.ll[1] <= BG.lon1 && mercY(p.ll[0]) >= BG.my0 && mercY(p.ll[0]) <= BG.my1;
     let pts = (d.stops || []).map((s, i) => ({ n: i + 1 + (d._off || 0), s, ll: pg(s.gps) })).filter(p => p.ll);
+    const allPts = pts.slice();
     { let ext = 0; for (let a = 0; a < pts.length; a++) for (let b = a + 1; b < pts.length; b++) ext = Math.max(ext, hav(pts[a].ll, pts[b].ll));
       if (pts.length >= 2 && (!BG || forceRegion || ext > 7 || !pts.every(inBG) || (BG.lon1 - BG.lon0) > 1.2)) { const fitM = M => M && M.img && pts.every(p => p.ll[1] >= M.lon0 && p.ll[1] <= M.lon1 && mercY(p.ll[0]) >= M.my0 && mercY(p.ll[0]) <= M.my1), cands = []; Object.values(HUBDATA._maps || {}).forEach(m => { if (m && m.near) cands.push(m.near); if (m && m.wide) cands.push(m.wide); }); const R = cands.filter(fitM).sort((x, y) => (x.lon1 - x.lon0) - (y.lon1 - y.lon0))[0] || null; if (R && (!BG || R !== BG)) { BG = R; regionBG = true; } } }
     const bgPts = BG ? pts.filter(inBG) : []; let bgOK = bgPts.length >= 2;
@@ -2846,8 +2882,9 @@ details.pgrp>summary::-webkit-details-marker{display:none}
     const wp = pts.slice(0, 10).map(p => p.ll.join(",")).join("/");
     const miss = (d.stops || []).length - pts.length;
     const legend = pts.map(p => `<span class="lg"><i class="${p.s.star ? "star" : ""}">${p.n}</i>${E(p.s.name)}</span>`).join("");
+    const dmJson = JSON.stringify(allPts.map((q, k) => ({ n: q.n, lat: +q.ll[0].toFixed(6), lon: +q.ll[1].toFixed(6), star: !!q.s.star, name: latinOf(q.s.name), m: k < allPts.length - 1 ? legOf(q.ll, allPts[k + 1].ll).mode : "" })));
     return sec(`${ic("map","sm")} ${d._label || "แผนที่เส้นทางวันนี้"}`, `ระหว่างจุดรวม ~${fmtKm(totalKm)} (เส้นตรง)`,
-      `<div class="${bgOK && vw / vh < 0.75 ? "mpscroll" : ""}"><svg class="mp ${bgOK ? "bg" : ""}" viewBox="${vx.toFixed(1)} ${vy.toFixed(1)} ${vw.toFixed(1)} ${vh.toFixed(1)}" role="img" aria-label="แผนที่แสดงลำดับจุดแวะของวันนี้">${bgOK ? `${BG.ay != null ? `<svg x="0" y="0" width="${W}" height="${H}" viewBox="0 ${BG.ay} ${BG.w} ${BG.h}" preserveAspectRatio="none"><image class="dmimg" href="${esc(BG.img)}" x="0" y="0" width="${BG.aw}" height="${BG.ah}"/></svg>` : `<image class="dmimg" href="${esc(BG.img)}" x="0" y="0" width="${W}" height="${H}"/>`}` : ""}${grid}${lines}${marks}${scale}${north}</svg></div>${bgOK && vw / vh < 0.75 ? `<p class="mp-note" style="margin:4px 2px 0">แผนที่ยาวตามแนวเหนือ-ใต้ เลื่อนในกรอบเพื่อดูทั้งเส้นทาง</p>` : ""}
+      `<div class="dmv" data-j="${esc(dmJson)}"><div class="dmc"></div><div class="dmfb"><svg class="mp ${bgOK ? "bg" : ""}" viewBox="${vx.toFixed(1)} ${vy.toFixed(1)} ${vw.toFixed(1)} ${vh.toFixed(1)}" role="img" aria-label="แผนที่แสดงลำดับจุดแวะของวันนี้">${bgOK ? `${BG.ay != null ? `<svg x="0" y="0" width="${W}" height="${H}" viewBox="0 ${BG.ay} ${BG.w} ${BG.h}" preserveAspectRatio="none"><image class="dmimg" href="${esc(BG.img)}" x="0" y="0" width="${BG.aw}" height="${BG.ah}"/></svg>` : `<image class="dmimg" href="${esc(BG.img)}" x="0" y="0" width="${W}" height="${H}"/>`}` : ""}${grid}${lines}${marks}${scale}${north}</svg></div></div>
       <div class="mp-key"><span><i class="k wk"></i>เดินได้ (~${walkMin} นาทีรวมช่วงเดิน)</span><span><i class="k tr"></i>ต้องนั่งรถไฟ/รถ</span></div>
       <div class="legend">${legend}</div>
       <p class="mp-note">${bgOK ? (regionBG ? "แผนที่ภูมิภาคย่อส่วน ตำแหน่งจุดเป็นค่าประมาณ © ผู้ร่วมจัดทำ OpenStreetMap" : "แผนที่ © ผู้ร่วมจัดทำ OpenStreetMap") + " เส้นคือเส้นตรงระหว่างจุด ไม่ใช่เส้นทางถนนจริง" : "แผนที่ลายเส้นจากพิกัดของแต่ละจุด ไม่มีภาพถนน"} ระยะเดินคำนวณจากเส้นตรง ×1.3 ที่ความเร็ว 4 กม./ชม. เป็นค่าประมาณ${miss ? ` · ${miss} จุดไม่มีพิกัดหรืออยู่นอกกรอบแผนที่จึงไม่แสดง` : ""} กดปุ่ม "ดูเส้นทางจริง" ระหว่างจุดเพื่อดูเวลาจริงใน Google Maps</p>
