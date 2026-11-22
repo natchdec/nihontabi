@@ -2782,7 +2782,7 @@ details.pgrp>summary::-webkit-details-marker{display:none}
       }
     } catch (e) { map = ""; }
     const waves = '<svg class="igwave" viewBox="0 0 400 40" preserveAspectRatio="none" aria-hidden="true"><path d="M0 20 Q 25 5 50 20 T 100 20 T 150 20 T 200 20 T 250 20 T 300 20 T 350 20 T 400 20" fill="none" stroke="currentColor" stroke-width="2" opacity=".35"/></svg>';
-    return sec(`${ic("map", "sm")} ภาพรวมทริป · ไปที่ไหนบ้าง`, "ชี้ที่วันหรือหมุดเพื่อดูรูปและรายละเอียด", `<div class="igwrap${map ? " hasmap" : ""}"><div class="igpop" hidden></div>${map}<div class="igcolp"><div class="igbase"><span>🏠</span> ฐานที่พัก ${E(HB.short)}</div>${waves}<div class="igpath">${nodes}</div>${waves}<div class="igbase end"><span>🏠</span> กลับฐาน ${E(HB.short)}</div></div></div><p class="mp-note">เส้นทางตามลำดับวัน ตำแหน่งเป็นจุดกลางคร่าวๆ ของแต่ละวัน ดูแผนที่จริงและตารางได้ด้านล่าง</p>`, 1);
+    return sec(`${ic("map", "sm")} ภาพรวมทริป · ไปที่ไหนบ้าง`, "ชี้ที่วันหรือหมุดเพื่อดูรูปและรายละเอียด", `<div class="igwrap${map ? " hasmap" : ""}"><div class="igpop" hidden></div>${map}<div class="igcolp"><div class="igbase"><span>🏠</span> ฐานที่พัก ${E(HB.short)}</div>${waves}<div class="igpath">${nodes}</div>${waves}<div class="igbase end"><span>🏠</span> กลับฐาน ${E(HB.short)}</div></div></div><p class="mp-note">เส้นทางตามลำดับวัน ตำแหน่งเป็นจุดกลางคร่าวๆ ของแต่ละวัน</p>`, 1);
   }
   function overviewCard(daysIn) {
     const days = (daysIn || []).filter(Boolean); if (!days.length) return "";
@@ -3837,7 +3837,7 @@ ${apSteps()}</div></section>
       </div></header>
       ${passPlanCard(p, days)}
       ${hubCard(days, "")}
-      ${infoTrip(days)}${fold("แผนที่จริงและตารางรายวัน", "ตำแหน่งบนแผนที่ · ตาราง", overviewCard(days))}
+      ${infoTrip(days)}
       <div class="stripw"><button type="button" class="sn l" data-act="stripgo" data-v="-1" aria-label="ก่อนหน้า">‹</button><button type="button" class="sn r" data-act="stripgo" data-v="1" aria-label="ถัดไป">›</button><div class="strip rv" style="--i:1" role="tablist" aria-label="เลือกวัน">${dayChips}</div></div>
       <header class="dh glass rv" style="--i:2">
         <div class="label"><span class="dnum">DAY ${S.day + 1}</span>${E(d.area)}${d.optional ? ` · <span class="tag warn">ตัดได้ถ้าไป 5 วัน</span>` : ""}${d.aiEdited ? ` · <span class="tag shu">${d.userEdited ? "ปรับเอง" : "แก้ด้วย AI"}</span> <button class="btn sm" data-act="resetday" data-v="${esc(d.n)}">คืนค่าเดิม</button>` : ""}</div>
