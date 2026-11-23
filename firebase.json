@@ -36,6 +36,24 @@
           ]
         },
         {
+          "source": "/data/px_*.json",
+          "headers": [
+            {
+              "key": "Cache-Control",
+              "value": "no-cache"
+            }
+          ]
+        },
+        {
+          "source": "/data/hotel_prices.json",
+          "headers": [
+            {
+              "key": "Cache-Control",
+              "value": "no-cache"
+            }
+          ]
+        },
+        {
           "source": "/img/**",
           "headers": [
             {
