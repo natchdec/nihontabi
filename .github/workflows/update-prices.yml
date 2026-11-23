@@ -30,6 +30,12 @@ jobs:
         env:
           TRAVELPAYOUTS_TOKEN: ${{ secrets.TRAVELPAYOUTS_TOKEN }}
         run: node scripts/update_prices.mjs
+      - name: Send Telegram price alerts (skipped when the bot token is missing)
+        continue-on-error: true
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          SA: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        run: node scripts/telegram_alerts.mjs
       - name: Fetch hotel prices (monthly, needs SERPAPI_KEY; skipped when the secret is missing)
         continue-on-error: true
         env:

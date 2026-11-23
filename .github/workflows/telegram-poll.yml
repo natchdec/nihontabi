@@ -1,0 +1,20 @@
+name: telegram-poll
+on:
+  schedule:
+    - cron: "*/30 * * * *"   # answers /start, /stop, /list messages sent to the price-alert bot (exits at once when no bot token is set)
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  poll:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20 }
+      - name: Poll Telegram bot
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          SA: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        run: node scripts/telegram_alerts.mjs --poll-only
