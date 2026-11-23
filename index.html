@@ -2075,7 +2075,7 @@ details.pgrp>summary::-webkit-details-marker{display:none}
     const v = ({ season: vSeason, px: vPx, lib: vLib, trip: vTrip, pick: () => seasonPromo() + vPick(), plan: vPlan, cmp: vCmp, info: () => vInfo() + eventsCalendar() }[S.tab] || (() => { S.tab = "pick"; return vPick(); }))();
     $("#app").innerHTML = `<section class="view ${anim ? "anim" : ""}">${v}</section>`;
     anim = false;
-    initRegionMaps(); setTimeout(initDayMaps, 0); setTimeout(initIgMaps, 0); setTimeout(initSeasonMap, 0);
+    try { postProcess(); } catch (e) { } initRegionMaps(); setTimeout(initDayMaps, 0); setTimeout(initIgMaps, 0); setTimeout(initSeasonMap, 0);
   }
 
   const PIC_ALLOC = {}, PIC_NM = {};
@@ -3452,7 +3452,7 @@ ${apSteps()}</div></section>
        <div class="days">${days}</div>
        <div class="actions"><button class="btn pri" data-act="tab" data-tab="lib">+ เพิ่มที่เที่ยว</button><button class="btn" data-act="copytrip" id="copyBtn">คัดลอกสรุปส่งเพื่อน</button><button class="btn" data-act="addday" data-id="arrival">+ วันมาถึง</button><button class="btn" data-act="addday" data-id="departure">+ วันกลับ</button><button class="btn" data-act="shrtoggle">แชร์ทริป (รหัส)</button><button class="btn" data-act="imptoggle">นำเข้าทริป</button><button class="btn" data-act="printpage" data-src="trip" data-v="short" title="ข้อความย่อ ประหยัดหน้ากระดาษ">พิมพ์/PDF แบบย่อ</button><button class="btn" data-act="printpage" data-src="trip" data-v="full" title="มีรูปประกอบแต่ละจุดและรายละเอียดครบ">พิมพ์/PDF แบบเต็ม (มีรูป)</button></div>${sharePanel()}
        <p class="sub" style="margin:10px 0 0">วันที่มีหลายตัวเลือก (A/B/C) คือให้แต่ละคนเลือกเอง แตะตัวเลือกที่คุณจะไปเพื่อดูแผนและคำนวณ pass ของตัวเอง</p>`, 0)
-      + (infoTrip(tripPlan().days) || overviewCard(tripPlan().days)) + tripBudget()
+      + (infoTrip(tripPlan().days) || overviewCard(tripPlan().days)) + tripBudget() + tripExport() + checklistCard()
       + `<div class="stripw"><button type="button" class="sn l" data-act="stripgo" data-v="-1" aria-label="ก่อนหน้า">‹</button><button type="button" class="sn r" data-act="stripgo" data-v="1" aria-label="ถัดไป">›</button><div class="strip rv" style="--i:3" role="tablist" aria-label="ดูแผนรายวัน">${TRIP.days.map((d, i) => `<button class="dchip" aria-current="${i === S.tday}" data-act="viewday" data-v="${i}"><b>D${i + 1}</b><span>${E(pickOf(d).title)}</span>${passBadge2(modDay(pickOf(d)))}</button>`).join("")}</div></div>`
       + hubCard(tripPlan().days.map(x => Object.assign({}, x, { mod: x.mid })), "") + tripDayDetail()
       + fold("ค่าใช้จ่ายและ Pass", "งบต่อคน · Pass คุ้มไหม", ticketRecCard(tripPlan().days.map(x => ({ id: x.mid }))) + mixCard(tripPlan().days.map(x => x.mid)) + sec(`${ic("ticket", "sm")} วันไหนใช้ Pass / วันไหนไม่ต้องใช้`, "", `<p style="margin:0">${passSummary(tripPlan().days)}</p>`, 4) + passCard() + budgetCard())
@@ -3556,9 +3556,9 @@ ${apSteps()}</div></section>
     const nm = k => { const t = k.split("-"); return MTHX[+t[1] - 1] + " " + String(+t[0] + 543).slice(2); }, mx = Math.max(...ms.map(m => d[m].median)), mn = Math.min(...ms.map(m => d[m].low));
     const cheapest = ms.slice().sort((a, b) => d[a].median - d[b].median)[0], selM = ms.includes(S.pxm) ? S.pxm : cheapest;
     const rows = ms.map(m => `<tr data-act="pxmonth" data-v="${m}" style="cursor:pointer;${m === selM ? "background:rgba(240,106,78,.14)" : ""}"><td style="white-space:nowrap">${m === cheapest ? "⭐ " : ""}${E(nm(m))}</td><td class="num">${thb(d[m].low)}</td><td class="num"><b>${thb(d[m].median)}</b></td><td><div style="height:8px;border-radius:5px;background:var(--accent,#c0392b);opacity:.6;width:${Math.round(12 + 80 * (d[m].median - mn) / Math.max(1, mx - mn))}%"></div></td></tr>`).join("");
-    const top = (d[selM] && d[selM].top) || [], area = (HOTELPX.area && HOTELPX.area[HB.id]) || "";
+    const topAll = (d[selM] && d[selM].top) || [], hs = S.hstar || 0, top = hs ? topAll.filter(x => x.c && x.c >= hs) : topAll, area = (HOTELPX.area && HOTELPX.area[HB.id]) || "";
     const star = c => c ? " · " + "★".repeat(Math.min(5, c)) : "", walkT = t => { if (!t) return ""; const [pl, du] = String(t).split("|"); return `<br><span style="color:var(--muted)">🚶 ${E(du)} จาก ${E(pl)}</span>`; };
-    const list = top.length ? `<h3 style="margin:16px 0 4px;font-size:15px">ตัวอย่างโรงแรม ราคาถูกสุดที่คะแนนดี · ${E(nm(selM))}</h3><p class="sub" style="margin:0 0 8px;font-size:12.5px">ห้องสำหรับ 2 คน 1 คืน เข้าพัก ${E(String(d[selM].checkIn || ""))} เรียงจากราคาต่ำ (คัดคะแนนรีวิว 4.0 ขึ้นไปก่อน)</p><ol class="plain" style="margin:0;padding:0;list-style:none">${top.map((x, i) => `<li style="display:flex;justify-content:space-between;gap:10px;padding:7px 0;border-top:${i ? "1px solid var(--tile-edge)" : "0"};font-size:13.5px"><span style="min-width:0">${i + 1}. <b>${x.u ? `<a href="${esc(x.u)}" target="_blank" rel="noopener nofollow">${E(x.n)}</a>` : `<a href="https://www.google.com/travel/search?q=${encodeURIComponent(x.n + " " + pxHubName(HB.id))}" target="_blank" rel="noopener nofollow">${E(x.n)}</a>`}</b>${E(star(x.c))}${x.r != null ? ` · ⭐${x.r}${x.rv ? ` <small style="color:var(--muted)">(${Number(x.rv).toLocaleString("en-US")} รีวิว)</small>` : ""}` : ""}<span style="display:block;font-size:12px">${walkT(x.t).replace(/^<br>/, "")}</span></span><b class="mono" style="white-space:nowrap">${thb(x.p)}</b></li>`).join("")}</ol>` : "";
+    const starChips = `<div class="chips" style="margin:6px 0">${[[0, tx("ทุกระดับ", "All")], [3, "3★+"], [4, "4★+"]].map(([n, l]) => `<button class="chip" aria-pressed="${hs === n}" data-act="hstar" data-v="${n}">${l}</button>`).join("")}</div>`, list = topAll.length ? `<h3 style="margin:16px 0 4px;font-size:15px">ตัวอย่างโรงแรม ราคาถูกสุดที่คะแนนดี · ${E(nm(selM))}</h3><p class="sub" style="margin:0 0 8px;font-size:12.5px">ห้องสำหรับ 2 คน 1 คืน เข้าพัก ${E(String(d[selM].checkIn || ""))} เรียงจากราคาต่ำ (คัดคะแนนรีวิว 4.0 ขึ้นไปก่อน)</p>${starChips}${top.length ? "" : `<p class="sub">${tx("ไม่มีโรงแรมระดับนี้ในรายการของเดือนนี้", "No hotels of this class in this month's list")}</p>`}<ol class="plain" style="margin:0;padding:0;list-style:none">${top.map((x, i) => `<li style="display:flex;justify-content:space-between;gap:10px;padding:7px 0;border-top:${i ? "1px solid var(--tile-edge)" : "0"};font-size:13.5px"><span style="min-width:0">${i + 1}. <b>${x.u ? `<a href="${esc(x.u)}" target="_blank" rel="noopener nofollow">${E(x.n)}</a>` : `<a href="https://www.google.com/travel/search?q=${encodeURIComponent(x.n + " " + pxHubName(HB.id))}" target="_blank" rel="noopener nofollow">${E(x.n)}</a>`}</b>${E(star(x.c))}${x.r != null ? ` · ⭐${x.r}${x.rv ? ` <small style="color:var(--muted)">(${Number(x.rv).toLocaleString("en-US")} รีวิว)</small>` : ""}` : ""}<span style="display:block;font-size:12px">${walkT(x.t).replace(/^<br>/, "")}</span></span><b class="mono" style="white-space:nowrap">${thb(x.p)}</b></li>`).join("")}</ol>` : "";
     return sec(`${ic("coin", "sm")} โรงแรมแถว ${E(pxHubName(HB.id))} · ราคาต่อคืน 12 เดือน`, `ข้อมูล ณ ${E(HOTELPX.asOf || "")}`,
       `<p class="sub" style="margin:8px 0 10px;font-size:13.5px;color:var(--ink-2)">ผลค้นหา Google Hotels ย่าน <b>${E(area || pxHubName(HB.id))}</b> ห้องสำหรับผู้ใหญ่ 2 คน 1 คืน เข้าพักกลางสัปดาห์ กลางเดือน (จันทร์–พฤหัส) จากโรงแรมประมาณ 20 แห่งที่ Google แสดงในแต่ละเดือน ตารางสรุปจากทุกแห่ง "ถูกสุด" และ "ราคากลาง" แตะเดือนเพื่อดูรายชื่อโรงแรม ราคาจริงเปลี่ยนตามวัน ช่วงเทศกาลและห้องว่าง ตรวจที่เว็บจองก่อนตัดสินใจ</p>
       <div class="tblwrap"><table class="cmp"><thead><tr><th>เดือน</th><th style="text-align:right">ถูกสุด</th><th style="text-align:right">ราคากลาง</th><th></th></tr></thead><tbody>${rows}</tbody></table></div>${list}`, 1); };
@@ -3578,6 +3578,15 @@ ${apSteps()}</div></section>
       `<p class="sub" style="margin:8px 0 10px;font-size:13.5px;color:var(--ink-2)">ราคาไป-กลับถูกสุดต่อคน (BKK) เฉพาะทริปไม่เกิน 15 วัน แยกฮับและเดือน สีเขียวเข้ม = ถูก กรอบ = เดือนที่ถูกสุดของฮับนั้น แตะชื่อฮับเพื่อเปลี่ยนฐานและดูรายละเอียด</p>
        <div class="tblwrap"><table class="cmp"><thead><tr><th>ฮับ</th>${months.map(k => `<th style="text-align:right">${nm(k)}</th>`).join("")}</tr></thead><tbody>${body}</tbody></table></div>
        <p class="mp-note"><b>ถูกสุดโดยรวม:</b> ${E(hn(best[0].h))} ${nm(best[0].k)} ${thb(best[0].thb)}${best[1] ? " · รองลงมา " + E(hn(best[1].h)) + " " + nm(best[1].k) + " " + thb(best[1].thb) : ""}${tip ? "<br>" + tip : ""}<br>* เซนไดไม่มีตั๋วบินตรงในข้อมูล ใช้ราคาบินถึงโตเกียวแล้วต่อชินคันเซ็น ราคาแคชจากการค้นหา ไม่ใช่ราคาตอนจอง</p>`, 0); };
+  // ---------- DOM post-processing after every render: (1) show baht next to yen amounts, (2) English dictionary (see I18N)
+  let FX = null; fetch("data/fx.json").then(r => r.ok ? r.json() : null).then(j => { if (j && j.rates && j.rates.THB) { FX = { r: j.rates.THB, d: j.date }; draw(); } }).catch(() => { });
+  const yenToBaht = (n) => { const v = n * (FX ? FX.r : 0), r = v >= 1000 ? Math.round(v / 10) * 10 : Math.round(v); return "฿" + r.toLocaleString("en-US"); };
+  const postProcess = () => { const root = document.getElementById("app"); if (!root) return;
+    if (LANG === "en" && typeof i18nApply === "function") i18nApply(root);
+    if (!FX) return; const skip = /^(SCRIPT|STYLE|TEXTAREA|INPUT|OPTION|CODE|SELECT|SMALL)$/, w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, { acceptNode: n => n.nodeValue.indexOf("¥") >= 0 && n.parentNode && !skip.test(n.parentNode.nodeName) && !(n.parentNode.closest && n.parentNode.closest("small.fx,[data-nofx]")) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT }), nodes = []; while (w.nextNode()) nodes.push(w.currentNode);
+    const re = /¥\s?(\d[\d,]*)(?:\s?[–~-]\s?¥?\s?(\d[\d,]*))?/g;
+    nodes.forEach(n => { const t = n.nodeValue; re.lastIndex = 0; let m, last = 0, frag = null; while ((m = re.exec(t))) { const a = +m[1].replace(/,/g, ""), b = m[2] ? +m[2].replace(/,/g, "") : null; if (a < 100 && !(b && b >= 100)) continue; frag = frag || document.createDocumentFragment(); const end = m.index + m[0].length; frag.appendChild(document.createTextNode(t.slice(last, end))); const sm = document.createElement("small"); sm.className = "fx"; sm.style.cssText = "color:var(--muted);font-weight:400;margin-left:3px;white-space:nowrap"; sm.textContent = "(≈" + yenToBaht(a) + (b ? "–" + yenToBaht(b).slice(1) : "") + ")"; frag.appendChild(sm); last = end; }
+      if (frag) { frag.appendChild(document.createTextNode(t.slice(last))); n.parentNode.replaceChild(frag, n); } }); };
   // ---------- budget estimators shared by the price page calculator and the trip-tab summary (real fares from px_months, real hotel prices from hotel_prices)
   const ymForMonth = mkey => { const mm = MONTHS.findIndex(x => x[0] === mkey) + 1, ks = PXM && PXM.hubs && PXM.hubs[HB.id] ? Object.keys(PXM.hubs[HB.id]).filter(k => /^\d{4}-\d{2}$/.test(k)).sort() : []; return ks.find(k => +k.slice(5) === mm) || null; };
   const fareFor = ym => { const pm = ym && PXM && PXM.hubs && PXM.hubs[HB.id] && PXM.hubs[HB.id][ym]; if (!pm) return null; const c = [pm.nonstop && pm.nonstop[0] ? Object.assign({ t: "บินตรง" }, pm.nonstop[0]) : null, pm.one && pm.one[0] ? Object.assign({ t: "ต่อเครื่อง 1 จุด" }, pm.one[0]) : null].filter(Boolean).sort((a, b) => a.p - b.p); return c[0] || null; };
@@ -3601,6 +3610,46 @@ ${apSteps()}</div></section>
     const row = (l, v, sub) => `<tr><td>${l}<div class="sub">${sub}</div></td><td class="num">${thb(v)}</td></tr>`;
     return sec(`${ic("coin", "sm")} งบทริปโดยประมาณ · ${TRIP.days.length} วัน ${nights} คืน`, `${S.people} คน`, `<div class="tblwrap"><table class="cmp"><tbody>${row("ตั๋วบิน ไป-กลับ", air, S.people + " คน × " + thb(fp) + (ym ? " (" + mn(ym) + (fr ? " · " + fr.t : "") + ")" : ""))}${row("ที่พัก", hot, rooms + " ห้อง × " + nights + " คืน × " + thb(hn) + (hotelFor(ym, S.pxt) ? "" : " (ค่าประมาณ)"))}${row("กิน เดินทาง เข้าชม", loc, S.people + " คน × " + TRIP.days.length + " วัน × " + thb(S.pxd))}<tr><td><b>รวมทั้งกลุ่ม</b></td><td class="num"><b>${thb(tot)}</b></td></tr><tr><td><b>เฉลี่ยต่อคน</b></td><td class="num"><b>${thb(Math.round(tot / S.people))}</b></td></tr></tbody></table></div>
       <p class="mp-note">ตั๋วบินและที่พักใช้ราคาจริงล่าสุดของเดือนที่เลือก (ตั๋วบินไม่เกิน 15 วัน) ปรับจำนวนคน ระดับที่พัก และค่าใช้จ่ายรายวันได้ที่หน้า "ราคา" ไม่รวมตั๋ว Pass ประกัน ซิม และช้อปปิ้ง</p>`, 1); };
+  // ---------- export & share of the trip: calendar (.ics), Google My Maps (.kml), share link
+  const dlFile = (name, mime, text) => { const b = new Blob([text], { type: mime + ";charset=utf-8" }), u = URL.createObjectURL(b), a = document.createElement("a"); a.href = u; a.download = name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(u), 4000); };
+  const pad2 = n => String(n).padStart(2, "0");
+  const tripKml = () => { const days = tripPlan().days, xe = s => String(s == null ? "" : s).replace(/[&<>]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c])), pm = [];
+    days.forEach((d, i) => (d.stops || []).forEach(x => { const g = typeof pg === "function" ? pg(x.gps) : null; if (g) pm.push(`<Placemark><name>${xe(x.name)}</name><description>${xe("Day " + (i + 1) + " · " + (d.title || "") + (x.time ? " · " + x.time : ""))}</description><Point><coordinates>${g[1]},${g[0]},0</coordinates></Point></Placemark>`); }));
+    return `<?xml version="1.0" encoding="UTF-8"?><kml xmlns="http://www.opengis.net/kml/2.2"><Document><name>${xe("Nihontabi · " + HB.short)}</name>${pm.join("")}</Document></kml>`; };
+  const tripLink = () => location.origin + "/?hub=" + HB.id + "&trip=" + tripCode().slice(5);
+  const tripExport = () => sec(`${ic("route", "sm")} ${tx("แชร์ทริปและส่งออกหมุด", "Share this trip & export pins")}`, "", `<p class="sub" style="margin:8px 0 10px;font-size:13.5px;color:var(--ink-2)">${tx("ส่งลิงก์ให้เพื่อนเปิดทริปเดียวกัน (ใช้ได้กับฐานที่พักเดียวกัน) หรือดาวน์โหลดหมุดทุกจุดไปนำเข้า Google My Maps เพื่อดูบนแผนที่ระหว่างเที่ยว ส่วนปฏิทินอยู่ในปุ่ม “เพิ่มลงปฏิทิน” ด้านล่าง", "Send a link so friends open the same trip (same base city), or download every stop as pins to import into Google My Maps. The calendar file is in the “Add to calendar” button below.")}</p>
+      <div class="actions"><button class="btn pri" data-act="triplink">${tx("คัดลอกลิงก์แชร์ทริป", "Copy share link")}</button><button class="btn" data-act="tripkml">${tx("ไฟล์หมุด (.kml) สำหรับ Google My Maps", "Pins file (.kml) for Google My Maps")}</button></div>`, 1);
+  // ---------- pre-trip checklist for Thai travellers (ticks are saved on this device)
+  const CHK = [
+    { g: ["เอกสาร", "Documents"], items: [
+      ["pp", "พาสปอร์ตอายุเหลือเกิน 6 เดือน และมีหน้าว่างพอ", "Passport valid for 6+ months with blank pages", null],
+      ["visa", "คนไทยเข้าญี่ปุ่นแบบฟรีวีซ่าอยู่ได้ไม่เกิน 15 วัน (ตั๋วขากลับและที่พักต้องแสดงได้)", "Thai passport holders: visa-free stays up to 15 days (keep return ticket and accommodation proof)", ["https://www.mofa.go.jp/j_info/visit/visa/short/novisa.html", "MOFA Japan"]],
+      ["vjw", "ลงทะเบียน Visit Japan Web (ตม. และศุลกากร) ล่วงหน้าบนเว็บทางการ", "Register on Visit Japan Web (immigration & customs) in advance", ["https://services.digital.go.jp/en/visit-japan-web/", "Visit Japan Web"]],
+      ["ins", "ซื้อประกันการเดินทางที่คุ้มครองการรักษาพยาบาลในต่างประเทศ", "Buy travel insurance with overseas medical cover", null],
+      ["copy", "ถ่ายสำเนาพาสปอร์ต ตั๋ว และที่พัก เก็บไว้ในมือถือและกระดาษ", "Keep copies of passport, tickets and bookings (phone + paper)", null]] },
+    { g: ["จองล่วงหน้า", "Bookings"], items: [
+      ["flt", "จองตั๋วเครื่องบิน (ดูเดือนที่ถูกสุดที่หน้า ราคา)", "Book flights (see the cheapest months on the Prices tab)", null],
+      ["hotel", "จองที่พัก ตรวจนโยบายยกเลิกและการเช็กอิน", "Book accommodation, check cancellation and check-in rules", null],
+      ["pass", "ซื้อ Pass / ตั๋วที่ต้องจองล่วงหน้า (เช่น สวนสนุก พิพิธภัณฑ์ จุดชมวิว)", "Buy passes / timed tickets in advance (theme parks, museums, observation decks)", null],
+      ["rest", "จองร้านที่คิวแน่น หรือเตรียมแผนสำรอง", "Reserve popular restaurants or prepare a backup", null]] },
+    { g: ["เงินและการสื่อสาร", "Money & connectivity"], items: [
+      ["yen", "แลกเงินเยนบางส่วน (หลายร้านยังรับเงินสดเท่านั้น) และเตรียมบัตรที่ใช้ต่างประเทศได้", "Carry some yen cash (many places are cash-only) and a card that works abroad", null],
+      ["sim", "เตรียม eSIM / ซิม / Pocket WiFi ก่อนบิน", "Arrange an eSIM / SIM / pocket WiFi before you fly", null],
+      ["apps", "ติดตั้งแอปแผนที่/รถไฟ (Google Maps, Japan Transit by Navitime หรือ Yahoo! Transit) และดาวน์โหลดแผนที่ออฟไลน์", "Install map/train apps (Google Maps, Japan Transit by Navitime or Yahoo! Transit) and download offline maps", null],
+      ["suica", "เตรียมบัตร IC (Welcome Suica / PASMO / ICOCA) หรือเพิ่มใน Wallet", "Get an IC card (Welcome Suica / PASMO / ICOCA) or add one to your phone wallet", null]] },
+    { g: ["ของที่ต้องเตรียม", "Packing"], items: [
+      ["plug", "ปลั๊กแบนแบบญี่ปุ่น (Type A) และพาวเวอร์แบงก์ (พกขึ้นเครื่องเท่านั้น)", "Japanese flat plug adapter (Type A) and power bank (cabin bag only)", null],
+      ["med", "ยาประจำตัว (ตรวจว่ายาบางชนิดต้องมีใบรับรองแพทย์หรือห้ามนำเข้า)", "Personal medicine (check which drugs need a doctor's letter or are restricted)", null],
+      ["wear", "เสื้อผ้าตามเดือนที่ไป (ดูหน้า ข้อมูล หรือหน้า ซากุระ) รองเท้าเดินสบาย ร่ม/เสื้อกันฝน", "Clothes for your month, comfortable shoes, umbrella/rain jacket", null],
+      ["bag", "ถุงผ้า/กระเป๋าใบเล็กสำหรับช้อปปิ้ง และเผื่อน้ำหนักกระเป๋าขากลับ", "Foldable shopping bag and spare baggage allowance for the way back", null]] },
+    { g: ["ก่อนออกเดินทาง", "Before departure"], items: [
+      ["ci", "เช็กอินออนไลน์ และดูน้ำหนักกระเป๋า", "Online check-in and baggage weight", null],
+      ["arr", "จดวิธีเดินทางจากสนามบินเข้าที่พัก และเวลารถไฟรอบสุดท้าย", "Note how to get from the airport to your hotel and the last-train time", null],
+      ["note", "แชร์แพลนให้คนที่บ้านหรือเพื่อนร่วมทาง (ปุ่มแชร์ด้านบน)", "Share the plan with family or friends (share button above)", null]] }
+  ];
+  const checklistCard = () => { S.chkl = S.chkl || {}; const all = CHK.flatMap(g => g.items), done = all.filter(x => S.chkl[x[0]]).length;
+    const body = CHK.map(g => `<h3 style="margin:14px 0 4px;font-size:15px">${tx(g.g[0], g.g[1])}</h3>` + g.items.map(x => `<label style="display:flex;gap:10px;align-items:flex-start;padding:7px 0;border-top:1px solid var(--tile-edge);cursor:pointer"><input type="checkbox" data-act="chkl" data-v="${x[0]}" ${S.chkl[x[0]] ? "checked" : ""} style="margin-top:3px;width:18px;height:18px"><span style="${S.chkl[x[0]] ? "opacity:.55;text-decoration:line-through" : ""}">${E(tx(x[1], x[2]))}${x[3] ? ` <a href="${x[3][0]}" target="_blank" rel="noopener nofollow" onclick="event.stopPropagation()">${E(x[3][1])} ↗</a>` : ""}</span></label>`).join("")).join("");
+    return sec(`${ic("check", "sm")} ${tx("เช็กลิสต์ก่อนไปญี่ปุ่น", "Pre-trip checklist for Japan")}`, `${done}/${all.length}`, `<p class="sub" style="margin:8px 0 0;font-size:13.5px;color:var(--ink-2)">${tx("สำหรับคนไทย ติ๊กแล้วระบบจำไว้ในเครื่องนี้ กฎเข้าเมืองเปลี่ยนได้ ตรวจกับเว็บทางการก่อนบินเสมอ", "For Thai travellers. Ticks are saved on this device. Entry rules can change; always check the official sites before you fly.")}</p><div style="height:6px;border-radius:4px;background:var(--tile-edge);margin:10px 0"><div style="height:100%;border-radius:4px;width:${Math.round(done / all.length * 100)}%;background:var(--accent,#c0392b)"></div></div>${body}${affPrep ? affPrep() : ""}`, 1); };
   function vPx() {
     if (HB.id !== "tokyo") {
       const g = x => "https://www.google.com/travel/" + x, d = HUBPX[HB.id];
@@ -4318,6 +4367,10 @@ ${apSteps()}</div></section>
     if (a === "pxw") { S.pxw = v; return render(); }
     if (a === "pxall") { S.pxall = !S.pxall; return render(); }
     if (a === "pxmonth") { S.pxm = v; return render(); }
+    if (a === "tripkml") { dlFile("nihontabi-trip.kml", "application/vnd.google-earth.kml+xml", tripKml()); return; }
+    if (a === "triplink") { const url = tripLink(), lab = t.textContent; const done = ok => { t.textContent = ok ? tx("คัดลอกลิงก์แล้ว ✓", "Link copied ✓") : tx("คัดลอกไม่ได้", "Could not copy"); setTimeout(() => { t.textContent = lab; }, 2500); if (!ok) prompt(tx("คัดลอกลิงก์นี้", "Copy this link"), url); }; (navigator.clipboard ? navigator.clipboard.writeText(url).then(() => done(true), () => done(false)) : Promise.resolve(done(false))); return; }
+    if (a === "chkl") { S.chkl = S.chkl || {}; S.chkl[v] = !S.chkl[v]; save(); return render(); }
+    if (a === "hstar") { S.hstar = +v || 0; return render(); }
     if (a === "skind") { S.sk = v; S.sdkind = null; return render(); }
     if (a === "seaplan") { S.month = v; S.mall = false; return go("pick"); }
     if (a === "pmap") { S.pmap = v; S.__fitOff = true; return render(); }
@@ -4481,6 +4534,7 @@ ${apSteps()}</div></section>
   document.addEventListener("focusout", () => { if (tip) tip.hidden = true; });
   document.addEventListener("scroll", () => { if (tip) tip.hidden = true; }, true);
   if (S.tab === "plan" && !cur()) S.tab = "pick";
+  try { const tq = new URLSearchParams(location.search).get("trip"); if (tq && /^[A-Za-z0-9_-]{8,6000}$/.test(tq)) { const r = importTrip("JPT1." + tq); if (r.ok) S.tab = "trip"; history.replaceState(null, "", location.pathname + "?hub=" + HB.id); } } catch (e) { }
   draw();
   let __t25 = 0; const __slow = (() => { try { const c = navigator.connection; return !!(c && (c.saveData || /(^|-)2g$|3g/.test(c.effectiveType || ""))); } catch (e) { return false; } })();
   if (!__slow) setTimeout(async () => { for (const h of [__B].concat(__HUBS.filter(x => x !== __B))) { if (h !== __B) { if (!__t25) { await new Promise(r => setTimeout(r, 25000)); __t25 = 1; } while (document.hidden) await new Promise(r => setTimeout(r, 3000)); } const had = HUBDATA[h] && HUBDATA[h]._stub; await __loadHub(h); if (had && S.tab === "pick") draw(); } }, 600);
