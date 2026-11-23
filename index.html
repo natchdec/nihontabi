@@ -2630,6 +2630,10 @@ details.pgrp>summary::-webkit-details-marker{display:none}
   const dirUrl = (o, d, mode) => "https://www.google.com/maps/dir/?api=1&origin=" + encodeURIComponent(o) + "&destination=" + encodeURIComponent(d) + "&travelmode=" + mode;
   // ---------- live day map: MapLibre GL + OpenFreeMap vector tiles, labels forced to Latin (English) letters; the raster map stays as fallback
   const latinOf = n => { const m = String(n || "").replace(EMO, "").match(/[A-Za-z][A-Za-z0-9'’.&\-\/ ]*[A-Za-z0-9.]/g) || [], best = m.sort((a, b) => b.length - a.length)[0]; return (best ? best.trim() : String(n || "").replace(EMO, "").replace(/\s*[(（].*$/, "").trim()).slice(0, 48); };
+  // map credit: collapsed by default (only the (i) button shows); tapping (i) opens it
+  const mlHideAttrib = map => { const hide = () => { try { const c = map.getContainer().querySelector(".maplibregl-ctrl-attrib"); if (c && !c.dataset.userOpen) { c.classList.remove("maplibregl-compact-show"); c.removeAttribute("open"); } } catch (e) { } };
+    try { const btn = () => map.getContainer().querySelector(".maplibregl-ctrl-attrib-button"); setTimeout(() => { const b = btn(); if (b) b.addEventListener("click", () => { const c = map.getContainer().querySelector(".maplibregl-ctrl-attrib"); if (c) c.dataset.userOpen = "1"; }); }, 0); } catch (e) { }
+    hide(); map.on("load", hide); map.on("resize", hide); [200, 800, 2000].forEach(t => setTimeout(hide, t)); };
   let MLP = null, MLSTYLE = null; const MLINST = [];
   const loadML = () => MLP || (MLP = new Promise((res, rej) => { const css = document.createElement("link"); css.rel = "stylesheet"; css.href = "https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css"; document.head.appendChild(css); const sc = document.createElement("script"); sc.src = "https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"; sc.onload = () => window.maplibregl ? res(window.maplibregl) : rej(new Error("no maplibre")); sc.onerror = () => rej(new Error("load")); document.head.appendChild(sc); }));
   const MLSTYLES = {}; const loadMLStyle = (nm = "liberty") => MLSTYLES[nm] || (MLSTYLES[nm] = fetch("https://tiles.openfreemap.org/styles/" + nm.replace("-dim", "")).then(r => { if (!r.ok) throw new Error("style"); return r.json(); }).then(st => { (st.layers || []).forEach(l => { const tf = l.layout && l.layout["text-field"]; if (tf && JSON.stringify(tf).indexOf("name") >= 0) l.layout["text-field"] = ["coalesce", ["get", "name:latin"], ["get", "name_en"], ["get", "name"]]; }); return /-dim$/.test(nm) ? dimStyle(st) : st; }));
@@ -2673,7 +2677,7 @@ details.pgrp>summary::-webkit-details-marker{display:none}
         if (RMAP !== R) return;
         const map = new ml.Map({ container: box, style, bounds: FB(), fitBoundsOptions: { padding: 10 }, attributionControl: false, cooperativeGestures: true, locale: { "CooperativeGesturesHandler.WindowsHelpText": "กด Ctrl + เลื่อนเมาส์เพื่อซูมแผนที่", "CooperativeGesturesHandler.MacHelpText": "กด ⌘ + เลื่อนเมาส์เพื่อซูมแผนที่", "CooperativeGesturesHandler.MobileHelpText": "ใช้สองนิ้วเลื่อนแผนที่" } });
         R.map = map;
-        map.addControl(new ml.NavigationControl({ showCompass: false }), "top-right"); map.addControl(new ml.AttributionControl({ compact: true }), "bottom-right");
+        map.addControl(new ml.NavigationControl({ showCompass: false }), "top-right"); map.addControl(new ml.AttributionControl({ compact: true }), "bottom-right"); mlHideAttrib(map);
         try { new ResizeObserver(() => { map.resize(); }).observe(box); } catch (e) { }
         map.on("error", e => { try { if (R.el) R.el.dataset.err = (R.el.dataset.err || "") + String((e && e.error && e.error.message) || e).slice(0, 100) + "|"; } catch (x) { } });
         map.on("load", () => {
@@ -2706,7 +2710,7 @@ details.pgrp>summary::-webkit-details-marker{display:none}
         const box = el.querySelector(".igv"), b = new ml.LngLatBounds(); b.extend([J.home[1], J.home[0]]); J.seq.forEach(q => b.extend([q[1], q[0]]));
         const map = new ml.Map({ container: box, style, bounds: b, fitBoundsOptions: { padding: { top: 70, bottom: 50, left: 60, right: 60 }, maxZoom: 12 }, attributionControl: false, cooperativeGestures: true, locale: { "CooperativeGesturesHandler.WindowsHelpText": "กด Ctrl + เลื่อนเมาส์เพื่อซูมแผนที่", "CooperativeGesturesHandler.MacHelpText": "กด ⌘ + เลื่อนเมาส์เพื่อซูมแผนที่", "CooperativeGesturesHandler.MobileHelpText": "ใช้สองนิ้วเลื่อนแผนที่" } });
         MLINST.push(map);
-        map.addControl(new ml.NavigationControl({ showCompass: false }), "top-right"); map.addControl(new ml.AttributionControl({ compact: true }), "bottom-right");
+        map.addControl(new ml.NavigationControl({ showCompass: false }), "top-right"); map.addControl(new ml.AttributionControl({ compact: true }), "bottom-right"); mlHideAttrib(map);
         const rt = el.querySelector(".igrt2"), KEY = (la, lo) => (+la).toFixed(5) + "," + (+lo).toFixed(5), hk = KEY(J.home[0], J.home[1]), sk = J.seq.map(q => KEY(q[0], q[1]));
         const place = () => { const W = el.clientWidth, H = el.clientHeight, pins = [...el.querySelectorAll(".igpin[data-ll]")], MIN = W < 420 ? 26 : 34;
           const P = pins.map(p => { const [la, lo] = p.dataset.ll.split(",").map(Number), q = map.project([lo, la]); return [q.x, q.y]; }), O = P.map(q => q.slice());
@@ -2729,7 +2733,7 @@ details.pgrp>summary::-webkit-details-marker{display:none}
         const box = el.querySelector(".dmc"), b = new ml.LngLatBounds(); J.forEach(q => b.extend([q.lon, q.lat]));
         const map = new ml.Map({ container: box, style, bounds: b, fitBoundsOptions: { padding: 48, maxZoom: 15 }, attributionControl: false, cooperativeGestures: true, locale: { "CooperativeGesturesHandler.WindowsHelpText": "กด Ctrl + เลื่อนเมาส์เพื่อซูมแผนที่", "CooperativeGesturesHandler.MacHelpText": "กด ⌘ + เลื่อนเมาส์เพื่อซูมแผนที่", "CooperativeGesturesHandler.MobileHelpText": "ใช้สองนิ้วเลื่อนแผนที่" } });
         map.addControl(new ml.NavigationControl({ showCompass: false }), "top-right"); map.addControl(new ml.ScaleControl({ unit: "metric" }), "bottom-left");
-        map.addControl(new ml.AttributionControl({ compact: true }), "bottom-right");
+        map.addControl(new ml.AttributionControl({ compact: true }), "bottom-right"); mlHideAttrib(map);
         MLINST.push(map); window.__dmMaps = MLINST;
         try { new ResizeObserver(() => { map.resize(); }).observe(box); } catch (e) { }
         map.on("load", () => {
