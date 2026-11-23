@@ -28,7 +28,11 @@ async function query(code, ym, direct, market) {
   return { dep: String(best.departure_at).slice(0, 10), thb: Math.round(best.price), rows };
 }
 // top date pairs for one month: cheapest per (depart, return) pair, best 10
-const topPairs = (rows, pred) => { const m = new Map(); rows.filter(pred).forEach(x => { const k = String(x.departure_at).slice(0, 10) + "|" + String(x.return_at || "").slice(0, 10), v = { d: String(x.departure_at).slice(0, 10), r: x.return_at ? String(x.return_at).slice(0, 10) : null, p: Math.round(x.price), a: x.airline || null }; if (!m.has(k) || m.get(k).p > v.p) m.set(k, v); }); return [...m.values()].sort((a, b) => a.p - b.p).slice(0, 10); };
+const topPairs = (rows, pred) => { const m = new Map(); rows.filter(pred).forEach(x => { const k = String(x.departure_at).slice(0, 10) + "|" + String(x.return_at || "").slice(0, 10), v = { d: String(x.departure_at).slice(0, 10), r: x.return_at ? String(x.return_at).slice(0, 10) : null, p: Math.round(x.price), a: x.airline || null,
+      t1: String(x.departure_at).slice(11, 16) || null, t2: x.return_at ? String(x.return_at).slice(11, 16) : null, // local departure times (BKK out, Japan back)
+      m1: x.duration_to || null, m2: x.duration_back || null, // minutes door-to-door incl. layovers, each way
+      ap: x.destination_airport || null, fn: x.flight_number || null, s1: x.transfers == null ? null : x.transfers, s2: x.return_transfers == null ? null : x.return_transfers,
+      u: typeof x.link === "string" && x.link.startsWith("/") ? x.link.slice(0, 120) : null }; if (!m.has(k) || m.get(k).p > v.p) m.set(k, v); }); return [...m.values()].sort((a, b) => a.p - b.p).slice(0, 10); };
 const MONTHLY = {};
 async function fromTravelpayouts(code, ym) {
   let any = await query(code, ym, false); await sleep(400);
