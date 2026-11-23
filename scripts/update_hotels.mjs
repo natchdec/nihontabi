@@ -19,11 +19,17 @@ async function one(area, ym) {
   diag.calls++; const r = await fetch(u); if (!r.ok) { diag.errors++; throw new Error("HTTP " + r.status); }
   const j = await r.json(); if (j.error) { diag.errors++; throw new Error(String(j.error).slice(0, 100)); }
   const props = j.properties || []; if (props.length) diag.withProps++;
-  const prices = props.map(p => (p.rate_per_night && p.rate_per_night.extracted_lowest) || null).filter(v => typeof v === "number" && v >= 500 && v <= 200000).sort((a, b) => a - b);
+  const price = p => (p.rate_per_night && p.rate_per_night.extracted_lowest) || null;
+  const walk = p => { for (const np of (p.nearby_places || [])) { const w = (np.transportations || []).find(t => /walk/i.test(t.type || "")); if (w && np.name) return String(np.name).slice(0, 40) + "|" + String(w.duration || "").slice(0, 14); } return null; };
+  const list = props.map(p => ({ n: String(p.name || "").slice(0, 70), p: price(p), r: typeof p.overall_rating === "number" ? p.overall_rating : null, rv: typeof p.reviews === "number" ? p.reviews : null, c: p.extracted_hotel_class || (parseInt(p.hotel_class) || null), t: walk(p), u: typeof p.link === "string" ? p.link.slice(0, 200) : null, s: /sponsor|ad/i.test(String(p.type || "")) ? 1 : 0 })).filter(x => x.n && typeof x.p === "number" && x.p >= 500 && x.p <= 200000);
+  diag.rated = (diag.rated || 0) + list.filter(x => x.r != null).length; diag.walk = (diag.walk || 0) + list.filter(x => x.t).length; diag.classed = (diag.classed || 0) + list.filter(x => x.c).length; diag.props = (diag.props || 0) + list.length;
+  const prices = list.map(x => x.p).sort((a, b) => a - b);
   if (prices.length < 4) { diag.noPrice++; return null; }
-  return { low: prices[0], p25: pct(prices, .25), median: pct(prices, .5), n: prices.length, checkIn: iso(ci) };
+  const good = list.filter(x => x.r == null || x.r >= 4.0).sort((a, b) => a.p - b.p), rest = list.filter(x => !good.includes(x)).sort((a, b) => a.p - b.p), top = good.concat(rest).slice(0, 10);
+  return { low: prices[0], p25: pct(prices, .25), median: pct(prices, .5), n: prices.length, checkIn: iso(ci), top };
 }
 let out = { asOf: iso(today), hubs: {} }; try { out = JSON.parse(fs.readFileSync(FILE, "utf8")); out.asOf = iso(today); out.hubs = out.hubs || {}; } catch (e) { }
+out.area = AREA;
 for (const [hub, area] of Object.entries(AREA)) {
   for (const ym of months) {
     if (calls >= MAX_CALLS) break; calls++;
