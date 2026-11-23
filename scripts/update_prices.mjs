@@ -10,6 +10,9 @@ const today = new Date(); const iso = d => d.toISOString().slice(0, 10);
 const months = Array.from({ length: MONTHS_AHEAD }, (_, i) => { const d = new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth() + 1 + i, 1)); return d.toISOString().slice(0, 7); }); // from next month, rolling
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 
+// Thai passport = visa-free 15 days in Japan: keep only round trips that fit (arrive day 1 ... leave day 15 -> return at most 14 days after departure)
+const MAX_STAY_GAP = 14;
+const stayOk = x => { if (!x.return_at) return false; const g = (Date.parse(String(x.return_at).slice(0, 10)) - Date.parse(String(x.departure_at).slice(0, 10))) / 86400000; return g >= 1 && g <= MAX_STAY_GAP; };
 const diag = {};
 async function query(code, ym, direct, market) {
   const u = new URL("https://api.travelpayouts.com/aviasales/v3/prices_for_dates");
@@ -18,7 +21,7 @@ async function query(code, ym, direct, market) {
   Object.entries(q).forEach(([k, v]) => u.searchParams.set(k, v));
   const r = await fetch(u, { headers: { "Accept-Encoding": "gzip" } });
   if (!r.ok) throw new Error(`HTTP ${r.status}`);
-  const j = await r.json(); const rows = (j.data || []).filter(x => typeof x.price === "number" && x.price >= MIN_THB && x.price <= MAX_THB && x.departure_at);
+  const j = await r.json(); const rows = (j.data || []).filter(x => typeof x.price === "number" && x.price >= MIN_THB && x.price <= MAX_THB && x.departure_at && stayOk(x));
   const k = `${code}${direct ? "-direct" : ""}${market ? "-" + market : ""}`; (diag[k] = diag[k] || { calls: 0, rows: 0, success: j.success }).calls++; diag[k].rows += rows.length; if (j.error) diag[k].error = String(j.error).slice(0, 120);
   if (!rows.length) return null;
   const best = rows.reduce((a, b) => (b.price < a.price ? b : a));
