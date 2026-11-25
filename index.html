@@ -2795,7 +2795,7 @@ var E=window.__enDict("emb");if(E){["photos","pmon","events","dishes","xpass","p
       <div class="smv" data-init0="1"><div class="smc"></div></div>
       <div style="display:flex;flex-wrap:wrap;gap:10px;margin:8px 0;font-size:12.5px">${legend.map(([c, a, b]) => `<span>${seaIcon(S.sk, c, 16)}${tx(a, b)}</span>`).join("")}</div>
       <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:14px"><h3 style="margin:0;font-size:1em">${S.sall ? tx("ตารางเมืองทั้งญี่ปุ่น", "Whole-Japan city table") : tx("ตารางเมืองใกล้ฐานของฉัน", "Cities near my base")}</h3><button class="btn sm" data-act="sall">${S.sall ? tx("📍 กลับไปที่ฐานของฉัน", "📍 Back to my base") : tx("🗾 ดูทั้งญี่ปุ่น", "🗾 Show whole Japan")}</button></div><div id="seaTbl" style="margin-top:8px">${seaTable()}</div><p class="mp-note">${tx("ตำแหน่งเมืองเป็นจุดกลางคร่าวๆ", "City positions are approximate.")}</p></section>`;
-    return hubSec + nat + flowersCard(); }
+    return hubSec + nat + `<div id="flwrap">${flowersCard()}</div>`; }
   // short promo for the plans tab: what is in season / coming up for the current hub
   const seasonPromo = () => { if (!SEAS) return ""; const st = seaStation(HUBST[HB.id]); if (!st) return ""; const t = todayDoy(); let best = null;
     for (const k of ["sakura", "maple", "ginkgo"]) { const w = peakWin(st, k); if (!w) continue; let d = w[0] - t; if (d < -(w[1] - w[0])) d += 365; if (!best || d < best.d) best = { k, w, d }; }
@@ -4451,7 +4451,7 @@ ${apSteps()}</div></section>
     if (a === "tgopen") { const th = Math.round(+S.tgthr || 0); if (!(th >= 3000 && th <= 150000) || !TGC || !TGC.bot) return; window.open("https://t.me/" + TGC.bot + "?start=" + [HB.id, th, S.tgm || "any", S.tgd ? 1 : 0, LANG].join("_"), "_blank", "noopener"); return; }
     if (a === "skind") { S.sk = v; S.sdkind = null; return render(); }
     if (a === "sall") { S.sall = !S.sall; return render(); }
-    if (a === "fmon") { S.fm = +v; return render(); }
+    if (a === "fmon") { S.fm = +v; const w = document.getElementById("flwrap"); if (w) { w.innerHTML = flowersCard(); try { i18nApply(w); } catch (e) { } return; } return render(); }
     if (a === "seaplan") { S.month = v; S.mall = false; return go("pick"); }
     if (a === "pmap") { S.pmap = v; S.__fitOff = true; return render(); }
     if (a === "pcat" && HB.id !== "tokyo") { S.__fitOff = false; S.pcat = v; S.hpass = String(v).startsWith("p:") ? v.slice(2) : null; if (S.hpass) { const pv = passView(HB.id, S.hpass); if (pv) S.hmv = pv; } return render(); }
