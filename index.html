@@ -2654,7 +2654,7 @@ var E=window.__enDict("emb");if(E){["photos","pmon","events","dishes","xpass","p
   let LANG = (() => { try { return localStorage.getItem("jp:lang") === "en" ? "en" : "th"; } catch (e) { return "th"; } })();
   const tx = (th, en) => LANG === "en" ? en : th;
   setTimeout(() => { if (LANG === "en") i18nLoad(); }, 0);
-  setTimeout(() => { if (LANG !== "en") return; let tm = 0; try { new MutationObserver(() => { clearTimeout(tm); tm = setTimeout(() => { try { i18nShell(); } catch (e) { } }, 60); }).observe(document.body, { childList: true, subtree: true, characterData: true }); } catch (e) { } }, 0);
+  setTimeout(() => { if (LANG !== "en") return; let tm = 0; try { new MutationObserver(() => { clearTimeout(tm); tm = setTimeout(() => { try { i18nShell(); } catch (e) { } try { i18nApply(document.body); } catch (e) { } }, 60); }).observe(document.body, { childList: true, subtree: true, characterData: true }); } catch (e) { } }, 0);
   const THEME_KEY = "jp:theme";
   const themeMode = () => { try { const t = localStorage.getItem(THEME_KEY); return t === "light" || t === "dark" ? t : "auto"; } catch (e) { return "auto"; } };
   const isDark = () => { const t = document.documentElement.dataset.theme; return t ? t === "dark" : !!(window.matchMedia && matchMedia("(prefers-color-scheme: dark)").matches); };
@@ -3589,13 +3589,25 @@ ${apSteps()}</div></section>
        <p class="mp-note"><b>ถูกสุดโดยรวม:</b> ${E(hn(best[0].h))} ${nm(best[0].k)} ${thb(best[0].thb)}${best[1] ? " · รองลงมา " + E(hn(best[1].h)) + " " + nm(best[1].k) + " " + thb(best[1].thb) : ""}${tip ? "<br>" + tip : ""}<br>* เซนไดไม่มีตั๋วบินตรงในข้อมูล ใช้ราคาบินถึงโตเกียวแล้วต่อชินคันเซ็น ราคาแคชจากการค้นหา ไม่ใช่ราคาตอนจอง</p>`, 0); };
   // ---------- English mode: UI strings come from data/i18n_en.json (Thai UI text -> English; numbers kept). Plan/stop descriptions that are data stay in Thai.
   let I18N = null, I18N_LOAD = false;
-  const i18nLoad = () => { if (I18N || I18N_LOAD) return; I18N_LOAD = true; fetch("data/i18n_en.json").then(r => r.ok ? r.json() : null).then(j => { I18N = j || {}; draw(); i18nShell(); }).catch(() => { I18N = {}; }); };
+  const i18nLoad = () => { if (I18N || I18N_LOAD) return; I18N_LOAD = true; Promise.all([fetch("data/i18n_en.json").then(r => r.ok ? r.json() : null), fetch("data/en/tpl.json").then(r => r.ok ? r.json() : null).catch(() => null)]).then(([j, t]) => { I18N = j || {}; if (Array.isArray(t)) tplBuild(t); draw(); i18nShell(); }).catch(() => { I18N = {}; }); };
   const THAI = /[\u0E00-\u0E3E\u0E40-\u0E7F]/;
-  const i18nOne = raw => { if (!I18N || !THAI.test(raw)) return null; const nums = [], key = raw.replace(/\d[\d,.]*/g, m => { nums.push(m); return "#"; });
+  // template matching for strings composed in code ("แผน {0} วัน ฐาน {1}" ...): data/en/tpl.json = [[thai template with {n}, english template], ...]
+  let TPLS = [], TPLF = [];
+  const tplEsc = x => x.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const tplBuild = arr => { TPLS = []; TPLF = []; arr.forEach(([th, en]) => { const t = String(th).replace(/\s+/g, " ").trim(); if (!t || !en) return; if (!/\{\d+\}/.test(t)) { if (t.length >= 4) TPLF.push([t, String(en).replace(/\s+/g, " ").trim()]); return; }
+      const parts = t.split(/\{\d+\}/), anchor = parts.filter(p => THAI.test(p)).sort((a, b) => b.length - a.length)[0]; if (!anchor) return; const idx = (t.match(/\{(\d+)\}/g) || []).map(m => +m.slice(1, -1));
+      let re; try { re = new RegExp("^" + parts.map(tplEsc).join("([\\s\\S]*?)") + "$"); } catch (e) { return; } TPLS.push({ re, anchor, idx, en: String(en).replace(/\s+/g, " ").trim(), n: parts.join("").length }); });
+    TPLS.sort((a, b) => b.n - a.n); TPLF.sort((a, b) => b[0].length - a[0].length); };
+  const TPLC = new Map();
+  const tplOne = (core, depth) => { if (depth > 3 || !THAI.test(core)) return null; if (TPLC.has(core)) return TPLC.get(core); let res = null;
+    for (const t of TPLS) { if (core.indexOf(t.anchor) < 0) continue; const m = t.re.exec(core); if (!m) continue; res = t.en.replace(/\{(\d+)\}/g, (_, k) => { const pos = t.idx.indexOf(+k); const v = pos >= 0 ? m[pos + 1] : ""; return i18nOne(v, depth + 1) ?? v; }); break; }
+    if (res == null) { let x = core, hit = false; for (const [th, en] of TPLF) { if (x.indexOf(th) >= 0) { x = x.split(th).join(" " + en + " "); hit = true; } } x = x.replace(/\s+/g, " ").trim(); if (hit && !THAI.test(x)) res = x; }
+    TPLC.set(core, res); return res; };
+  const i18nOne = (raw, depth = 0) => { if (!I18N || !THAI.test(raw)) return null; const nums = [], key = raw.replace(/\d[\d,.]*/g, m => { nums.push(m); return "#"; });
     let v = I18N[key]; if (v == null && key.length > 2) { const parts = key.split(/(\s·\s|\s\/\s|:\s|\s–\s|\s—\s)/); if (parts.length > 1) { let any = false, out = parts.map(x => { if (!THAI.test(x)) return x; const t = I18N[x.trim()]; if (t == null) return x; any = true; return x.replace(x.trim(), t); }).join(""); if (any) v = out; } }
-    if (v == null) return null; let i = 0; return v.replace(/#/g, () => (i < nums.length ? nums[i++] : "#")); };
+    if (v == null || THAI.test(v)) { const c = raw.replace(/\s+/g, " ").trim(), r = TPLS.length || TPLF.length ? tplOne(c, depth) : null; if (r != null && (v == null || !THAI.test(r))) return r; if (v == null) return null; } let i = 0; return v.replace(/#/g, () => (i < nums.length ? nums[i++] : "#")); };
   const i18nApply = root => { if (!I18N || LANG !== "en") return; const w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, { acceptNode: n => n.parentNode && !/^(SCRIPT|STYLE|TEXTAREA)$/.test(n.parentNode.nodeName) && THAI.test(n.nodeValue) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT }), nodes = []; while (w.nextNode()) nodes.push(w.currentNode);
-    nodes.forEach(n => { const raw = n.nodeValue, lead = raw.match(/^\s*/)[0], trail = raw.match(/\s*$/)[0], core = raw.trim().replace(/\s+/g, " "), t = i18nOne(core); if (t != null) { if (!n.__th) n.__th = raw; n.nodeValue = lead + t + trail; } });
+    nodes.forEach(n => { try { const raw = n.nodeValue, lead = raw.match(/^\s*/)[0], trail = raw.match(/\s*$/)[0], core = raw.trim().replace(/\s+/g, " "), t = i18nOne(core); if (t != null) { if (!n.__th) n.__th = raw; n.nodeValue = lead + t + trail; } } catch (e) { } });
     root.querySelectorAll("[placeholder],[title],[aria-label]").forEach(e => { for (const a of ["placeholder", "title", "aria-label"]) { const v = e.getAttribute(a); if (v && THAI.test(v)) { const t = i18nOne(v.replace(/\s+/g, " ").trim()); if (t != null) { if (!e.hasAttribute("data-th-" + a)) e.setAttribute("data-th-" + a, v); e.setAttribute(a, t); } } } }); };
   // static shell (tab bar, modals, header): translated in place; the Thai original is kept so the language can be switched back
   const i18nShell = () => { const roots = [document.body]; roots.forEach(r => { const w = document.createTreeWalker(r, NodeFilter.SHOW_TEXT, { acceptNode: n => n.parentNode && !/^(SCRIPT|STYLE|TEXTAREA)$/.test(n.parentNode.nodeName) && !(n.parentNode.closest && n.parentNode.closest("#app,#printRoot,script")) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT }), nodes = []; while (w.nextNode()) nodes.push(w.currentNode);
