@@ -4181,10 +4181,11 @@ ${apSteps()}</div></section>
         <dl class="facts">
           <div><dt>จำนวนวัน</dt><dd class="big">${days.length} วัน</dd></div>
           <div><dt>ค่าเดินทาง / ผู้ใหญ่</dt><dd class="big">${yen(p.transportBudget?.adultJPY)}${days.length !== 6 ? ` <small style="font-weight:400;font-size:11px">ประมาณจากแพลน 6 วัน</small>` : ""}</dd></div>
+          <div class="wide"><dt>เหมาะกับ</dt><dd>${E(p.who)}</dd></div>
+          <div class="wide"><dt>วันไหนใช้ Pass / วันไหนไม่ต้องใช้</dt><dd>${passSummary(days)}</dd></div>
+          <div class="wide"><dt>ฤดูที่ดีที่สุด</dt><dd>${E(p.bestSeason)}</dd></div>
+          ${p.april ? `<div class="wide"><dt>${esc("เดือนเมษายน " + starStr(p.april.stars))}</dt><dd><b>${E(p.april.verdict)}</b><br>${E(p.april.bloom)}<br><span class="sub">${E(p.april.tips)}</span></dd></div>` : ""}
         </dl>
-        <div class="flines">${(() => { const plain = h => String(h).replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim(), fl = (k, s, f2) => `<details class="fline"><summary><span class="k">${k}</span><span class="v">${s}</span></summary>${f2 ? `<div class="more">${f2}</div>` : ""}</details>`, ps = passSummary(days);
-          return fl(tx("เหมาะกับ", "Best for"), E(p.who), "") + fl(tx("วันไหนใช้ Pass", "Pass days"), E(plain(ps)), ps) + fl(tx("ฤดูที่ดีที่สุด", "Best season"), E(p.bestSeason), "")
-            + (p.april ? fl(esc("เดือนเมษายน " + starStr(p.april.stars)), `<b>${E(p.april.verdict)}</b>`, `${E(p.april.bloom)}<br><span class="sub">${E(p.april.tips)}</span>`) : ""); })()}</div>
         <div class="actions">${lenCtl()}<button class="btn" data-act="tab" data-tab="pick">${ic("left","sm")}เปลี่ยนแพลน</button><button class="btn pri" data-act="useplan" data-id="${esc(p.id)}">ใช้แพลนนี้เป็นทริปของฉัน</button><button class="btn" data-act="shareplan">แชร์ลิงก์แพลนนี้</button><button class="btn" data-act="copyplan">คัดลอกสรุป (วางใน LINE)</button><button class="btn" data-act="printpage" data-v="short" title="ข้อความย่อ ประหยัดหน้ากระดาษ">พิมพ์/PDF แบบย่อ</button><button class="btn" data-act="printpage" data-v="full" title="มีรูปประกอบแต่ละจุดและรายละเอียดครบ">พิมพ์/PDF แบบเต็ม (มีรูป)</button></div>
       </div></header>
       ${ptabBar}
