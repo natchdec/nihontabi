@@ -3496,7 +3496,7 @@ ${apSteps()}</div></section>
         const strip = `<div class="stripw"><button type="button" class="sn l" data-act="stripgo" data-v="-1" aria-label="ก่อนหน้า">‹</button><button type="button" class="sn r" data-act="stripgo" data-v="1" aria-label="ถัดไป">›</button><div class="strip rv" style="--i:3" role="tablist" aria-label="ดูแผนรายวัน">${TRIP.days.map((d, i) => `<button class="dchip" aria-current="${i === S.tday}" data-act="viewday" data-v="${i}"><b>D${i + 1}</b><span>${E(pickOf(d).title)}</span>${passBadge2(modDay(pickOf(d)))}</button>`).join("")}</div></div>`;
         if (tb === "money") return bar + tripBudget() + ticketRecCard(td.map(x => ({ id: x.mid }))) + mixCard(td.map(x => x.mid)) + sec(`${ic("ticket", "sm")} วันไหนใช้ Pass / วันไหนไม่ต้องใช้`, "", `<p style="margin:0">${passSummary(td)}</p>`, 4) + passCard() + budgetCard();
         if (tb === "prep") return bar + packCard() + prepCard() + tripWarnsCard() + tripSourcesCard() + fold("ส่งออกและแชร์", "ปฏิทิน · Google Maps · ส่งเพื่อน", tripExport() + mapsCard() + icsCard("icstrip")) + checklistCard();
-        return bar + editSec + strip + tripDayDetail() + hubCard(td.map(x => Object.assign({}, x, { mod: x.mid })), "") + (infoTrip(td) || overviewCard(td)); })();
+        return bar + editSec + (infoTrip(td) || overviewCard(td)) + strip + hubCard(td.map(x => Object.assign({}, x, { mod: x.mid })), "") + tripDayDetail(); })();
   }
 
   const tripTools = () => [{ name: "set_trip_day", description: "เปลี่ยนเมือง/ตัวเลือกของหนึ่งวันในทริปของฉัน (planId mytrip) mode=replace แทนที่ตัวเลือกที่เลือกอยู่ด้วย moduleId, addOption เพิ่มเป็นตัวเลือกให้แยกกลุ่ม, remove เอา moduleId ออกจากวัน, newDay (dayN=0) เพิ่มเป็นวันใหม่ moduleId ต้องเป็น id จากรายการเมืองในแอปเท่านั้น",
@@ -4189,6 +4189,8 @@ ${apSteps()}</div></section>
       </div></header>
       ${ptabBar}
       ${pt === "days" ? `
+      ${hubCard(days, "")}
+      ${infoTrip(days)}
       <div class="stripw"><button type="button" class="sn l" data-act="stripgo" data-v="-1" aria-label="ก่อนหน้า">‹</button><button type="button" class="sn r" data-act="stripgo" data-v="1" aria-label="ถัดไป">›</button><div class="strip rv" style="--i:1" role="tablist" aria-label="เลือกวัน">${dayChips}</div></div>
       <header class="dh glass rv" style="--i:2">
         <div class="label"><span class="dnum">DAY ${S.day + 1}</span>${E(d.area)}${d.optional ? ` · <span class="tag warn">ตัดได้ถ้าไป 5 วัน</span>` : ""}${d.aiEdited ? ` · <span class="tag shu">${d.userEdited ? "ปรับเอง" : "แก้ด้วย AI"}</span> <button class="btn sm" data-act="resetday" data-v="${esc(d.n)}">คืนค่าเดิม</button>` : ""}</div>
@@ -4207,21 +4209,19 @@ ${apSteps()}</div></section>
           ${farSuggest(d) ? `<div class="note"><span>ที่นอน</span><p>${E(farSuggest(d))}</p></div>` : ""}
         </div>
       </header>
-      <ol class="tline glass">${stopsHtml(d, !d.extra)}</ol>
-      ${dayEditPanel(p, d)}
       ${dayMap(d)}
       ${dayRouteBtn(d)}
+      <ol class="tline glass">${stopsHtml(d, !d.extra)}</ol>
+      ${dayEditPanel(p, d)}
       ${(d.eats || []).length ? sec(`${ic("bowl","sm")} กินอะไรดีวันนี้`, "", (d.eats || []).map(eatItem).join(""), 4) : ""}
       ${eventsSec(d.mod)}
       <div class="pager">${S.day > 0 ? `<button class="btn" data-act="day" data-v="${S.day - 1}">${ic("left","sm")}D${S.day}</button>` : "<span></span>"}${S.day < days.length - 1 ? `<button class="btn" data-act="day" data-v="${S.day + 1}">D${S.day + 2}${ic("chev","sm")}</button>` : ""}</div>
-      ${p.auto ? apBanner() : ""}
-      ${infoTrip(days)}
 ` : ""}
       ${pt === "money" ? `
       ${passPlanCard(p, days)}
       ${passes ? sec(`${ic("train","sm")} Pass และตั๋ว`, "", `<ul class="xl">${passes}</ul>${p.transportBudget?.note ? `<p class="sub" style="margin:10px 0 0;font-size:13px;color:var(--ink-2);white-space:pre-line">${E(p.transportBudget.note)}</p>` : ""}`, 5) : ""}
       ${planWinCard(p)}
-      ${p.auto ? "" : mixCard(days.map(d => modOfDay(d)))}
+      ${p.auto ? apBanner() : mixCard(days.map(d => modOfDay(d)))}
       ${planBudgetCard(p, days)}
 ` : ""}
       ${pt === "prep" ? `
@@ -4230,7 +4230,6 @@ ${apSteps()}</div></section>
       ${planSources(p, days)}
 ` : ""}
       ${pt === "stay" ? `
-      ${hubCard(days, "")}
       ${bases ? sec(`${ic("bed","sm")} ที่พัก`, "", `<ul class="xl">${bases}</ul>${affNote()}`, 6) : ""}
 ` : ""}`;
   }
