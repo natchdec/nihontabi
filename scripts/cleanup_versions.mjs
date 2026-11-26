@@ -1,6 +1,6 @@
 // Delete old Firebase Hosting versions (keeps the live version + the newest KEEP). Needs env SA = service-account JSON.
 import crypto from "node:crypto";
-const KEEP = 3, SITES = ["nihontabi", "nihontabi-63523"], B = "https://firebasehosting.googleapis.com/v1beta1/";
+const KEEP = 2, SITES = ["nihontabi", "nihontabi-63523"], B = "https://firebasehosting.googleapis.com/v1beta1/";
 const sa = JSON.parse(process.env.SA || "{}"); if (!sa.private_key) { console.log("no SA, skip"); process.exit(0); }
 const b64 = o => Buffer.from(typeof o === "string" ? o : JSON.stringify(o)).toString("base64url"), now = Math.floor(Date.now() / 1000);
 const hdr = b64({ alg: "RS256", typ: "JWT" }), cl = b64({ iss: sa.client_email, scope: "https://www.googleapis.com/auth/cloud-platform", aud: "https://oauth2.googleapis.com/token", iat: now, exp: now + 3000 });
