@@ -4077,7 +4077,7 @@ ${apSteps()}</div></section>
   }
   const DISH = JSON.parse(document.getElementById("dishes").textContent);
   const AT_W = 1280, AT_H = 1000, AT_TW = 320, AT_TH = 200;
-  const atStyle = (at, w, h) => { const sc = Math.max(w / AT_TW, h / AT_TH); return `background-image:url(img/dishatlas${at[0]}.jpg);background-size:${(AT_W * sc).toFixed(1)}px ${(AT_H * sc).toFixed(1)}px;background-position:${(-(at[1] * sc) - (AT_TW * sc - w) / 2).toFixed(1)}px ${(-(at[2] * sc) - (AT_TH * sc - h) / 2).toFixed(1)}px`; };
+  const atStyle = (at, w, h) => { const sc = Math.max(w / AT_TW, h / AT_TH); return `background-image:url(img/dishatlas${at[0]}.webp);background-size:${(AT_W * sc).toFixed(1)}px ${(AT_H * sc).toFixed(1)}px;background-position:${(-(at[1] * sc) - (AT_TW * sc - w) / 2).toFixed(1)}px ${(-(at[2] * sc) - (AT_TH * sc - h) / 2).toFixed(1)}px`; };
   const DISH_RE = (DISH.r || []).map(r => { try { return { k: r.k, re: new RegExp(r.re, "i") }; } catch (x) { return null; } }).filter(Boolean);
   const dishOf = e => { const t = (e.name || "") + " " + (e.what || ""); const r = DISH_RE.find(x => x.re.test(t)); return r ? Object.assign({ _k: r.k }, DISH.d[r.k]) : null; };
   function eatItem(e) {
