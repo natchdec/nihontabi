@@ -1,0 +1,30 @@
+name: smoke-test
+# Opens every hub in headless Chrome, walks every tab and sub-tab, and fails on JS errors or missing images/data files.
+# Runs when the site files change. It does not block the daily price/deploy workflow; a red run is the warning.
+on:
+  push:
+    branches: [main]
+    paths:
+      - "index.html"
+      - "sw.js"
+      - "data/**"
+      - "img/**"
+      - "scripts/smoke_test.mjs"
+      - ".github/workflows/smoke.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20 }
+      - name: Install puppeteer-core (no browser download; the runner already has Chrome)
+        run: npm install --no-save --no-audit --no-fund puppeteer-core@23.11.1
+      - name: Run smoke test
+        env:
+          CHROME_PATH: /usr/bin/google-chrome
+        run: node scripts/smoke_test.mjs
